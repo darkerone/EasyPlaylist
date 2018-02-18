@@ -39,6 +39,11 @@ namespace EasyPlaylist.ViewModels
             return folderCopy;
         }
 
+        public void RemoveItem(MenuItemViewModel menuItemVM)
+        {
+
+        }
+
         /// <summary>
         /// Créé le dossier au chemin passé en paramètre avec son titre personnalisé
         /// </summary>

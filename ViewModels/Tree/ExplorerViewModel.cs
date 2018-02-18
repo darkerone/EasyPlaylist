@@ -6,20 +6,64 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace EasyPlaylist.ViewModels
 {
     class ExplorerViewModel : IExplorer
     {
+        private FolderViewModel _rootFolder;
+        private MenuItemViewModel _selectedItem;
+
+        #region Properties
+
         public FolderViewModel RootFolder { get; set; }
+        //{
+        //    get { return _rootFolder; }
+        //    set
+        //    {
+        //        _rootFolder = value;
+        //        RaisePropertyChanged("RootFolder");
+        //    }
+        //}
 
         public MenuItemViewModel SelectedItem { get; set; }
+        //{
+        //    get { return _selectedItem; }
+        //    set
+        //    {
+        //        _selectedItem = value;
+        //        RaisePropertyChanged("SelectedItem");
+        //    }
+        //}
+
+        #endregion
 
         public ExplorerViewModel()
         {
             RootFolder = new FolderViewModel(null, "Root");
         }
+
+        #region Commands
+
+        public ICommand RemoveSelectedItem
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    if(SelectedItem != null)
+                    {
+                        RemoveMenuItem(SelectedItem);
+                    }
+                });
+            }
+        }
+
+        #endregion
+
+        #region Public methods
 
         public void AddMenuItem(MenuItemViewModel itemsToAdd)
         {
@@ -38,12 +82,36 @@ namespace EasyPlaylist.ViewModels
             else
             {
                 // On ajoute les éléments au dossier parent de l'élément sélectionné
-                FolderViewModel folderWhereAdd = GetParentFolderList(SelectedItem);
+                FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
                 folderWhereAdd.Items.AddRange(itemsToAdd);
             }
         }
 
-        private FolderViewModel GetParentFolderList(MenuItemViewModel menuItemVM)
+        public void RemoveMenuItem(MenuItemViewModel itemToRemove)
+        {
+            RemoveMenuItems(new List<MenuItemViewModel>() { itemToRemove });
+        }
+
+        public void RemoveMenuItems(List<MenuItemViewModel> itemsToRemove)
+        {
+            foreach(MenuItemViewModel itemToRemove in itemsToRemove)
+            {
+                // On retire les éléments au dossier parent de l'élément sélectionné
+                FolderViewModel folderWhereAdd = GetFirstParentFolder(itemToRemove);
+                folderWhereAdd.RemoveItem(itemToRemove);
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// Renvoie le dossier contenant l'élément passé en paramètre
+        /// </summary>
+        /// <param name="menuItemVM"></param>
+        /// <returns></returns>
+        private FolderViewModel GetFirstParentFolder(MenuItemViewModel menuItemVM)
         {
             List<FolderViewModel> allContainerFolders = SearchAllFoldersContainingMenuItem(menuItemVM, RootFolder);
 
@@ -55,6 +123,12 @@ namespace EasyPlaylist.ViewModels
             return RootFolder;
         }
 
+        /// <summary>
+        /// Renvoie tous les dossiers contenant l'élément passé en paramètre
+        /// </summary>
+        /// <param name="menuItemVM">Eléméent à rechercher</param>
+        /// <param name="folderVM">Dossier où l'on fait la recherche</param>
+        /// <returns></returns>
         private List<FolderViewModel> SearchAllFoldersContainingMenuItem(MenuItemViewModel menuItemVM, FolderViewModel folderVM)
         {
             List<FolderViewModel> containerFolders = new List<FolderViewModel>();
@@ -63,12 +137,14 @@ namespace EasyPlaylist.ViewModels
                 containerFolders.Add(folderVM);
             }
 
-            foreach(FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
+            foreach (FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
             {
                 containerFolders.AddRange(SearchAllFoldersContainingMenuItem(menuItemVM, subFolder));
             }
 
             return containerFolders;
         }
+
+        #endregion
     }
 }

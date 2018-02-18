@@ -6,66 +6,26 @@
              xmlns:local="clr-namespace:EasyPlaylist.Views"
              xmlns:vm="clr-namespace:EasyPlaylist.ViewModels"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:prism="http://prismlibrary.com/"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <telerik:RadTreeListView 
-            x:Name="MenuTreeList" 
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Content="Expand all" Command="{Binding ExpandAll}"></Button>
+            <Button Content="Remove selected" Command="{Binding RemoveSelectedItem}"></Button>
+        </StackPanel>
+        <telerik:RadTreeView 
+            x:Name="ExplorerTreeView"
             ItemsSource="{Binding RootFolder.Items}" 
             SelectionMode="Single" 
             SelectedItem="{Binding SelectedItem}"
-            AutoGenerateColumns="False">
-            <telerik:RadTreeListView.ChildTableDefinitions>
-                <telerik:TreeListViewTableDefinition ItemsSource="{Binding Items}"/>
-            </telerik:RadTreeListView.ChildTableDefinitions>
-            <telerik:RadTreeListView.Columns>
-                <telerik:GridViewDataColumn DataMemberBinding="{Binding Title}" Header="Title" />
-            </telerik:RadTreeListView.Columns>
-        </telerik:RadTreeListView>
-        <!--<TreeView ItemsSource="{Binding Items}" Margin="10" AllowDrop="True">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Items}" DataType="{x:Type vm:MenuItemViewModel}">
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox ></CheckBox>
-                        <TextBlock Text="{Binding Title}"/>
-                    </StackPanel>
+            IsDragDropEnabled="True">
+            <telerik:RadTreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+                    <TextBlock Text="{Binding Title}" />
                 </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>-->
-        
-        <!--<TreeView x:Name="treeviewList"  ItemsSource="{Binding Items}">
-            <TreeView.ItemTemplate>
-                <DataTemplate>
-                    <TreeViewItem  ItemsSource="{Binding Items}">
-                        <TreeViewItem.Header>
-                            <Grid Width="350">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"></ColumnDefinition>
-                                    <ColumnDefinition Width="Auto" MinWidth="50"></ColumnDefinition>
-                                    <ColumnDefinition ></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0"/>
-                                <TextBlock Text="{Binding Title}" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Grid.Column="1"/>
-                                <TextBlock Text="{Binding Title}" HorizontalAlignment="Left"  VerticalAlignment="Center"  Grid.Column="2"/>
-                            </Grid>
-                        </TreeViewItem.Header>
-                        <TreeViewItem.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="-20,0,0,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="100"></ColumnDefinition>
-                                        <ColumnDefinition Width="Auto" MinWidth="50"></ColumnDefinition>
-                                        <ColumnDefinition></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Title}" Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0"/>
-                                    <TextBlock Text="{Binding Title}" Margin="10,0,10,0" HorizontalAlignment="Left" VerticalAlignment="Center"  Grid.Column="1"/>
-                                    <TextBlock Text="{Binding Title}" HorizontalAlignment="Left" VerticalAlignment="Center"  Grid.Column="2"/>
-                                </Grid>
-                            </DataTemplate>
-                        </TreeViewItem.ItemTemplate>
-                    </TreeViewItem>
-                </DataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>-->
-    </Grid>
+            </telerik:RadTreeView.ItemTemplate>
+        </telerik:RadTreeView>
+    </DockPanel>
 </UserControl>
