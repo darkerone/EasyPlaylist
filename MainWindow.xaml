@@ -6,26 +6,35 @@
         xmlns:local="clr-namespace:EasyPlaylist"
         xmlns:controls="clr-namespace:EasyPlaylist.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <DockPanel>
-        <controls:ExplorerView DockPanel.Dock="Left" MinWidth="200" DataContext="{Binding Explorer}"></controls:ExplorerView>
-        <StackPanel>
+        Title="MainWindow" Height="700" Width="1050">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
 
-            <TextBox Text="{Binding Music.Name}" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
-            <TextBox Text="{Binding Music.PathNameExtension}" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBox>
-            <TreeView>
-                <TreeViewItem Header="North America">
-                    <TreeViewItem Header="USA"></TreeViewItem>
-                    <TreeViewItem Header="Canada"></TreeViewItem>
-                    <TreeViewItem Header="Mexico"></TreeViewItem>
-                </TreeViewItem>
-                <TreeViewItem Header="South America">
-                    <TreeViewItem Header="Argentina"></TreeViewItem>
-                    <TreeViewItem Header="Brazil"></TreeViewItem>
-                    <TreeViewItem Header="Uruguay"></TreeViewItem>
-                </TreeViewItem>
-            </TreeView>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Content="Browse" Command="{Binding Browse}"></Button>
+            <Button Content="Add to playlist" Command="{Binding AddToPlaylist}"></Button>
+            <Button Content="Add folder to playlist" Command="{Binding AddFolderToPlaylist}"></Button>
+            <Button Content="Save playlist" Command="{Binding SavePlaylist}"></Button>
+            <Button Content="Export playlist" Command="{Binding ExportPlaylist}"></Button>
         </StackPanel>
-    </DockPanel>
+        
+        <controls:ExplorerView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:ExplorerView>
+        <GridSplitter 
+            Grid.Row="1"
+            Grid.Column="1" 
+            HorizontalAlignment="Right" 
+            VerticalAlignment="Stretch"
+            ResizeBehavior="PreviousAndNext"
+            Width="5" Background="#FFBCBCBC"/>
+        <controls:ExplorerView Grid.Row="1" Grid.Column="2" DataContext="{Binding Playlist}"></controls:ExplorerView>
+    </Grid>
     
 </Window>

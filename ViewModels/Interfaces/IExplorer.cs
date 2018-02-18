@@ -9,6 +9,5 @@ namespace EasyPlaylist.ViewModels.Interfaces
 {
     interface IExplorer
     {
-        ObservableCollection<MenuItemViewModel> Items { get; set; }
     }
 }

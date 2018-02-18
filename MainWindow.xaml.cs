@@ -1,4 +1,5 @@
 ﻿using EasyPlaylist.ViewModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,61 +29,28 @@ namespace EasyPlaylist.Views
         {
             InitializeComponent();
 
-            mainViewModel = new MainViewModel()
-            {
-                Music = new MusicViewModel()
-                {
-                    Name = "baba"
-                },
-            };
+            ExplorerViewModel playlist = new ExplorerViewModel();
 
-            mainViewModel.Explorer = new ExplorerViewModel()
+            // Récupère la playlist sauvegardée
+            if (System.IO.File.Exists(@"Playlist.txt"))
             {
-                Items = new ObservableCollection<MenuItemViewModel>()
-                    {
-                        new FolderViewModel()
-                        {
-                            Title = "1",
-                            Items = new ObservableCollection<MenuItemViewModel>()
-                            {
-                                new MenuItemViewModel()
-                                {
-                                    Title = "11"
-                                },
-                                new MenuItemViewModel()
-                                {
-                                    Title = "12"
-                                }
-                            }
-                        },
-                        new FolderViewModel()
-                        {
-                            Title = "2",
-                            Items = new ObservableCollection<MenuItemViewModel>()
-                            {
-                                new FolderViewModel()
-                                {
-                                    Title = "21",
-                                    Items = new ObservableCollection<MenuItemViewModel>
-                                    {
-                                        new FileViewModel
-                                        {
-                                            Title = "211"
-                                        } 
-                                    }
-                                },
-                                new FileViewModel()
-                                {
-                                    Title = "22"
-                                }
-                            }
-                        },
-                        new MenuItemViewModel()
-                        {
-                            Title = "3"
-                        }
-                    }
-            };
+                string json = System.IO.File.ReadAllText(@"Playlist.txt");
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All
+                };
+                playlist = JsonConvert.DeserializeObject<ExplorerViewModel>(json, jsonSerializerSettings);
+            }
+
+            mainViewModel = new MainViewModel(playlist);
+
+            mainViewModel.Explorer = new ExplorerViewModel();
+            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            // Récupère le dossier et ses sous dossiers et fichiers
+            FolderViewModel musicFolder = mainViewModel.GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
+            mainViewModel.Explorer.AddMenuItems(musicFolder.Items.ToList());
+
+            
 
             DataContext = mainViewModel;
         }

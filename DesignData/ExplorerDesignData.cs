@@ -15,32 +15,32 @@ namespace EasyPlaylist.DesignData
 
         public ExplorerDesignData()
         {
-            Items =  new ObservableCollection<MenuItemViewModel>()
-            {
-                new FolderViewModel()
-                {
-                    Title = "aaa",
-                    Items = new ObservableCollection<MenuItemViewModel>()
-                    {
-                        new MenuItemViewModel()
-                        {
-                            Title = "aaa1"
-                        },
-                        new MenuItemViewModel()
-                        {
-                            Title = "aaa2"
-                        }
-                    }
-                },
-                new MenuItemViewModel()
-                {
-                    Title = "bbb"
-                },
-                new MenuItemViewModel()
-                {
-                    Title = "ccc"
-                } 
-            };
+            //Items =  new ObservableCollection<MenuItemViewModel>()
+            //{
+            //    new FolderViewModel()
+            //    {
+            //        Title = "aaa",
+            //        Items = new ObservableCollection<MenuItemViewModel>()
+            //        {
+            //            new MenuItemViewModel()
+            //            {
+            //                Title = "aaa1"
+            //            },
+            //            new MenuItemViewModel()
+            //            {
+            //                Title = "aaa2"
+            //            }
+            //        }
+            //    },
+            //    new MenuItemViewModel()
+            //    {
+            //        Title = "bbb"
+            //    },
+            //    new MenuItemViewModel()
+            //    {
+            //        Title = "ccc"
+            //    } 
+            //};
         }
     }
 }

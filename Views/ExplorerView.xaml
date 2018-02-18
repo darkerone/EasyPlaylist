@@ -5,20 +5,35 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EasyPlaylist.Views"
              xmlns:vm="clr-namespace:EasyPlaylist.ViewModels"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
+        <telerik:RadTreeListView 
+            x:Name="MenuTreeList" 
+            ItemsSource="{Binding RootFolder.Items}" 
+            SelectionMode="Single" 
+            SelectedItem="{Binding SelectedItem}"
+            AutoGenerateColumns="False">
+            <telerik:RadTreeListView.ChildTableDefinitions>
+                <telerik:TreeListViewTableDefinition ItemsSource="{Binding Items}"/>
+            </telerik:RadTreeListView.ChildTableDefinitions>
+            <telerik:RadTreeListView.Columns>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Title}" Header="Title" />
+            </telerik:RadTreeListView.Columns>
+        </telerik:RadTreeListView>
         <!--<TreeView ItemsSource="{Binding Items}" Margin="10" AllowDrop="True">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Items}" DataType="{x:Type vm:MenuItemViewModel}">
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox></CheckBox>
+                        <CheckBox ></CheckBox>
                         <TextBlock Text="{Binding Title}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>-->
-        <TreeView x:Name="treeviewList"  ItemsSource="{Binding Items}">
+        
+        <!--<TreeView x:Name="treeviewList"  ItemsSource="{Binding Items}">
             <TreeView.ItemTemplate>
                 <DataTemplate>
                     <TreeViewItem  ItemsSource="{Binding Items}">
@@ -51,6 +66,6 @@
                     </TreeViewItem>
                 </DataTemplate>
             </TreeView.ItemTemplate>
-        </TreeView>
+        </TreeView>-->
     </Grid>
 </UserControl>
