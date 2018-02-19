@@ -76,7 +76,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\Prism.Wpf.6.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -95,34 +98,36 @@
       <HintPath>packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Controls, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Controls.dll</HintPath>
+    <Reference Include="Telerik.Windows.Controls, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Controls.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Controls.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Controls.Data, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Controls.Data.dll</HintPath>
+    <Reference Include="Telerik.Windows.Controls.Data, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Controls.Data.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Controls.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Controls.GridView, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Controls.GridView.dll</HintPath>
+    <Reference Include="Telerik.Windows.Controls.GridView, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Controls.GridView.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Controls.GridView.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Controls.Input, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Controls.Input.dll</HintPath>
+    <Reference Include="Telerik.Windows.Controls.Input, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Controls.Input.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Controls.Input.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Controls.Navigation, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Controls.Navigation.dll</HintPath>
+    <Reference Include="Telerik.Windows.Controls.Navigation, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Controls.Navigation.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Controls.Navigation.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Data, Version=2018.1.122.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Data.dll</HintPath>
+    <Reference Include="Telerik.Windows.Data, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Data.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Telerik.Windows.Themes.Fluent">
-      <HintPath>lib\RCWPF\2018.1.122.45.NoXaml.Trial\Telerik.Windows.Themes.Fluent.dll</HintPath>
+    <Reference Include="Telerik.Windows.Themes.Office2013, Version=2016.3.1024.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
+      <HintPath>packages\Telerik.Windows.Themes.Office2013.for.Wpf.2016.3.1024\lib\net45\Telerik.Windows.Themes.Office2013.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
