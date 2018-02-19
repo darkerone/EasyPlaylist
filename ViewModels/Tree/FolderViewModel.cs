@@ -33,15 +33,42 @@ namespace EasyPlaylist.ViewModels
             if (Items.Any())
             {                
                 List<MenuItemViewModel> itemsToAdd = Items.Select(x => x.GetItemCopy()).ToList();
-                folderCopy.Items.AddRange(itemsToAdd);
+                folderCopy.AddItems(itemsToAdd);
             }
             
             return folderCopy;
         }
 
-        public void RemoveItem(MenuItemViewModel menuItemVM)
+        public void RemoveItem(MenuItemViewModel menuItemToRemoveVM)
         {
+            RemoveItems(new List<MenuItemViewModel>() { menuItemToRemoveVM });
+        }
 
+        public void RemoveItems(IEnumerable<MenuItemViewModel> menuItemsToRemoveVM)
+        {
+            foreach (MenuItemViewModel menuItemToRemoveVM in menuItemsToRemoveVM)
+            {
+                Items.Remove(menuItemToRemoveVM);
+            }
+        }
+
+        public void RemoveAllItems()
+        {
+            Items.Clear();
+        }
+
+        public void AddItem(MenuItemViewModel menuItemVMToAdd)
+        {
+            AddItems(new List<MenuItemViewModel>() { menuItemVMToAdd });
+        }
+
+        public void AddItems(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
+        {
+            Items.AddRange(menuItemsVMToAdd);
+            foreach (MenuItemViewModel menuItemVM in menuItemsVMToAdd)
+            {
+                menuItemVM.ParentFolder = this;
+            }
         }
 
         /// <summary>
@@ -61,6 +88,33 @@ namespace EasyPlaylist.ViewModels
             Directory.CreateDirectory(path + "\\" + Title);
 
             return true;
+        }
+
+        /// <summary>
+        /// Met à jour les dossiers parents des éléments du dossier
+        /// </summary>
+        public void UpdateAllSubParentFolders()
+        {
+            DefineAllSubParentFoldersIn(this);
+        }
+
+        /// <summary>
+        /// Met à jour les dossiers parents des éléments du dossier passé en paramètre
+        /// </summary>
+        /// <param name="folderVM"></param>
+        private void DefineAllSubParentFoldersIn(FolderViewModel folderVM)
+        {
+            // Définit les parents des éléments du dossier
+            foreach (MenuItemViewModel menuItemVM in folderVM.Items)
+            {
+                menuItemVM.ParentFolder = folderVM;
+            }
+
+            // Définit les parents des éléments des sous dossiers du dossier
+            foreach (FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
+            {
+                DefineAllSubParentFoldersIn(subFolder);
+            }
         }
     }
 }

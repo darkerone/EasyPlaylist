@@ -19,6 +19,11 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// Dossier parent
+        /// </summary>
+        public FolderViewModel ParentFolder { get; set; }
+        
         public MenuItemViewModel(string path)
         {
             Path = path;
@@ -36,5 +41,10 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <returns></returns>
         abstract public MenuItemViewModel GetItemCopy();
+
+        public FolderViewModel GetParentFolder()
+        {
+            return ParentFolder;
+        }
     }
 }

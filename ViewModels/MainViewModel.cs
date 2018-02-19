@@ -35,8 +35,8 @@ namespace EasyPlaylist.ViewModels
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        Explorer.RootFolder.Items.Clear();
-                        Explorer.RootFolder.Items.Add(GetFolderViewModel(fbd.SelectedPath, Path.GetFileName(fbd.SelectedPath)));
+                        Explorer.RootFolder.RemoveAllItems();
+                        Explorer.RootFolder.AddItem(GetFolderViewModel(fbd.SelectedPath, Path.GetFileName(fbd.SelectedPath)));
                     }
                 });
             }
@@ -53,7 +53,7 @@ namespace EasyPlaylist.ViewModels
                     {
                         // On ajoute l'élément au dossier séléctionné
                         FolderViewModel folderVM = Playlist.SelectedItem as FolderViewModel;
-                        folderVM.Items.Add(Explorer.SelectedItem.GetItemCopy());
+                        folderVM.AddItem(Explorer.SelectedItem.GetItemCopy());
                     }
                     else
                     {
@@ -85,7 +85,8 @@ namespace EasyPlaylist.ViewModels
                 {
                     var jsonSerializerSettings = new JsonSerializerSettings()
                     {
-                        TypeNameHandling = TypeNameHandling.All
+                        TypeNameHandling = TypeNameHandling.All,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                     };
                     string jsonPlaylist = JsonConvert.SerializeObject(Playlist, jsonSerializerSettings);
                     System.IO.File.WriteAllText(@"Playlist.txt", jsonPlaylist);
@@ -155,7 +156,7 @@ namespace EasyPlaylist.ViewModels
             {
                 foreach (string subDirectoryPath in subDirectoriesPaths)
                 {
-                    folderViewModel.Items.Add(GetFolderViewModel(subDirectoryPath, Path.GetFileName(subDirectoryPath)));
+                    folderViewModel.AddItem(GetFolderViewModel(subDirectoryPath, Path.GetFileName(subDirectoryPath)));
                 }
             }
 
@@ -167,7 +168,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if(Path.GetExtension(filePath) == ".mp3")
                     {
-                        folderViewModel.Items.Add(new FileViewModel(filePath));
+                        folderViewModel.AddItem(new FileViewModel(filePath));
                     }
                 }
             }

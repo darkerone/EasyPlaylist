@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,32 +12,32 @@ using System.Windows.Input;
 
 namespace EasyPlaylist.ViewModels
 {
-    class ExplorerViewModel : IExplorer
+    class ExplorerViewModel : BaseViewModel, IExplorer
     {
         private FolderViewModel _rootFolder;
         private MenuItemViewModel _selectedItem;
 
         #region Properties
 
-        public FolderViewModel RootFolder { get; set; }
-        //{
-        //    get { return _rootFolder; }
-        //    set
-        //    {
-        //        _rootFolder = value;
-        //        RaisePropertyChanged("RootFolder");
-        //    }
-        //}
+        public FolderViewModel RootFolder
+        {
+            get { return _rootFolder; }
+            set
+            {
+                _rootFolder = value;
+                RaisePropertyChanged("RootFolder");
+            }
+        }
 
-        public MenuItemViewModel SelectedItem { get; set; }
-        //{
-        //    get { return _selectedItem; }
-        //    set
-        //    {
-        //        _selectedItem = value;
-        //        RaisePropertyChanged("SelectedItem");
-        //    }
-        //}
+        public MenuItemViewModel SelectedItem
+        {
+            get { return _selectedItem; }
+            set
+            {
+                _selectedItem = value;
+                RaisePropertyChanged("SelectedItem");
+            }
+        }
 
         #endregion
 
@@ -53,7 +54,7 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    if(SelectedItem != null)
+                    if (SelectedItem != null)
                     {
                         RemoveMenuItem(SelectedItem);
                     }
@@ -77,13 +78,13 @@ namespace EasyPlaylist.ViewModels
             {
                 // On ajoute les éléments au dossier sélectionné
                 FolderViewModel selectedFolder = SelectedItem as FolderViewModel;
-                selectedFolder.Items.AddRange(itemsToAdd);
+                selectedFolder.AddItems(itemsToAdd);
             }
             else
             {
                 // On ajoute les éléments au dossier parent de l'élément sélectionné
                 FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
-                folderWhereAdd.Items.AddRange(itemsToAdd);
+                folderWhereAdd.AddItems(itemsToAdd);
             }
         }
 
@@ -94,12 +95,22 @@ namespace EasyPlaylist.ViewModels
 
         public void RemoveMenuItems(List<MenuItemViewModel> itemsToRemove)
         {
-            foreach(MenuItemViewModel itemToRemove in itemsToRemove)
+            foreach (MenuItemViewModel itemToRemove in itemsToRemove)
             {
                 // On retire les éléments au dossier parent de l'élément sélectionné
                 FolderViewModel folderWhereAdd = GetFirstParentFolder(itemToRemove);
                 folderWhereAdd.RemoveItem(itemToRemove);
             }
+        }
+
+        /// <summary>
+        /// Met à jour les références au dossier parents de tous les éléments du dossier root
+        /// </summary>
+        /// <param name="context"></param>
+        [OnDeserialized]
+        public void UpdateAllRootSubParentFolder(StreamingContext context)
+        {
+            RootFolder.UpdateAllSubParentFolders();
         }
 
         #endregion
@@ -144,6 +155,8 @@ namespace EasyPlaylist.ViewModels
 
             return containerFolders;
         }
+
+        
 
         #endregion
     }

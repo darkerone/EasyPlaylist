@@ -29,7 +29,7 @@ namespace EasyPlaylist.Views
         {
             InitializeComponent();
 
-            ExplorerViewModel playlist = new ExplorerViewModel();
+            ExplorerViewModel playlist = null;
 
             // Récupère la playlist sauvegardée
             if (System.IO.File.Exists(@"Playlist.txt"))
@@ -37,9 +37,15 @@ namespace EasyPlaylist.Views
                 string json = System.IO.File.ReadAllText(@"Playlist.txt");
                 var jsonSerializerSettings = new JsonSerializerSettings()
                 {
-                    TypeNameHandling = TypeNameHandling.All
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
                 playlist = JsonConvert.DeserializeObject<ExplorerViewModel>(json, jsonSerializerSettings);
+            }
+
+            if(playlist == null)
+            {
+                playlist = new ExplorerViewModel();
             }
 
             mainViewModel = new MainViewModel(playlist);
