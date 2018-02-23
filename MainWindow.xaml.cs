@@ -47,6 +47,10 @@ namespace EasyPlaylist.Views
             {
                 playlist = new ExplorerViewModel();
             }
+            playlist.CopyItemInEnabled = true;
+            playlist.CopyItemOutEnabled = false;
+            playlist.MoveItemEnabled = true;
+            playlist.Name = "Ma playlist";
 
             mainViewModel = new MainViewModel(playlist);
 
@@ -55,8 +59,10 @@ namespace EasyPlaylist.Views
             // Récupère le dossier et ses sous dossiers et fichiers
             FolderViewModel musicFolder = mainViewModel.GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
             mainViewModel.Explorer.AddMenuItems(musicFolder.Items.ToList());
+            mainViewModel.Explorer.CopyItemInEnabled = false;
+            mainViewModel.Explorer.CopyItemOutEnabled = true;
+            mainViewModel.Explorer.MoveItemEnabled = false;
 
-            
 
             DataContext = mainViewModel;
         }

@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 
 namespace EasyPlaylist.ViewModels
@@ -39,6 +40,13 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        public string Name { get; set; }
+
+        public bool MoveItemEnabled { get; set; }
+        public bool CopyItemInEnabled { get; set; }
+        public bool CopyItemOutEnabled { get; set; }
+        public bool IsEditable { get; set; }
+
         #endregion
 
         public ExplorerViewModel()
@@ -57,6 +65,37 @@ namespace EasyPlaylist.ViewModels
                     if (SelectedItem != null)
                     {
                         RemoveMenuItem(SelectedItem);
+                    }
+                });
+            }
+        }
+
+        public ICommand AddFolder
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    FolderViewModel newFolder = new FolderViewModel(null, "Nouveau dossier");
+                    AddMenuItem(newFolder);
+                    SelectedItem = newFolder;
+                });
+            }
+        }
+        
+        public ICommand Export
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+                    DialogResult result = fbd.ShowDialog();
+
+                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    {
+                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
                     }
                 });
             }
@@ -156,7 +195,34 @@ namespace EasyPlaylist.ViewModels
             return containerFolders;
         }
 
-        
+        /// <summary>
+        /// Exporte tout le contenu du dossier passé en paramètre dans le dossier de destination
+        /// </summary>
+        /// <param name="destinationFolder"></param>
+        /// <param name="folderVM"></param>
+        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM)
+        {
+            string folderPath = destinationFolder + "\\" + folderVM.Title;
+
+            // Créé le dossier
+            bool success = folderVM.WriteFolder(destinationFolder);
+
+            if (success)
+            {
+                // Créé les sous dossiers du dossier
+                foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
+                {
+                    ExportFoldersAndFiles(folderPath, subFolderVM);
+                }
+
+                // Créé les fichiers du dossier
+                foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+                {
+                    fileVM.WriteFile(folderPath);
+                }
+            }
+        }
+
 
         #endregion
     }

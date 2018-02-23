@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:EasyPlaylist"
         xmlns:controls="clr-namespace:EasyPlaylist.Views"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
         mc:Ignorable="d"
         Title="MainWindow" Height="700" Width="1050">
     <Grid>
@@ -20,10 +21,7 @@
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Content="Browse" Command="{Binding Browse}"></Button>
-            <Button Content="Add to playlist" Command="{Binding AddToPlaylist}"></Button>
-            <Button Content="Add folder to playlist" Command="{Binding AddFolderToPlaylist}"></Button>
-            <Button Content="Save playlist" Command="{Binding SavePlaylist}"></Button>
-            <Button Content="Export playlist" Command="{Binding ExportPlaylist}"></Button>
+            <Button Content="Save playlists" Command="{Binding SavePlaylist}"></Button>
         </StackPanel>
         
         <controls:ExplorerView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:ExplorerView>
@@ -34,7 +32,17 @@
             VerticalAlignment="Stretch"
             ResizeBehavior="PreviousAndNext"
             Width="5" Background="#FFBCBCBC"/>
-        <controls:ExplorerView Grid.Row="1" Grid.Column="2" DataContext="{Binding Playlist}"></controls:ExplorerView>
+        <telerik:RadTabControl Grid.Row="1" Grid.Column="2" >
+            <telerik:RadTabControl.Items>
+                <telerik:RadTabItem Header="{Binding Playlist.Name}">
+                    <controls:ExplorerView DataContext="{Binding Playlist}"></controls:ExplorerView>
+                </telerik:RadTabItem>
+                <telerik:RadTabItem Header="Tab 2" />
+                <telerik:RadTabItem Header="Tab 3" />
+                <telerik:RadTabItem Header="Tab 4" />
+            </telerik:RadTabControl.Items>
+        </telerik:RadTabControl>
+        
     </Grid>
     
 </Window>

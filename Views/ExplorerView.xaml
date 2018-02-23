@@ -12,14 +12,15 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Expand all" Command="{Binding ExpandAll}"></Button>
-            <Button Content="Remove selected" Command="{Binding RemoveSelectedItem}"></Button>
+            <Button Content="Remove selected" Command="{Binding RemoveSelectedItem}" Margin="5"></Button>
+            <Button Content="Add folder" Command="{Binding AddFolder}"></Button>
+            <Button Content="Export playlist" Command="{Binding Export}"></Button>
         </StackPanel>
         <telerik:RadTreeView 
             x:Name="ExplorerTreeView"
             ItemsSource="{Binding RootFolder.Items}" 
             SelectionMode="Single" 
-            SelectedItem="{Binding SelectedItem}"
+            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
             IsDragDropEnabled="True">
             <telerik:RadTreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Items}">

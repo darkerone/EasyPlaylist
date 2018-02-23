@@ -42,40 +42,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand AddToPlaylist
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    // Si l'élément sélectionné dans la playlist est un dossier
-                    if(Playlist.SelectedItem != null && Playlist.SelectedItem is FolderViewModel)
-                    {
-                        // On ajoute l'élément au dossier séléctionné
-                        FolderViewModel folderVM = Playlist.SelectedItem as FolderViewModel;
-                        folderVM.AddItem(Explorer.SelectedItem.GetItemCopy());
-                    }
-                    else
-                    {
-                        // On ajoute l'élément au dossier parent
-                        Playlist.AddMenuItem(Explorer.SelectedItem.GetItemCopy());
-                    }
-                });
-            }
-        }
-
-        public ICommand AddFolderToPlaylist
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    FolderViewModel newFolder = new FolderViewModel(null, "Nouveau dossier");
-                    Playlist.AddMenuItem(newFolder);
-                    Playlist.SelectedItem = newFolder;
-                });
-            }
-        }
+        
 
         public ICommand SavePlaylist
         {
@@ -91,52 +58,6 @@ namespace EasyPlaylist.ViewModels
                     string jsonPlaylist = JsonConvert.SerializeObject(Playlist, jsonSerializerSettings);
                     System.IO.File.WriteAllText(@"Playlist.txt", jsonPlaylist);
                 });
-            }
-        }
-
-        public ICommand ExportPlaylist
-        {
-            get
-            {
-                return new DelegateCommand(() =>
-                {
-                    FolderBrowserDialog fbd = new FolderBrowserDialog();
-
-                    DialogResult result = fbd.ShowDialog();
-
-                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-                    {
-                        ExportFoldersAndFiles(fbd.SelectedPath, Playlist.RootFolder);
-                    }
-                });
-            }
-        }
-
-        /// <summary>
-        /// Exporte tout le contenu du dossier passé en paramètre dans le dossier de destination
-        /// </summary>
-        /// <param name="destinationFolder"></param>
-        /// <param name="folderVM"></param>
-        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM)
-        {
-            string folderPath = destinationFolder + "\\" + folderVM.Title;
-
-            // Créé le dossier
-            bool success = folderVM.WriteFolder(destinationFolder);
-
-            if (success)
-            {
-                // Créé les sous dossiers du dossier
-                foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
-                {
-                    ExportFoldersAndFiles(folderPath, subFolderVM);
-                }
-
-                // Créé les fichiers du dossier
-                foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
-                {
-                    fileVM.WriteFile(folderPath);
-                }
             }
         }
 

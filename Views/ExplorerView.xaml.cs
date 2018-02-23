@@ -43,6 +43,8 @@ namespace EasyPlaylist.Views
             }
         }
 
+        #region Static methods
+
         private static void OnDropCompleted(object sender, Telerik.Windows.DragDrop.DragEventArgs e)
         {
             var options = DragDropPayloadManager.GetDataFromObject(e.Data, TreeViewDragDropOptions.Key) as TreeViewDragDropOptions;
@@ -64,71 +66,132 @@ namespace EasyPlaylist.Views
                 return;
             }
 
+            // ==============================
+            // Récupère le treeview d'origine
+            // ==============================
+            RadTreeView originRadTreeView = sender as RadTreeView;
+            ExplorerViewModel originExplorerVM = originRadTreeView.DataContext as ExplorerViewModel;
+
+            if (originRadTreeView == null || originExplorerVM == null)
+            {
+                return;
+            }
+
+            // ===================================
+            // Récupère le treeview de destination
+            // ===================================
+            RadTreeView destinationRadTreeView = options.DropTargetTree;
+            // Si le treeview de destination n'est pas renseigné
+            if (destinationRadTreeView == null)
+            {
+                // Si l'item de destination est renseigné
+                if (options.DropTargetItem != null)
+                {
+                    // On récupère le treeview de destination grâce à l'item de destination
+                    destinationRadTreeView = (options.DropTargetItem as FrameworkElement).ParentOfType<RadTreeView>();
+                }
+            }
+
+            ExplorerViewModel destinationExplorerVM = destinationRadTreeView.DataContext as ExplorerViewModel;
+
+            if (destinationRadTreeView == null || destinationExplorerVM == null)
+            {
+                return;
+            }
+
+            // ==============================
+            // Récupère l'item de destination
+            // ==============================
+            MenuItemViewModel destinationItemVM;
+            if (options.DropTargetItem != null)
+            {
+                destinationItemVM = options.DropTargetItem.DataContext as MenuItemViewModel;
+            }
+            else
+            {
+                destinationItemVM = destinationExplorerVM.RootFolder;
+            }
+
             // ===============
             // Eléments dropés
             // ===============
             List<object> draggedItems = options.DraggedItems as List<object>;
             List<MenuItemViewModel> draggedItemVms = draggedItems.OfType<MenuItemViewModel>().ToList();
 
-            // ===========================================
-            // Dans le cas d'une copie dans un autre arbre
-            // ===========================================
-            if (options.DropTargetTree != null)
+            // =============================================
+            // Dans le cas de 2 arbres différents : on copie
+            // =============================================
+            if (originRadTreeView != destinationRadTreeView)
             {
-                // ===================
-                // Elément destination
-                // ===================
-                MenuItemViewModel destinationItemVM;
-                if (options.DropTargetItem != null)
+                if (destinationExplorerVM != null && destinationExplorerVM.CopyItemInEnabled && originExplorerVM.CopyItemOutEnabled)
                 {
-                    RadTreeViewItem destinationItem = options.DropTargetItem as RadTreeViewItem;
-                    destinationItemVM = destinationItem.DataContext as MenuItemViewModel;
-                }
-                else
-                {
-                    // Récupère l'élément root de l'arbre de destination
-                    ExplorerViewModel explorerVM = options.DropTargetTree.DataContext as ExplorerViewModel;
-                    destinationItemVM = explorerVM.RootFolder;
-                }
+                    // Dossier de destination
+                    FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
 
-                // ======================
-                // Dossier de destination
-                // ======================
-                FolderViewModel destinationFolderVM;
-                // Si l'élément de destination est un dossier
-                if (destinationItemVM is FolderViewModel)
-                {
-                    // Le dossier de destination est l'élément de destination
-                    destinationFolderVM = destinationItemVM as FolderViewModel;
-                }
-                else
-                {
-                    FileViewModel destinationFileVM = destinationItemVM as FileViewModel;
-                    // Le dossier de destination est le dossier parent de l'élément de destination
-                    destinationFolderVM = destinationFileVM.GetParentFolder();
-                }
+                    // Copie des éléments dropés
+                    if (destinationFolderVM != null)
+                    {
+                        // Copie les éléments dropés 
+                        List<MenuItemViewModel> copiedElements = draggedItemVms.Select(x => x.GetItemCopy()).ToList();
 
-                // =========================
-                // Copie des éléments dropés
-                // =========================
-                if (destinationFolderVM != null)
-                {
-                    // Copie les éléments dropés 
-                    List<MenuItemViewModel> copiedElements = draggedItemVms.Select(x => x.GetItemCopy()).ToList();
-
-                    // Ajoute les éléments copiés au dossier
-                    destinationFolderVM.AddItems(copiedElements);
+                        // Ajoute les éléments copiés au dossier
+                        destinationFolderVM.AddItems(copiedElements);
+                    }
                 }
             }
-            // ==================================================
-            // Dans le cas d'un déplacement au sein du même arbre
-            // ==================================================
+            // ======================================
+            // Dans le cas du même arbre : on déplace
+            // ======================================
             else
             {
+                if (originExplorerVM.MoveItemEnabled)
+                {
+                    FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
 
+                    // Déplacement des éléments dropés
+                    if (destinationFolderVM != null)
+                    {
+                        // Retire les éléments déplacés de leur dossier d'origine
+                        foreach (MenuItemViewModel draggedMenuItemVM in options.DraggedItems)
+                        {
+                            draggedMenuItemVM.ParentFolder.RemoveItem(draggedMenuItemVM);
+                        }
+
+                        // Ajoute les éléments déplacés dans leur dossier de destination
+                        destinationFolderVM.AddItems(draggedItemVms);
+                    }
+                }
             }
-            
         }
 
+        /// <summary>
+        /// Renvoie le dossier de destination du drag and drop.
+        /// Si l'élément de destination n'est pas un dossier, le dossier renvoyé sera son parent.
+        /// </summary>
+        /// <param name="destinationItemVM">Elément de destination (peut être null)</param>
+        /// <returns></returns>
+        static private FolderViewModel GetDestinationFolder(MenuItemViewModel destinationItemVM)
+        {
+            // ======================
+            // Dossier de destination
+            // ======================
+            FolderViewModel destinationFolderVM;
+            // Si l'élément de destination est un dossier
+            if (destinationItemVM is FolderViewModel)
+            {
+                // Le dossier de destination est l'élément de destination
+                destinationFolderVM = destinationItemVM as FolderViewModel;
+            }
+            else
+            {
+                FileViewModel destinationFileVM = destinationItemVM as FileViewModel;
+                // Le dossier de destination est le dossier parent de l'élément de destination
+                destinationFolderVM = destinationFileVM.GetParentFolder();
+            }
+
+            return destinationFolderVM;
+        }
+
+        #endregion
     }
 }
