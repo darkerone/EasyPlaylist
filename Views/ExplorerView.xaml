@@ -8,25 +8,45 @@
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:controls="clr-namespace:EasyPlaylist.Views"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Button Content="Remove selected" Command="{Binding RemoveSelectedItem}" Margin="5"></Button>
-            <Button Content="Add folder" Command="{Binding AddFolder}"></Button>
-            <Button Content="Export playlist" Command="{Binding Export}"></Button>
-        </StackPanel>
-        <telerik:RadTreeView 
+    <Grid>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}" 
+                        Content="Remove selected" 
+                        Command="{Binding RemoveSelectedItem}" Margin="5"></Button>
+                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Content="Add folder" 
+                        Command="{Binding OpenAddFolderPopup}"></Button>
+                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Content="Export playlist" 
+                        Command="{Binding Export}"></Button>
+            </StackPanel>
+            <telerik:RadTreeView 
             x:Name="ExplorerTreeView"
             ItemsSource="{Binding RootFolder.Items}" 
             SelectionMode="Single" 
             SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
             IsDragDropEnabled="True">
-            <telerik:RadTreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding Title}" />
-                </HierarchicalDataTemplate>
-            </telerik:RadTreeView.ItemTemplate>
-        </telerik:RadTreeView>
-    </DockPanel>
+                <telerik:RadTreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+                        <TextBlock Text="{Binding Title}">
+                            <telerik:RadContextMenu.ContextMenu>
+                                <telerik:RadContextMenu>
+                                    <telerik:RadMenuItem 
+                                        Header="Rename" 
+                                        Command="{Binding Rename}" />
+                                    <telerik:RadMenuItem Header="New Sibling" />
+                                    <telerik:RadMenuItem Header="Delete" />
+                                </telerik:RadContextMenu>
+                            </telerik:RadContextMenu.ContextMenu>       
+                        </TextBlock>
+                    </HierarchicalDataTemplate>
+                </telerik:RadTreeView.ItemTemplate>
+            </telerik:RadTreeView>
+        </DockPanel>
+    </Grid>
+
 </UserControl>

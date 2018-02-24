@@ -137,8 +137,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="DesignData\ExplorerDesignData.cs" />
     <Compile Include="ViewModels\Interfaces\IExplorer.cs" />
+    <Compile Include="Views\FolderNamePopupView.xaml.cs">
+      <DependentUpon>FolderNamePopupView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ExplorerView.xaml.cs">
       <DependentUpon>ExplorerView.xaml</DependentUpon>
     </Compile>
@@ -156,6 +160,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\FolderNamePopupView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ExplorerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -167,7 +175,7 @@
     <Compile Include="ViewModels\Tree\FileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\Tree\MenuItemViewModel.cs" />
-    <Compile Include="ViewModels\MusicViewModel.cs" />
+    <Compile Include="ViewModels\FolderNamePopupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -67,7 +67,18 @@ namespace EasyPlaylist.ViewModels
             Items.AddRange(menuItemsVMToAdd);
             foreach (MenuItemViewModel menuItemVM in menuItemsVMToAdd)
             {
+                // Redéfinit l'item parent
                 menuItemVM.ParentFolder = this;
+
+                // Si le nom existe déjà, on incrémente un index entre parenthèse
+                string nameTmp = menuItemVM.Title;
+                int index = 1;
+                while (Items.Any(x => x.Title == nameTmp && x != menuItemVM))
+                {
+                    nameTmp = menuItemVM.Title + $" ({index})";
+                    index++;
+                }
+                menuItemVM.Title = nameTmp;
             }
         }
 

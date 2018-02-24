@@ -50,6 +50,7 @@ namespace EasyPlaylist.Views
             playlist.CopyItemInEnabled = true;
             playlist.CopyItemOutEnabled = false;
             playlist.MoveItemEnabled = true;
+            playlist.IsEditable = true;
             playlist.Name = "Ma playlist";
 
             mainViewModel = new MainViewModel(playlist);
@@ -62,6 +63,7 @@ namespace EasyPlaylist.Views
             mainViewModel.Explorer.CopyItemInEnabled = false;
             mainViewModel.Explorer.CopyItemOutEnabled = true;
             mainViewModel.Explorer.MoveItemEnabled = false;
+            mainViewModel.Explorer.IsEditable = false;
 
 
             DataContext = mainViewModel;

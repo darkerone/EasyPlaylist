@@ -1,4 +1,5 @@
 ﻿using EasyPlaylist.ViewModels.Interfaces;
+using EasyPlaylist.Views;
 using Prism.Commands;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Telerik.Windows.Controls;
 
 namespace EasyPlaylist.ViewModels
 {
@@ -70,19 +72,28 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand AddFolder
+        public ICommand OpenAddFolderPopup
         {
             get
             {
                 return new DelegateCommand(() =>
                 {
-                    FolderViewModel newFolder = new FolderViewModel(null, "Nouveau dossier");
-                    AddMenuItem(newFolder);
-                    SelectedItem = newFolder;
+                    FolderNamePopupView folderNamePopupView = new FolderNamePopupView();
+                    FolderNamePopupViewModel folderNamePopupViewModel = new FolderNamePopupViewModel();
+                    folderNamePopupViewModel.ItemName = "New folder";
+                    folderNamePopupView.DataContext = folderNamePopupViewModel;
+                    RadWindow radWindow = new RadWindow();
+                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                    radWindow.Header = "New folder";
+                    radWindow.Content = folderNamePopupView;
+                    radWindow.Closed += FolderNamePopup_Closed;
+                    radWindow.Show();
                 });
             }
         }
+
         
+
         public ICommand Export
         {
             get
@@ -96,6 +107,11 @@ namespace EasyPlaylist.ViewModels
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
                         ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
+                        RadWindow.Alert(new DialogParameters()
+                        {
+                            Content = $"Playlist exported to \"{fbd.SelectedPath}\"",
+                            Header = "Success"
+                        });
                     }
                 });
             }
@@ -223,6 +239,23 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+
+        #endregion
+
+        #region Events
+
+        private void FolderNamePopup_Closed(object sender, WindowClosedEventArgs e)
+        {
+            RadWindow popup = sender as RadWindow;
+            FolderNamePopupView folderNamePopupView = popup.Content as FolderNamePopupView;
+            FolderNamePopupViewModel folderNamePopupViewModel = folderNamePopupView.DataContext as FolderNamePopupViewModel;
+            if (e.DialogResult == true)
+            {
+                FolderViewModel newFolder = new FolderViewModel(null, folderNamePopupViewModel.ItemName);
+                AddMenuItem(newFolder);
+                SelectedItem = newFolder;
+            }
+        }
 
         #endregion
     }
