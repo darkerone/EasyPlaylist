@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using EasyPlaylist.Events;
+using Newtonsoft.Json;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,13 +13,8 @@ namespace EasyPlaylist.ViewModels
 {
     class FolderViewModel : MenuItemViewModel
     {
-        public FolderViewModel(string path) : base(path)
-        {
-            Items = new ObservableCollection<MenuItemViewModel>();
-        }
-
         [JsonConstructor]
-        public FolderViewModel(string path, string title) : base(path, title)
+        public FolderViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
         {
             Items = new ObservableCollection<MenuItemViewModel>();
             Items.CollectionChanged += Items_CollectionChanged;
@@ -25,7 +22,10 @@ namespace EasyPlaylist.ViewModels
 
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-
+            if(EventAggregator != null)
+            {
+                EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Publish(this);
+            }
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace EasyPlaylist.ViewModels
 
         public override MenuItemViewModel GetItemCopy()
         {
-            FolderViewModel folderCopy = new FolderViewModel(Path);
+            FolderViewModel folderCopy = new FolderViewModel(EventAggregator, Path, null);
             if (Items.Any())
             {                
                 List<MenuItemViewModel> itemsToAdd = Items.Select(x => x.GetItemCopy()).ToList();

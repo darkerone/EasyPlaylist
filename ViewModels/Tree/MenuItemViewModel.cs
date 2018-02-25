@@ -1,4 +1,5 @@
 ﻿using EasyPlaylist.Views;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +14,7 @@ namespace EasyPlaylist.ViewModels
     abstract class MenuItemViewModel : BaseViewModel
     {
         private string _title;
+        private IEventAggregator _eventAggregator;
 
         /// <summary>
         /// Titre du dossier/fichier
@@ -26,6 +28,16 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        public IEventAggregator EventAggregator
+        {
+            get { return _eventAggregator; }
+            set
+            {
+                _eventAggregator = value;
+                RaisePropertyChanged("EventAggregator");
+            }
+        }
+
         /// <summary>
         /// Chemin du dossier/fichier
         /// </summary>
@@ -35,17 +47,20 @@ namespace EasyPlaylist.ViewModels
         /// Dossier parent
         /// </summary>
         public FolderViewModel ParentFolder { get; set; }
-        
-        public MenuItemViewModel(string path)
-        {
-            Path = path;
-            Title = System.IO.Path.GetFileNameWithoutExtension(path);
-        }
 
-        public MenuItemViewModel(string path, string title)
+        public MenuItemViewModel(IEventAggregator eventAggregator, string path, string title)
         {
             Path = path;
-            Title = title;
+            if(title != null && title != "")
+            {
+                Title = title;
+            }
+            else
+            {
+                Title = System.IO.Path.GetFileNameWithoutExtension(path);
+            }
+           
+            EventAggregator = eventAggregator;
         }
 
         public ICommand Rename

@@ -1,6 +1,6 @@
-﻿using EasyPlaylist.ViewModels.Interfaces;
-using EasyPlaylist.Views;
+﻿using EasyPlaylist.Views;
 using Prism.Commands;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,10 +15,11 @@ using Telerik.Windows.Controls;
 
 namespace EasyPlaylist.ViewModels
 {
-    class ExplorerViewModel : BaseViewModel, IExplorer
+    class HierarchicalTreeViewModel : BaseViewModel
     {
         private FolderViewModel _rootFolder;
         private MenuItemViewModel _selectedItem;
+        private IEventAggregator _eventAggregator;
 
         #region Properties
 
@@ -42,6 +43,16 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        public IEventAggregator EventAggregator
+        {
+            get { return _eventAggregator; }
+            set
+            {
+                _eventAggregator = value;
+                RaisePropertyChanged("EventAggregator");
+            }
+        }
+
         public string Name { get; set; }
 
         public bool MoveItemEnabled { get; set; }
@@ -51,9 +62,10 @@ namespace EasyPlaylist.ViewModels
 
         #endregion
 
-        public ExplorerViewModel()
+        public HierarchicalTreeViewModel(IEventAggregator eventAggregator)
         {
-            RootFolder = new FolderViewModel(null, "Root");
+            RootFolder = new FolderViewModel(eventAggregator, "Root", null);
+            EventAggregator = eventAggregator;
         }
 
         #region Commands
@@ -256,7 +268,7 @@ namespace EasyPlaylist.ViewModels
             FolderNamePopupViewModel folderNamePopupViewModel = folderNamePopupView.DataContext as FolderNamePopupViewModel;
             if (e.DialogResult == true)
             {
-                FolderViewModel newFolder = new FolderViewModel(null, folderNamePopupViewModel.ItemName);
+                FolderViewModel newFolder = new FolderViewModel(EventAggregator, folderNamePopupViewModel.ItemName, null);
                 AddMenuItem(newFolder);
                 SelectedItem = newFolder;
             }

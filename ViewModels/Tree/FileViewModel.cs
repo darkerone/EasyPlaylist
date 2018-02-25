@@ -8,23 +8,42 @@ using TagLib;
 using TagLib.Id3v2;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using Prism.Events;
 
 namespace EasyPlaylist.ViewModels
 {
     class FileViewModel : MenuItemViewModel
     {
+        private string _fileTagId;
         /// <summary>
         /// Identifiant du fichier (md5 du fichier)
         /// </summary>
-        public string FileTagID { get; set; }
+        public string FileTagID
+        {
+            get { return _fileTagId; }
+            set
+            {
+                _fileTagId = value;
+                RaisePropertyChanged("FileTagID");
+            }
+        }
 
+        private bool _existsInPlaylist;
         /// <summary>
         /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
         /// </summary>
-        public bool ExistsInPlaylist { get; set; }
+        public bool ExistsInPlaylist
+        {
+            get { return _existsInPlaylist; }
+            set
+            {
+                _existsInPlaylist = value;
+                RaisePropertyChanged("ExistsInPlaylist");
+            }
+        }
 
         [JsonConstructor]
-        public FileViewModel(string path) : base(path)
+        public FileViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
         {
             TagLib.File fileInfos = TagLib.File.Create(path);
 
@@ -59,7 +78,7 @@ namespace EasyPlaylist.ViewModels
 
         public override MenuItemViewModel GetItemCopy()
         {
-            return new FileViewModel(Path);
+            return new FileViewModel(EventAggregator, Path, null);
         }
 
         /// <summary>

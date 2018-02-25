@@ -24,7 +24,7 @@
             <Button Content="Save playlists" Command="{Binding SavePlaylist}"></Button>
         </StackPanel>
         
-        <controls:ExplorerView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:ExplorerView>
+        <controls:HierarchicalTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
         <GridSplitter 
             Grid.Row="1"
             Grid.Column="1" 
@@ -35,7 +35,7 @@
         <telerik:RadTabControl Grid.Row="1" Grid.Column="2" >
             <telerik:RadTabControl.Items>
                 <telerik:RadTabItem Header="{Binding Playlist.Name}">
-                    <controls:ExplorerView DataContext="{Binding Playlist}"></controls:ExplorerView>
+                    <controls:HierarchicalTreeView DataContext="{Binding Playlist}"></controls:HierarchicalTreeView>
                 </telerik:RadTabItem>
                 <telerik:RadTabItem Header="Tab 2" />
                 <telerik:RadTabItem Header="Tab 3" />

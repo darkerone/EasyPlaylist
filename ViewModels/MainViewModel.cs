@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using EasyPlaylist.Events;
+using Newtonsoft.Json;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,10 +16,11 @@ namespace EasyPlaylist.ViewModels
 {
     class MainViewModel : BaseViewModel
     {
-        private ExplorerViewModel _explorer;
-        private ExplorerViewModel _playlist;
+        private HierarchicalTreeViewModel _explorer;
+        private HierarchicalTreeViewModel _playlist;
+        private IEventAggregator _eventAggregator;
 
-        public ExplorerViewModel Explorer
+        public HierarchicalTreeViewModel Explorer
         {
             get { return _explorer; }
             set
@@ -27,7 +30,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ExplorerViewModel Playlist
+        public HierarchicalTreeViewModel Playlist
         {
             get { return _playlist; }
             set
@@ -37,8 +40,25 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        public IEventAggregator EventAggregator
+        {
+            get { return _eventAggregator; }
+            set
+            {
+                _eventAggregator = value;
+                RaisePropertyChanged("EventAggregator");
+            }
+        }
+
         public MainViewModel()
         {
+            EventAggregator = new EventAggregator();
+
+            // ========
+            // Playlist
+            // ========
+            Playlist = new HierarchicalTreeViewModel(EventAggregator);
+
             // Récupère la playlist sauvegardée
             if (System.IO.File.Exists(@"Playlist.txt"))
             {
@@ -48,20 +68,23 @@ namespace EasyPlaylist.ViewModels
                     TypeNameHandling = TypeNameHandling.All,
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
-                Playlist = JsonConvert.DeserializeObject<ExplorerViewModel>(json, jsonSerializerSettings);
+                HierarchicalTreeViewModel deserializedPlaylist = JsonConvert.DeserializeObject<HierarchicalTreeViewModel>(json, jsonSerializerSettings);
+
+                // Copie toutes les propriétés utiles de la playlist déserialisée
+                Playlist.AddMenuItems(deserializedPlaylist.RootFolder.Items.ToList());
+                Playlist.Name = deserializedPlaylist.Name;
             }
 
-            if (Playlist == null)
-            {
-                Playlist = new ExplorerViewModel();
-            }
             Playlist.CopyItemInEnabled = true;
             Playlist.CopyItemOutEnabled = false;
             Playlist.MoveItemEnabled = true;
             Playlist.IsEditable = true;
             Playlist.Name = "Ma playlist";
             
-            Explorer = new ExplorerViewModel();
+            // ========
+            // Explorer
+            // ========
+            Explorer = new HierarchicalTreeViewModel(EventAggregator);
             string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             // Récupère le dossier et ses sous dossiers et fichiers
             FolderViewModel musicFolder = GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
@@ -72,6 +95,9 @@ namespace EasyPlaylist.ViewModels
             Explorer.IsEditable = false;
 
             CheckIfItemsExistInPlaylist(Explorer, Playlist);
+            EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
+                CheckIfItemsExistInPlaylist(Explorer, Playlist);
+            });
         }
 
         public ICommand Browse
@@ -120,7 +146,7 @@ namespace EasyPlaylist.ViewModels
         /// <returns></returns>
         public FolderViewModel GetFolderViewModel(string directoryPath, string directoryName)
         {
-            FolderViewModel folderViewModel = new FolderViewModel(directoryPath);
+            FolderViewModel folderViewModel = new FolderViewModel(EventAggregator, directoryPath, null);
 
             // Sous dossiers
             string[] subDirectoriesPaths = Directory.GetDirectories(directoryPath);
@@ -140,7 +166,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (Path.GetExtension(filePath) == ".mp3")
                     {
-                        folderViewModel.AddItem(new FileViewModel(filePath));
+                        folderViewModel.AddItem(new FileViewModel(EventAggregator, filePath, null));
                     }
                 }
             }
@@ -153,7 +179,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="folderVM"></param>
         /// <param name="playlistFileTagIDs"></param>
-        public void CheckIfItemsExistInPlaylist(ExplorerViewModel explorerVM, ExplorerViewModel playlistVM)
+        public void CheckIfItemsExistInPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
         {
             List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
 

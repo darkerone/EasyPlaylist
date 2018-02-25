@@ -138,13 +138,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
-    <Compile Include="DesignData\ExplorerDesignData.cs" />
-    <Compile Include="ViewModels\Interfaces\IExplorer.cs" />
+    <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
+    <Compile Include="KeysJsonConverter.cs" />
     <Compile Include="Views\FolderNamePopupView.xaml.cs">
       <DependentUpon>FolderNamePopupView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ExplorerView.xaml.cs">
-      <DependentUpon>ExplorerView.xaml</DependentUpon>
+    <Compile Include="Views\HierarchicalTreeView.xaml.cs">
+      <DependentUpon>HierarchicalTreeView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -164,14 +164,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ExplorerView.xaml">
+    <Page Include="Views\HierarchicalTreeView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ViewModels\Tree\FolderViewModel.cs" />
-    <Compile Include="ViewModels\Tree\ExplorerViewModel.cs" />
+    <Compile Include="ViewModels\Tree\HierarchicalTreeViewModel.cs" />
     <Compile Include="ViewModels\Tree\FileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\Tree\MenuItemViewModel.cs" />
@@ -203,7 +203,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="DesignData\" />
+    <Folder Include="ViewModels\Interfaces\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -21,17 +21,17 @@ using Telerik.Windows.DragDrop;
 namespace EasyPlaylist.Views
 {
     /// <summary>
-    /// Logique d'interaction pour ExplorerView.xaml
+    /// Logique d'interaction pour HierarchicalTreeView.xaml
     /// </summary>
-    public partial class ExplorerView : UserControl
+    public partial class HierarchicalTreeView : UserControl
     {
-        public ExplorerView()
+        public HierarchicalTreeView()
         {
             InitializeComponent();
 
-            DragDropManager.AddDragOverHandler(ExplorerTreeView, OnDragOver, true);
-            DragDropManager.AddDropHandler(ExplorerTreeView, OnDropCompleted, true);
-            DragDropManager.AddDragDropCompletedHandler(ExplorerTreeView, OnDragDropCompleted, true);
+            DragDropManager.AddDragOverHandler(HierarchicalTree, OnDragOver, true);
+            DragDropManager.AddDropHandler(HierarchicalTree, OnDropCompleted, true);
+            DragDropManager.AddDragDropCompletedHandler(HierarchicalTree, OnDragDropCompleted, true);
         }
 
         private void OnDragOver(object sender, Telerik.Windows.DragDrop.DragEventArgs e)
@@ -70,9 +70,9 @@ namespace EasyPlaylist.Views
             // Récupère le treeview d'origine
             // ==============================
             RadTreeView originRadTreeView = sender as RadTreeView;
-            ExplorerViewModel originExplorerVM = originRadTreeView.DataContext as ExplorerViewModel;
+            HierarchicalTreeViewModel originHierarchicalTreeVM = originRadTreeView.DataContext as HierarchicalTreeViewModel;
 
-            if (originRadTreeView == null || originExplorerVM == null)
+            if (originRadTreeView == null || originHierarchicalTreeVM == null)
             {
                 return;
             }
@@ -92,9 +92,9 @@ namespace EasyPlaylist.Views
                 }
             }
 
-            ExplorerViewModel destinationExplorerVM = destinationRadTreeView.DataContext as ExplorerViewModel;
+            HierarchicalTreeViewModel destinationHierarchicalTreeVM = destinationRadTreeView.DataContext as HierarchicalTreeViewModel;
 
-            if (destinationRadTreeView == null || destinationExplorerVM == null)
+            if (destinationRadTreeView == null || destinationHierarchicalTreeVM == null)
             {
                 return;
             }
@@ -109,7 +109,7 @@ namespace EasyPlaylist.Views
             }
             else
             {
-                destinationItemVM = destinationExplorerVM.RootFolder;
+                destinationItemVM = destinationHierarchicalTreeVM.RootFolder;
             }
 
             // ===============
@@ -123,7 +123,7 @@ namespace EasyPlaylist.Views
             // =============================================
             if (originRadTreeView != destinationRadTreeView)
             {
-                if (destinationExplorerVM != null && destinationExplorerVM.CopyItemInEnabled && originExplorerVM.CopyItemOutEnabled)
+                if (destinationHierarchicalTreeVM != null && destinationHierarchicalTreeVM.CopyItemInEnabled && originHierarchicalTreeVM.CopyItemOutEnabled)
                 {
                     // Dossier de destination
                     FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
@@ -144,7 +144,7 @@ namespace EasyPlaylist.Views
             // ======================================
             else
             {
-                if (originExplorerVM.MoveItemEnabled)
+                if (originHierarchicalTreeVM.MoveItemEnabled)
                 {
                     FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
 
