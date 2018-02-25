@@ -168,6 +168,11 @@ namespace EasyPlaylist.ViewModels
             RootFolder.UpdateAllSubParentFolders();
         }
 
+        public List<string> GetAllFileTagIDs()
+        {
+            return GetAllFileTagIDsRecursively(RootFolder);
+        }
+
         #endregion
 
         #region Private methods
@@ -255,6 +260,22 @@ namespace EasyPlaylist.ViewModels
                 AddMenuItem(newFolder);
                 SelectedItem = newFolder;
             }
+        }
+
+        private List<string> GetAllFileTagIDsRecursively(FolderViewModel folderViewModel)
+        {
+            List<string> fileTagIDs = new List<string>();
+            foreach (FolderViewModel subFolderVM in folderViewModel.Items.OfType<FolderViewModel>())
+            {
+                fileTagIDs.AddRange(GetAllFileTagIDsRecursively(subFolderVM));
+            }
+
+            foreach(FileViewModel fileVM in folderViewModel.Items.OfType<FileViewModel>())
+            {
+                fileTagIDs.Add(fileVM.FileTagID);
+            }
+
+            return fileTagIDs;
         }
 
         #endregion

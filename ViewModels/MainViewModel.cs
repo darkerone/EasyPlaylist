@@ -14,13 +14,64 @@ namespace EasyPlaylist.ViewModels
 {
     class MainViewModel : BaseViewModel
     {
-        public ExplorerViewModel Explorer { get; set; }
-         
-        public ExplorerViewModel Playlist { get; set; }
+        private ExplorerViewModel _explorer;
+        private ExplorerViewModel _playlist;
 
-        public MainViewModel(ExplorerViewModel playlist)
+        public ExplorerViewModel Explorer
         {
-            Playlist = playlist;
+            get { return _explorer; }
+            set
+            {
+                _explorer = value;
+                RaisePropertyChanged("Explorer");
+            }
+        }
+
+        public ExplorerViewModel Playlist
+        {
+            get { return _playlist; }
+            set
+            {
+                _playlist = value;
+                RaisePropertyChanged("Playlist");
+            }
+        }
+
+        public MainViewModel()
+        {
+            // Récupère la playlist sauvegardée
+            if (System.IO.File.Exists(@"Playlist.txt"))
+            {
+                string json = System.IO.File.ReadAllText(@"Playlist.txt");
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+                Playlist = JsonConvert.DeserializeObject<ExplorerViewModel>(json, jsonSerializerSettings);
+            }
+
+            if (Playlist == null)
+            {
+                Playlist = new ExplorerViewModel();
+            }
+            Playlist.CopyItemInEnabled = true;
+            Playlist.CopyItemOutEnabled = false;
+            Playlist.MoveItemEnabled = true;
+            Playlist.IsEditable = true;
+            Playlist.Name = "Ma playlist";
+            
+            Explorer = new ExplorerViewModel();
+            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            // Récupère le dossier et ses sous dossiers et fichiers
+            FolderViewModel musicFolder = GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
+            Explorer.AddMenuItems(musicFolder.Items.ToList());
+            Explorer.CopyItemInEnabled = false;
+            Explorer.CopyItemOutEnabled = true;
+            Explorer.MoveItemEnabled = false;
+            Explorer.IsEditable = false;
+
+            CheckIfItemsExistInPlaylist(Explorer, Playlist);
         }
 
         public ICommand Browse
@@ -42,7 +93,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        
+
 
         public ICommand SavePlaylist
         {
@@ -87,7 +138,7 @@ namespace EasyPlaylist.ViewModels
             {
                 foreach (string filePath in filesPaths)
                 {
-                    if(Path.GetExtension(filePath) == ".mp3")
+                    if (Path.GetExtension(filePath) == ".mp3")
                     {
                         folderViewModel.AddItem(new FileViewModel(filePath));
                     }
@@ -95,6 +146,43 @@ namespace EasyPlaylist.ViewModels
             }
 
             return folderViewModel;
+        }
+
+        /// <summary>
+        /// Vérifie et marque les fichiers de l'explorer passé en paramètre selon que le tag id est présent dans la playlist passée en paramètre
+        /// </summary>
+        /// <param name="folderVM"></param>
+        /// <param name="playlistFileTagIDs"></param>
+        public void CheckIfItemsExistInPlaylist(ExplorerViewModel explorerVM, ExplorerViewModel playlistVM)
+        {
+            List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
+
+            CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, playlistFileTagIDs);
+        }
+
+        /// <summary>
+        /// Vérifie et marque les fichiers du dossier passé en paramètre selon s'ils sont présent dans la liste des tag id passée en paramètre
+        /// </summary>
+        /// <param name="folderVM"></param>
+        /// <param name="playlistFileTagIDs"></param>
+        private void CheckIfItemsExistInPlaylistRecursively(FolderViewModel folderVM, List<string> playlistFileTagIDs)
+        {
+            foreach(FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
+            {
+                CheckIfItemsExistInPlaylistRecursively(subFolderVM, playlistFileTagIDs);
+            }
+
+            foreach(FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+            {
+                if(playlistFileTagIDs.Any(x => x == fileVM.FileTagID))
+                {
+                    fileVM.ExistsInPlaylist = true;
+                }
+                else
+                {
+                    fileVM.ExistsInPlaylist = false;
+                }
+            }
         }
     }
 }

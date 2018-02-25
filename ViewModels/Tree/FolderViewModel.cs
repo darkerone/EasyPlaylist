@@ -13,13 +13,19 @@ namespace EasyPlaylist.ViewModels
     {
         public FolderViewModel(string path) : base(path)
         {
-            this.Items = new ObservableCollection<MenuItemViewModel>();
+            Items = new ObservableCollection<MenuItemViewModel>();
         }
 
         [JsonConstructor]
         public FolderViewModel(string path, string title) : base(path, title)
         {
-            this.Items = new ObservableCollection<MenuItemViewModel>();
+            Items = new ObservableCollection<MenuItemViewModel>();
+            Items.CollectionChanged += Items_CollectionChanged;
+        }
+
+        private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+
         }
 
         /// <summary>

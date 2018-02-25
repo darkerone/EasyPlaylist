@@ -18,6 +18,11 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         public string FileTagID { get; set; }
 
+        /// <summary>
+        /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
+        /// </summary>
+        public bool ExistsInPlaylist { get; set; }
+
         [JsonConstructor]
         public FileViewModel(string path) : base(path)
         {

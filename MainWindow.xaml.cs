@@ -23,50 +23,11 @@ namespace EasyPlaylist.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainViewModel mainViewModel;
-
         public MainWindow()
         {
             InitializeComponent();
 
-            ExplorerViewModel playlist = null;
-
-            // Récupère la playlist sauvegardée
-            if (System.IO.File.Exists(@"Playlist.txt"))
-            {
-                string json = System.IO.File.ReadAllText(@"Playlist.txt");
-                var jsonSerializerSettings = new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                };
-                playlist = JsonConvert.DeserializeObject<ExplorerViewModel>(json, jsonSerializerSettings);
-            }
-
-            if(playlist == null)
-            {
-                playlist = new ExplorerViewModel();
-            }
-            playlist.CopyItemInEnabled = true;
-            playlist.CopyItemOutEnabled = false;
-            playlist.MoveItemEnabled = true;
-            playlist.IsEditable = true;
-            playlist.Name = "Ma playlist";
-
-            mainViewModel = new MainViewModel(playlist);
-
-            mainViewModel.Explorer = new ExplorerViewModel();
-            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            // Récupère le dossier et ses sous dossiers et fichiers
-            FolderViewModel musicFolder = mainViewModel.GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
-            mainViewModel.Explorer.AddMenuItems(musicFolder.Items.ToList());
-            mainViewModel.Explorer.CopyItemInEnabled = false;
-            mainViewModel.Explorer.CopyItemOutEnabled = true;
-            mainViewModel.Explorer.MoveItemEnabled = false;
-            mainViewModel.Explorer.IsEditable = false;
-
-
-            DataContext = mainViewModel;
+            DataContext = new MainViewModel();
         }
     }
 }
