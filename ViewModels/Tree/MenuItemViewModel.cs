@@ -69,33 +69,25 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    DefineNamePopupView defineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel defineNamePopupViewModel = new DefineNamePopupViewModel();
-                    defineNamePopupViewModel.ItemName = Title;
-                    defineNamePopupView.DataContext = defineNamePopupViewModel;
+                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+                    newDefineNamePopupViewModel.ItemName = Title;
+                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.Header = "Rename item";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = defineNamePopupView;
-                    radWindow.Closed += FolderNamePopup_Closed;
+                    radWindow.Content = newDefineNamePopupView;
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                        RadWindow popup = sender as RadWindow;
+                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+                        DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            Title = defineNamePopupViewModel.ItemName;
+                        }
+                    };
                     radWindow.Show();
                 });
-            }
-        }
-
-        /// <summary>
-        /// Lorsque la popup de définition du nom se ferme
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FolderNamePopup_Closed(object sender, WindowClosedEventArgs e)
-        {
-            RadWindow popup = sender as RadWindow;
-            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-            DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-            if (e.DialogResult == true)
-            {
-                Title = defineNamePopupViewModel.ItemName;
             }
         }
 

@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -138,13 +139,21 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    var jsonSerializerSettings = new JsonSerializerSettings()
+                    try
                     {
-                        TypeNameHandling = TypeNameHandling.All,
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                    };
-                    string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
-                    System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
+                        var jsonSerializerSettings = new JsonSerializerSettings()
+                        {
+                            TypeNameHandling = TypeNameHandling.All,
+                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        };
+                        string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
+                        System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
+                        System.Windows.MessageBox.Show("Playlists saved successfully", "Save playlists", MessageBoxButton.OK, MessageBoxImage.None);
+                    }
+                    catch(Exception e)
+                    {
+                        System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                    }
                 });
             }
         }
@@ -155,15 +164,30 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    DefineNamePopupView folderNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel defineNamePopupViewModel = new DefineNamePopupViewModel();
-                    defineNamePopupViewModel.ItemName = "New playlist";
-                    folderNamePopupView.DataContext = defineNamePopupViewModel;
+                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+                    newDefineNamePopupViewModel.ItemName = "New playlist";
+                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     radWindow.Header = "New playlist";
-                    radWindow.Content = folderNamePopupView;
-                    radWindow.Closed += DefineNameAndCreatePlyalistPopup_Closed;
+                    radWindow.Content = newDefineNamePopupView;
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                    {
+                        RadWindow popup = sender as RadWindow;
+                        DefineNamePopupView namePopupView = popup.Content as DefineNamePopupView;
+                        DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator);
+                            newPlaylist.Name = namePopupViewModel.ItemName;
+                            newPlaylist.CopyItemInEnabled = true;
+                            newPlaylist.CopyItemOutEnabled = false;
+                            newPlaylist.MoveItemEnabled = true;
+                            newPlaylist.IsEditable = true;
+                            AddPlaylist(newPlaylist);
+                        }
+                    };
                     radWindow.Show();
                 });
             }
@@ -258,28 +282,6 @@ namespace EasyPlaylist.ViewModels
                 {
                     fileVM.ExistsInPlaylist = false;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Lorsque la popup de définition du nom se ferme
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DefineNameAndCreatePlyalistPopup_Closed(object sender, WindowClosedEventArgs e)
-        {
-            RadWindow popup = sender as RadWindow;
-            DefineNamePopupView namePopupView = popup.Content as DefineNamePopupView;
-            DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
-            if (e.DialogResult == true)
-            {
-                HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator);
-                newPlaylist.Name = namePopupViewModel.ItemName;
-                newPlaylist.CopyItemInEnabled = true;
-                newPlaylist.CopyItemOutEnabled = false;
-                newPlaylist.MoveItemEnabled = true;
-                newPlaylist.IsEditable = true;
-                AddPlaylist(newPlaylist);
             }
         }
     }

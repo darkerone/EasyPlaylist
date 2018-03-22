@@ -98,15 +98,25 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    DefineNamePopupView folderNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel folderNamePopupViewModel = new DefineNamePopupViewModel();
-                    folderNamePopupViewModel.ItemName = "New folder";
-                    folderNamePopupView.DataContext = folderNamePopupViewModel;
+                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+                    newDefineNamePopupViewModel.ItemName = "New folder";
+                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     radWindow.Header = "New folder";
-                    radWindow.Content = folderNamePopupView;
-                    radWindow.Closed += DefineNameAndCreateFolderPopup_Closed;
+                    radWindow.Content = newDefineNamePopupView;
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                        RadWindow popup = sender as RadWindow;
+                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+                        DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            FolderViewModel newFolder = new FolderViewModel(EventAggregator, definePopupViewModel.ItemName, null);
+                            AddMenuItem(newFolder);
+                            SelectedItem = newFolder;
+                        }
+                    };
                     radWindow.Show();
                 });
             }
@@ -141,15 +151,25 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    DefineNamePopupView defineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel defineNamePopupViewModel = new DefineNamePopupViewModel();
-                    defineNamePopupViewModel.ItemName = Name;
-                    defineNamePopupView.DataContext = defineNamePopupViewModel;
+                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+                    newDefineNamePopupViewModel.ItemName = Name;
+                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.Header = "Rename playlist";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = defineNamePopupView;
-                    radWindow.Closed += DefineNamePopup_Closed;
+                    radWindow.Content = newDefineNamePopupView;
+
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                        RadWindow popup = sender as RadWindow;
+                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+                        DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            Name = defineNamePopupViewModel.ItemName;
+                        }
+                    };
+
                     radWindow.Show();
                 });
             }
@@ -285,45 +305,7 @@ namespace EasyPlaylist.ViewModels
                 }
             }
         }
-
-
-        #endregion
-
-        #region Events
-
-        /// <summary>
-        /// Lorsque la popup de définition du nom se ferme
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DefineNameAndCreateFolderPopup_Closed(object sender, WindowClosedEventArgs e)
-        {
-            RadWindow popup = sender as RadWindow;
-            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-            DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-            if (e.DialogResult == true)
-            {
-                FolderViewModel newFolder = new FolderViewModel(EventAggregator, definePopupViewModel.ItemName, null);
-                AddMenuItem(newFolder);
-                SelectedItem = newFolder;
-            }
-        }
-
-        /// <summary>
-        /// Lorsque la popup de définition du nom se ferme
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DefineNamePopup_Closed(object sender, WindowClosedEventArgs e)
-        {
-            RadWindow popup = sender as RadWindow;
-            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-            DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-            if (e.DialogResult == true)
-            {
-                Name = defineNamePopupViewModel.ItemName;
-            }
-        }
+        
 
         /// <summary>
         /// Récupère de manière récursive tous les ID des fichiers du dossier passé en paramètre
