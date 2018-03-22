@@ -62,47 +62,37 @@ namespace EasyPlaylist.ViewModels
             EventAggregator = new EventAggregator();
             _playlists = new ObservableCollection<HierarchicalTreeViewModel>();
 
-            HierarchicalTreeViewModel playlist1 = new HierarchicalTreeViewModel(EventAggregator);
-            playlist1.Name = "Playlist 1";
-            playlist1.CopyItemInEnabled = true;
-            playlist1.CopyItemOutEnabled = false;
-            playlist1.MoveItemEnabled = true;
-            playlist1.IsEditable = true;
-            Playlists.Add(playlist1);
-            HierarchicalTreeViewModel playlist2 = new HierarchicalTreeViewModel(EventAggregator);
-            playlist2.Name = "Playlist 2";
-            playlist1.CopyItemInEnabled = true;
-            playlist1.CopyItemOutEnabled = false;
-            playlist1.MoveItemEnabled = true;
-            playlist1.IsEditable = true;
-            Playlists.Add(playlist2);
+            // =========
+            // Playlists
+            // =========
 
-            // ========
-            // Playlist
-            // ========
-            Playlist = new HierarchicalTreeViewModel(EventAggregator);
-
-            // Récupère la playlist sauvegardée
-            if (System.IO.File.Exists(@"Playlist.txt"))
+            // Récupère les playlists sauvegardées
+            if (System.IO.File.Exists(@"Playlists.txt"))
             {
-                string json = System.IO.File.ReadAllText(@"Playlist.txt");
+                string json = System.IO.File.ReadAllText(@"Playlists.txt");
                 var jsonSerializerSettings = new JsonSerializerSettings()
                 {
                     TypeNameHandling = TypeNameHandling.All,
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
-                HierarchicalTreeViewModel deserializedPlaylist = JsonConvert.DeserializeObject<HierarchicalTreeViewModel>(json, jsonSerializerSettings);
+                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
 
-                // Copie toutes les propriétés utiles de la playlist déserialisée
-                Playlist.AddMenuItems(deserializedPlaylist.RootFolder.Items.ToList());
-                Playlist.Name = deserializedPlaylist.Name;
+                if (deserializedPlaylist != null)
+                {
+                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
+                    {
+                        // Copie toutes les propriétés utiles de la playlist déserialisée
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator);
+                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+                        hierarchicalTreeViewModel.Name = deserializedHierarchicalTreeVM.Name;
+                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
+                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
+                        hierarchicalTreeViewModel.MoveItemEnabled = true;
+                        hierarchicalTreeViewModel.IsEditable = true;
+                        AddPlaylist(hierarchicalTreeViewModel);
+                    }
+                }
             }
-
-            Playlist.CopyItemInEnabled = true;
-            Playlist.CopyItemOutEnabled = false;
-            Playlist.MoveItemEnabled = true;
-            Playlist.IsEditable = true;
-            Playlist.Name = "Ma playlist";
             
             // ========
             // Explorer
@@ -117,10 +107,10 @@ namespace EasyPlaylist.ViewModels
             Explorer.MoveItemEnabled = false;
             Explorer.IsEditable = false;
 
-            CheckIfItemsExistInPlaylist(Explorer, Playlist);
-            EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
-                CheckIfItemsExistInPlaylist(Explorer, Playlist);
-            });
+            //CheckIfItemsExistInPlaylist(Explorer, Playlist);
+            //EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
+            //    CheckIfItemsExistInPlaylist(Explorer, Playlist);
+            //});
         }
 
         public ICommand Browse
@@ -153,8 +143,8 @@ namespace EasyPlaylist.ViewModels
                         TypeNameHandling = TypeNameHandling.All,
                         ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                     };
-                    string jsonPlaylist = JsonConvert.SerializeObject(Playlist, jsonSerializerSettings);
-                    System.IO.File.WriteAllText(@"Playlist.txt", jsonPlaylist);
+                    string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
+                    System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
                 });
             }
         }
