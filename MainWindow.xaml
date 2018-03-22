@@ -35,7 +35,8 @@
             Width="5" Background="#FFBCBCBC"/>
         <telerik:RadTabControl Grid.Row="1" Grid.Column="2" 
                                ItemsSource="{Binding Playlists}" 
-                               DisplayMemberPath="Name">
+                               DisplayMemberPath="Name"
+                               SelectedItem="{Binding SelectedPlaylist}">
             <telerik:RadTabControl.ContentTemplate>
                 <DataTemplate>
                     <StackPanel>

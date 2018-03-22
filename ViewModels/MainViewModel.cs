@@ -36,14 +36,15 @@ namespace EasyPlaylist.ViewModels
             get { return _playlists; }
         }
 
-        private HierarchicalTreeViewModel _playlist;
-        public HierarchicalTreeViewModel Playlist
+        private HierarchicalTreeViewModel _selectedPlaylist;
+        public HierarchicalTreeViewModel SelectedPlaylist
         {
-            get { return _playlist; }
+            get { return _selectedPlaylist; }
             set
             {
-                _playlist = value;
+                _selectedPlaylist = value;
                 RaisePropertyChanged("Playlist");
+                CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             }
         }
 
@@ -94,6 +95,11 @@ namespace EasyPlaylist.ViewModels
                     }
                 }
             }
+
+            if (Playlists.Any())
+            {
+                SelectedPlaylist = Playlists.First();
+            }
             
             // ========
             // Explorer
@@ -108,10 +114,10 @@ namespace EasyPlaylist.ViewModels
             Explorer.MoveItemEnabled = false;
             Explorer.IsEditable = false;
 
-            //CheckIfItemsExistInPlaylist(Explorer, Playlist);
-            //EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
-            //    CheckIfItemsExistInPlaylist(Explorer, Playlist);
-            //});
+            CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+            EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
+                CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+            });
         }
 
         public ICommand Browse
@@ -234,11 +240,14 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="folderVM"></param>
         /// <param name="playlistFileTagIDs"></param>
-        public void CheckIfItemsExistInPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
+        public void CheckIfItemsExistInSelectedPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
         {
-            List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
+            if(explorerVM != null && playlistVM != null)
+            {
+                List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
 
-            CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, playlistFileTagIDs);
+                CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, playlistFileTagIDs);
+            }
         }
 
         /// <summary>
