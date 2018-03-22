@@ -140,8 +140,8 @@
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
-    <Compile Include="Views\FolderNamePopupView.xaml.cs">
-      <DependentUpon>FolderNamePopupView.xaml</DependentUpon>
+    <Compile Include="Views\DefineNamePopupView.xaml.cs">
+      <DependentUpon>DefineNamePopupView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\HierarchicalTreeView.xaml.cs">
       <DependentUpon>HierarchicalTreeView.xaml</DependentUpon>
@@ -160,7 +160,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\FolderNamePopupView.xaml">
+    <Page Include="Views\DefineNamePopupView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -175,7 +175,7 @@
     <Compile Include="ViewModels\Tree\FileViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\Tree\MenuItemViewModel.cs" />
-    <Compile Include="ViewModels\FolderNamePopupViewModel.cs" />
+    <Compile Include="ViewModels\DefineNamePopupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

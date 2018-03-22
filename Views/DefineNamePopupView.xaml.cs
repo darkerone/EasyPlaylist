@@ -21,11 +21,11 @@ using Telerik.Windows.DragDrop;
 namespace EasyPlaylist.Views
 {
     /// <summary>
-    /// Logique d'interaction pour FolderNamePopupView.xaml
+    /// Logique d'interaction pour DefineNamePopupView.xaml
     /// </summary>
-    public partial class FolderNamePopupView : UserControl
+    public partial class DefineNamePopupView : UserControl
     {
-        public FolderNamePopupView()
+        public DefineNamePopupView()
         {
             InitializeComponent();
         }
@@ -39,10 +39,10 @@ namespace EasyPlaylist.Views
 
         private void ValidateButton_Click(object sender, RoutedEventArgs e)
         {
-            FolderNamePopupView addFolderPopupView = (sender as FrameworkElement).ParentOfType<FolderNamePopupView>(); ;
-            FolderNamePopupViewModel addFolderPopupViewModel = addFolderPopupView.DataContext as FolderNamePopupViewModel;
+            DefineNamePopupView defineNamePopupView = (sender as FrameworkElement).ParentOfType<DefineNamePopupView>(); ;
+            DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
 
-            if (addFolderPopupViewModel.ValidateAddFolder())
+            if (defineNamePopupViewModel.ValidateName())
             {
                 RadWindow window = this.ParentOfType<RadWindow>();
                 window.DialogResult = true;

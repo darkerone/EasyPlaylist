@@ -8,13 +8,20 @@ using System.Windows.Input;
 
 namespace EasyPlaylist.ViewModels
 {
-    class FolderNamePopupViewModel : BaseViewModel
+    class DefineNamePopupViewModel : BaseViewModel
     {
+        private string _itemName;
+        public string ItemName
+        {
+            get { return _itemName; }
+            set
+            {
+                _itemName = value;
+                RaisePropertyChanged("ItemName");
+            }
+        }
+
         private bool _isOpen;
-        private string _errorMessage;
-
-        public string ItemName { get; set; }
-
         public bool IsOpen
         {
             get { return _isOpen; }
@@ -25,6 +32,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private string _errorMessage;
         public string ErrorMessage
         {
             get { return _errorMessage; }
@@ -35,15 +43,15 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public FolderNamePopupViewModel()
+        public DefineNamePopupViewModel()
         {
             IsOpen = false;
             ErrorMessage = "";
         }
 
-        public bool ValidateAddFolder()
+        public bool ValidateName()
         {
-            // Vérifie que le nom du dossier ne soit pas vide
+            // Vérifie que le nom ne soit pas vide
             if (ItemName == null || ItemName == "")
             {
                 ErrorMessage = "Name is required";

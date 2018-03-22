@@ -90,15 +90,15 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    FolderNamePopupView folderNamePopupView = new FolderNamePopupView();
-                    FolderNamePopupViewModel folderNamePopupViewModel = new FolderNamePopupViewModel();
+                    DefineNamePopupView folderNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel folderNamePopupViewModel = new DefineNamePopupViewModel();
                     folderNamePopupViewModel.ItemName = "New folder";
                     folderNamePopupView.DataContext = folderNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     radWindow.Header = "New folder";
                     radWindow.Content = folderNamePopupView;
-                    radWindow.Closed += FolderNamePopup_Closed;
+                    radWindow.Closed += DefineNamePopup_Closed;
                     radWindow.Show();
                 });
             }
@@ -180,6 +180,10 @@ namespace EasyPlaylist.ViewModels
             RootFolder.UpdateAllSubParentFolders();
         }
 
+        /// <summary>
+        /// Récupère tous les ID des fichiers du dossier root
+        /// </summary>
+        /// <returns></returns>
         public List<string> GetAllFileTagIDs()
         {
             return GetAllFileTagIDsRecursively(RootFolder);
@@ -261,19 +265,29 @@ namespace EasyPlaylist.ViewModels
 
         #region Events
 
-        private void FolderNamePopup_Closed(object sender, WindowClosedEventArgs e)
+        /// <summary>
+        /// Lorsque la popup de définition du nom se ferme
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DefineNamePopup_Closed(object sender, WindowClosedEventArgs e)
         {
             RadWindow popup = sender as RadWindow;
-            FolderNamePopupView folderNamePopupView = popup.Content as FolderNamePopupView;
-            FolderNamePopupViewModel folderNamePopupViewModel = folderNamePopupView.DataContext as FolderNamePopupViewModel;
+            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+            DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
             if (e.DialogResult == true)
             {
-                FolderViewModel newFolder = new FolderViewModel(EventAggregator, folderNamePopupViewModel.ItemName, null);
+                FolderViewModel newFolder = new FolderViewModel(EventAggregator, definePopupViewModel.ItemName, null);
                 AddMenuItem(newFolder);
                 SelectedItem = newFolder;
             }
         }
 
+        /// <summary>
+        /// Récupère de manière récursive tous les ID des fichiers du dossier passé en paramètre
+        /// </summary>
+        /// <param name="folderViewModel"></param>
+        /// <returns></returns>
         private List<string> GetAllFileTagIDsRecursively(FolderViewModel folderViewModel)
         {
             List<string> fileTagIDs = new List<string>();

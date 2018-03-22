@@ -22,6 +22,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <Button Content="Browse" Command="{Binding Browse}"></Button>
             <Button Content="Save playlists" Command="{Binding SavePlaylist}"></Button>
+            <Button Content="Add playlist" Command="{Binding AddNewPlaylist}"></Button>
         </StackPanel>
         
         <controls:HierarchicalTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
@@ -32,15 +33,17 @@
             VerticalAlignment="Stretch"
             ResizeBehavior="PreviousAndNext"
             Width="5" Background="#FFBCBCBC"/>
-        <telerik:RadTabControl Grid.Row="1" Grid.Column="2" >
-            <telerik:RadTabControl.Items>
-                <telerik:RadTabItem Header="{Binding Playlist.Name}">
-                    <controls:HierarchicalTreeView DataContext="{Binding Playlist}"></controls:HierarchicalTreeView>
-                </telerik:RadTabItem>
-                <telerik:RadTabItem Header="Tab 2" />
-                <telerik:RadTabItem Header="Tab 3" />
-                <telerik:RadTabItem Header="Tab 4" />
-            </telerik:RadTabControl.Items>
+        <telerik:RadTabControl Grid.Row="1" Grid.Column="2" 
+                               ItemsSource="{Binding Playlists}" 
+                               DisplayMemberPath="Name">
+            <telerik:RadTabControl.ContentTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <controls:HierarchicalTreeView DataContext="{Binding}"></controls:HierarchicalTreeView>
+                    </StackPanel>
+                    
+                </DataTemplate>
+            </telerik:RadTabControl.ContentTemplate>
         </telerik:RadTabControl>
         
     </Grid>

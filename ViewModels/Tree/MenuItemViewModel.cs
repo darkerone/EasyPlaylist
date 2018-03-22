@@ -69,10 +69,10 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    FolderNamePopupView folderNamePopupView = new FolderNamePopupView();
-                    FolderNamePopupViewModel folderNamePopupViewModel = new FolderNamePopupViewModel();
-                    folderNamePopupViewModel.ItemName = Title;
-                    folderNamePopupView.DataContext = folderNamePopupViewModel;
+                    DefineNamePopupView folderNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel defineNamePopupViewModel = new DefineNamePopupViewModel();
+                    defineNamePopupViewModel.ItemName = Title;
+                    folderNamePopupView.DataContext = defineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.Header = "Rename item";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -83,14 +83,19 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        /// <summary>
+        /// Lorsque la popup de définition du nom se ferme
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FolderNamePopup_Closed(object sender, WindowClosedEventArgs e)
         {
             RadWindow popup = sender as RadWindow;
-            FolderNamePopupView folderNamePopupView = popup.Content as FolderNamePopupView;
-            FolderNamePopupViewModel folderNamePopupViewModel = folderNamePopupView.DataContext as FolderNamePopupViewModel;
+            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+            DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
             if (e.DialogResult == true)
             {
-                Title = folderNamePopupViewModel.ItemName;
+                Title = defineNamePopupViewModel.ItemName;
             }
         }
 
