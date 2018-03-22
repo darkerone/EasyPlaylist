@@ -1,4 +1,5 @@
-﻿using EasyPlaylist.Events;
+﻿using EasyPlaylist.Enums;
+using EasyPlaylist.Events;
 using EasyPlaylist.Views;
 using Newtonsoft.Json;
 using Prism.Events;
@@ -156,7 +157,7 @@ namespace EasyPlaylist.ViewModels
                         System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
                         System.Windows.MessageBox.Show("Playlists saved successfully", "Save playlists", MessageBoxButton.OK, MessageBoxImage.None);
                     }
-                    catch(Exception e)
+                    catch
                     {
                         System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
                     }
@@ -281,15 +282,15 @@ namespace EasyPlaylist.ViewModels
                 CheckIfItemsExistInPlaylistRecursively(subFolderVM, playlistFileTagIDs);
             }
 
-            foreach(FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+            foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
             {
-                if(playlistFileTagIDs.Any(x => x == fileVM.FileTagID))
+                if (playlistFileTagIDs.Any(x => x == fileVM.FileTagID))
                 {
-                    fileVM.ExistsInPlaylist = true;
+                    fileVM.ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.Exists;
                 }
                 else
                 {
-                    fileVM.ExistsInPlaylist = false;
+                    fileVM.ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.NotExists;
                 }
             }
         }

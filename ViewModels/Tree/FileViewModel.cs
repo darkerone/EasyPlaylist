@@ -9,6 +9,7 @@ using TagLib.Id3v2;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Prism.Events;
+using EasyPlaylist.Enums;
 
 namespace EasyPlaylist.ViewModels
 {
@@ -28,23 +29,25 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private bool _existsInPlaylist;
+        private ExistsInPlaylistStatusEnum _existsInPlaylistStatus;
         /// <summary>
         /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
         /// </summary>
-        public bool ExistsInPlaylist
+        public ExistsInPlaylistStatusEnum ExistsInPlaylistStatus
         {
-            get { return _existsInPlaylist; }
+            get { return _existsInPlaylistStatus; }
             set
             {
-                _existsInPlaylist = value;
-                RaisePropertyChanged("ExistsInPlaylist");
+                _existsInPlaylistStatus = value;
+                RaisePropertyChanged("ExistsInPlaylistStatus");
             }
         }
 
         [JsonConstructor]
         public FileViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
         {
+            ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.Default;
+
             TagLib.File fileInfos = TagLib.File.Create(path);
 
             TagLib.Id3v2.Tag tag = (TagLib.Id3v2.Tag)fileInfos.GetTag(TagTypes.Id3v2); // You can add a true parameter to the GetTag function if the file doesn't already have a tag.

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EasyPlaylist.Views"
              xmlns:vm="clr-namespace:EasyPlaylist.ViewModels"
+             xmlns:enums="clr-namespace:EasyPlaylist.Enums"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
@@ -38,10 +39,13 @@
                         <HierarchicalDataTemplate.ItemContainerStyle>
                             <Style TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ExistsInPlaylist}" Value="True">
+                                    <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Default}">
+                                        <Setter Property="TreeViewItem.Foreground" Value="Black" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Exists}">
                                         <Setter Property="TreeViewItem.Foreground" Value="Green" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding ExistsInPlaylist}" Value="False">
+                                    <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.NotExists}">
                                         <Setter Property="TreeViewItem.Foreground" Value="Red" />
                                     </DataTrigger>
                                 </Style.Triggers>

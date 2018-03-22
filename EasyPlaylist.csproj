@@ -138,6 +138,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
+    <Compile Include="Enums\ExistsInPlaylistStatusEnum.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
     <Compile Include="Views\DefineNamePopupView.xaml.cs">
