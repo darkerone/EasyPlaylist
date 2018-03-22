@@ -69,14 +69,14 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand(() =>
                 {
-                    DefineNamePopupView folderNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupView defineNamePopupView = new DefineNamePopupView();
                     DefineNamePopupViewModel defineNamePopupViewModel = new DefineNamePopupViewModel();
                     defineNamePopupViewModel.ItemName = Title;
-                    folderNamePopupView.DataContext = defineNamePopupViewModel;
+                    defineNamePopupView.DataContext = defineNamePopupViewModel;
                     RadWindow radWindow = new RadWindow();
                     radWindow.Header = "Rename item";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = folderNamePopupView;
+                    radWindow.Content = defineNamePopupView;
                     radWindow.Closed += FolderNamePopup_Closed;
                     radWindow.Show();
                 });

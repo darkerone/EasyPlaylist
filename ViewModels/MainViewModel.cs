@@ -163,7 +163,7 @@ namespace EasyPlaylist.ViewModels
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     radWindow.Header = "New playlist";
                     radWindow.Content = folderNamePopupView;
-                    radWindow.Closed += DefineNamePopup_Closed;
+                    radWindow.Closed += DefineNameAndCreatePlyalistPopup_Closed;
                     radWindow.Show();
                 });
             }
@@ -266,7 +266,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DefineNamePopup_Closed(object sender, WindowClosedEventArgs e)
+        private void DefineNameAndCreatePlyalistPopup_Closed(object sender, WindowClosedEventArgs e)
         {
             RadWindow popup = sender as RadWindow;
             DefineNamePopupView namePopupView = popup.Content as DefineNamePopupView;

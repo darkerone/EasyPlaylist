@@ -23,6 +23,9 @@
                 <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
                         Content="Export playlist" 
                         Command="{Binding Export}"></Button>
+                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Content="Rename playlist" 
+                        Command="{Binding Rename}"></Button>
             </StackPanel>
             <telerik:RadTreeView 
             x:Name="HierarchicalTree"
