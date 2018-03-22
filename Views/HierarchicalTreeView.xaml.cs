@@ -90,6 +90,10 @@ namespace EasyPlaylist.Views
                     // On récupère le treeview de destination grâce à l'item de destination
                     destinationRadTreeView = (options.DropTargetItem as FrameworkElement).ParentOfType<RadTreeView>();
                 }
+                else
+                {
+                    return;
+                }
             }
 
             HierarchicalTreeViewModel destinationHierarchicalTreeVM = destinationRadTreeView.DataContext as HierarchicalTreeViewModel;
