@@ -137,6 +137,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\NullToFalseConverter.cs" />
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="Enums\ExistsInPlaylistStatusEnum.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />

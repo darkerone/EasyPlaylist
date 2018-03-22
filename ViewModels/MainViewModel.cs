@@ -44,7 +44,7 @@ namespace EasyPlaylist.ViewModels
             set
             {
                 _selectedPlaylist = value;
-                RaisePropertyChanged("Playlist");
+                RaisePropertyChanged("SelectedPlaylist");
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             }
         }
@@ -155,7 +155,7 @@ namespace EasyPlaylist.ViewModels
                         };
                         string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
                         System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
-                        System.Windows.MessageBox.Show("Playlists saved successfully", "Save playlists", MessageBoxButton.OK, MessageBoxImage.None);
+                        System.Windows.MessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, MessageBoxImage.None);
                     }
                     catch
                     {
@@ -199,6 +199,39 @@ namespace EasyPlaylist.ViewModels
                 });
             }
         }
+
+        public ICommand RemoveSelectedPlaylist
+        {
+            get
+            {
+                return new DelegateCommand(() =>
+                {
+                    if(SelectedPlaylist != null)
+                    {
+                        string playlistToRemoveName = SelectedPlaylist.Name;
+                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to remove the playlist \"{playlistToRemoveName}\"", "Remove playlist", MessageBoxButton.YesNo);
+                        switch (result)
+                        {
+                            case MessageBoxResult.Yes:
+                                // Retire la playlist
+                                Playlists.Remove(SelectedPlaylist);
+                                // Sélectionne la première playlist restante si elle existe
+                                if (Playlists.Any())
+                                {
+                                    SelectedPlaylist = Playlists.First();
+                                }
+                                else
+                                {
+                                    SelectedPlaylist = null;
+                                }
+                                break;
+                        }
+                    }
+                });
+            }
+        }
+
+        
 
         /// <summary>
         /// Récupère le modèle de vue du dossier ainsi que de tous ses sous dossiers et fichiers

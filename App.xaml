@@ -23,6 +23,7 @@
                 </ResourceDictionary>
                 <ResourceDictionary>
                     <converters:FalseToHiddenVisibilityConverter x:Key="FalseToHiddenVisibilityConverter"/>
+                    <converters:NullToFalseConverter x:Key="NullToFalseConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

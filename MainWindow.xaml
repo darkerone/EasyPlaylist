@@ -23,6 +23,10 @@
             <Button Content="Browse" Command="{Binding Browse}"></Button>
             <Button Content="Save playlists" Command="{Binding SavePlaylist}"></Button>
             <Button Content="Add playlist" Command="{Binding AddNewPlaylist}"></Button>
+            <Button 
+                Content="Remove selected playlist" 
+                Command="{Binding RemoveSelectedPlaylist}"
+                IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}"></Button>
         </StackPanel>
         
         <controls:HierarchicalTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
