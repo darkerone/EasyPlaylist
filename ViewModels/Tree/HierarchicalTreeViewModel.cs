@@ -145,7 +145,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand Rename
+        public ICommand RenamePlaylist
         {
             get
             {

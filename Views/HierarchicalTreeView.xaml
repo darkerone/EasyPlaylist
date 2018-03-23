@@ -11,42 +11,45 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:EasyPlaylist.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
-        <DockPanel>
+             d:DesignHeight="300" d:DesignWidth="500">
+    <DockPanel>
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}" 
+                <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}" 
                         Content="Remove selected" 
-                        Command="{Binding RemoveSelectedItem}" Margin="5"></Button>
-                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Command="{Binding RemoveSelectedItem}"
+                        IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}"></telerik:RadButton>
+                <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
                         Content="Add folder" 
-                        Command="{Binding OpenAddFolderPopup}"></Button>
-                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Command="{Binding OpenAddFolderPopup}"></telerik:RadButton>
+                <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
                         Content="Export playlist" 
-                        Command="{Binding Export}"></Button>
-                <Button Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
+                        Command="{Binding Export}"></telerik:RadButton>
+                <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
                         Content="Rename playlist" 
-                        Command="{Binding Rename}"></Button>
+                        Command="{Binding RenamePlaylist}"></telerik:RadButton>
             </StackPanel>
-            <telerik:RadTreeView 
-            x:Name="HierarchicalTree"
-            ItemsSource="{Binding RootFolder.Items}" 
-            SelectionMode="Single" 
-            SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-            IsDragDropEnabled="True">
+            <telerik:RadTreeView  MaxHeight="550"
+                x:Name="HierarchicalTree"
+                ItemsSource="{Binding RootFolder.Items}" 
+                SelectionMode="Single" 
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                IsDragDropEnabled="True"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                telerik:AnimationManager.IsAnimationEnabled="False">
                 <telerik:RadTreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Items}">
                         <HierarchicalDataTemplate.ItemContainerStyle>
                             <Style TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Default}">
-                                        <Setter Property="TreeViewItem.Foreground" Value="Black" />
+                                        <Setter Property="Foreground" Value="Black" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Exists}">
-                                        <Setter Property="TreeViewItem.Foreground" Value="Green" />
+                                        <Setter Property="Foreground" Value="Green" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.NotExists}">
-                                        <Setter Property="TreeViewItem.Foreground" Value="Red" />
+                                        <Setter Property="Foreground" Value="Red" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -57,8 +60,9 @@
                                     <telerik:RadMenuItem 
                                         Header="Rename" 
                                         Command="{Binding Rename}" />
-                                    <telerik:RadMenuItem Header="New Sibling" />
-                                    <telerik:RadMenuItem Header="Delete" />
+                                    <telerik:RadMenuItem 
+                                        Header="Delete" 
+                                        Command="{Binding RemoveSelectedItem}"/>
                                 </telerik:RadContextMenu>
                             </telerik:RadContextMenu.ContextMenu>       
                         </TextBlock>
@@ -66,6 +70,5 @@
                 </telerik:RadTreeView.ItemTemplate>
             </telerik:RadTreeView>
         </DockPanel>
-    </Grid>
 
 </UserControl>

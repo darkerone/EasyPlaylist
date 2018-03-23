@@ -14,8 +14,6 @@ namespace EasyPlaylist.ViewModels
     abstract class MenuItemViewModel : BaseViewModel
     {
         private string _title;
-        private IEventAggregator _eventAggregator;
-
         /// <summary>
         /// Titre du dossier/fichier
         /// </summary>
@@ -28,6 +26,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private IEventAggregator _eventAggregator;
         public IEventAggregator EventAggregator
         {
             get { return _eventAggregator; }
@@ -48,6 +47,17 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         public FolderViewModel ParentFolder { get; set; }
 
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get { return _isExpanded; }
+            set
+            {
+                _isExpanded = value;
+                RaisePropertyChanged("IsExpanded");
+            }
+        }
+
         public MenuItemViewModel(IEventAggregator eventAggregator, string path, string title)
         {
             Path = path;
@@ -61,6 +71,7 @@ namespace EasyPlaylist.ViewModels
             }
            
             EventAggregator = eventAggregator;
+            IsExpanded = false;
         }
 
         public ICommand Rename

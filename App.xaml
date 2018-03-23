@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="/Telerik.Windows.Themes.Office2013;component/Themes/Telerik.Windows.Controls.GridView.xaml" />
                 <ResourceDictionary Source="/Telerik.Windows.Themes.Office2013;component/Themes/Telerik.Windows.Controls.Navigation.xaml" />
                 <ResourceDictionary>
-                    <Style TargetType="Button">
+                    <Style TargetType="telerik:RadButton" BasedOn="{StaticResource {x:Type Button}}">
                         <Setter Property="Margin" Value="5"/>
                         <Setter Property="Padding" Value="3"/>
                     </Style>

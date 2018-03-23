@@ -10,8 +10,7 @@
         Title="MainWindow" Height="700" Width="1050">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -19,37 +18,46 @@
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
-            <Button Content="Browse" Command="{Binding Browse}"></Button>
-            <Button Content="Save playlists" Command="{Binding SavePlaylist}"></Button>
-            <Button Content="Add playlist" Command="{Binding AddNewPlaylist}"></Button>
-            <Button 
-                Content="Remove selected playlist" 
-                Command="{Binding RemoveSelectedPlaylist}"
-                IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}"></Button>
+
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <StackPanel Orientation="Horizontal">
+                <telerik:RadButton Content="Invisible but why ?"></telerik:RadButton>
+                <telerik:RadButton Content="Browse" Command="{Binding Browse}"></telerik:RadButton>
+            </StackPanel>
+            <controls:HierarchicalTreeView  DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
         </StackPanel>
         
-        <controls:HierarchicalTreeView Grid.Row="1" Grid.Column="0" DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
         <GridSplitter 
-            Grid.Row="1"
+            Grid.Row="0"
             Grid.Column="1" 
             HorizontalAlignment="Right" 
             VerticalAlignment="Stretch"
             ResizeBehavior="PreviousAndNext"
             Width="5" Background="#FFBCBCBC"/>
-        <telerik:RadTabControl Grid.Row="1" Grid.Column="2" 
+
+        <DockPanel Grid.Row="0" Grid.Column="2">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                <telerik:RadButton Content="Add playlist" Command="{Binding AddNewPlaylist}"></telerik:RadButton>
+                <telerik:RadButton Content="Save playlists" Command="{Binding SavePlaylist}"></telerik:RadButton>
+                <telerik:RadButton 
+                Content="Remove selected playlist" 
+                Command="{Binding RemoveSelectedPlaylist}"
+                IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}"></telerik:RadButton>
+            </StackPanel>
+            <telerik:RadTabControl 
                                ItemsSource="{Binding Playlists}" 
                                DisplayMemberPath="Name"
                                SelectedItem="{Binding SelectedPlaylist}">
-            <telerik:RadTabControl.ContentTemplate>
-                <DataTemplate>
-                    <StackPanel>
-                        <controls:HierarchicalTreeView DataContext="{Binding}"></controls:HierarchicalTreeView>
-                    </StackPanel>
-                    
-                </DataTemplate>
-            </telerik:RadTabControl.ContentTemplate>
-        </telerik:RadTabControl>
+                <telerik:RadTabControl.ContentTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <controls:HierarchicalTreeView DataContext="{Binding}"></controls:HierarchicalTreeView>
+                        </StackPanel>
+                    </DataTemplate>
+                </telerik:RadTabControl.ContentTemplate>
+            </telerik:RadTabControl>
+        </DockPanel>
+        
         
     </Grid>
     
