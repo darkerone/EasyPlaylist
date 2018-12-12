@@ -29,19 +29,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private ExistsInPlaylistStatusEnum _existsInPlaylistStatus;
-        /// <summary>
-        /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
-        /// </summary>
-        public ExistsInPlaylistStatusEnum ExistsInPlaylistStatus
-        {
-            get { return _existsInPlaylistStatus; }
-            set
-            {
-                _existsInPlaylistStatus = value;
-                RaisePropertyChanged("ExistsInPlaylistStatus");
-            }
-        }
+        public override bool IsFolder { get { return false; } }
 
         [JsonConstructor]
         public FileViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)

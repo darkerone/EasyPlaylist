@@ -10,6 +10,7 @@ namespace EasyPlaylist.Enums
     {
         Default = 0,
         Exists = 1,
-        NotExists = 2
+        NotExists = 2,
+        PartialExists = 3
     }
 }

@@ -1,4 +1,5 @@
-﻿using EasyPlaylist.Views;
+﻿using EasyPlaylist.Events;
+using EasyPlaylist.Views;
 using Prism.Commands;
 using Prism.Events;
 using System;
@@ -30,6 +31,12 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        /// <summary>
+        /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
+        /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
+        /// </summary>
+        public ObservableCollection<MenuItemViewModel> RootFolders { get; }
+
         private MenuItemViewModel _selectedItem;
         public MenuItemViewModel SelectedItem
         {
@@ -38,6 +45,7 @@ namespace EasyPlaylist.ViewModels
             {
                 _selectedItem = value;
                 RaisePropertyChanged("SelectedItem");
+                EventAggregator.GetEvent<SelectedItemChangedEvent>().Publish(_selectedItem);
             }
         }
 
@@ -70,10 +78,15 @@ namespace EasyPlaylist.ViewModels
 
         #endregion
 
-        public HierarchicalTreeViewModel(IEventAggregator eventAggregator)
+        public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
         {
-            RootFolder = new FolderViewModel(eventAggregator, "Root", null);
             EventAggregator = eventAggregator;
+            Name = name;
+            RootFolders = new ObservableCollection<MenuItemViewModel>();
+            RootFolder = new FolderViewModel(eventAggregator, name, null);
+            RootFolders.Add(RootFolder);
+            RootFolder.IsExpanded = true;
+            SelectedItem = RootFolder;
         }
 
         #region Commands
@@ -82,11 +95,13 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     if (SelectedItem != null)
                     {
+                        FolderViewModel parentFolder = SelectedItem.GetParentFolder();
                         RemoveMenuItem(SelectedItem);
+                        SelectedItem = parentFolder;
                     }
                 });
             }
@@ -96,7 +111,7 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
                     DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
@@ -118,7 +133,7 @@ namespace EasyPlaylist.ViewModels
                         }
                     };
                     radWindow.Show();
-                });
+                }, (parameter) => { return true; });
             }
         }
         
@@ -126,7 +141,7 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
 
@@ -149,7 +164,7 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
                     DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();

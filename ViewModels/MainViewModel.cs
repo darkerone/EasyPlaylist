@@ -46,6 +46,7 @@ namespace EasyPlaylist.ViewModels
                 _selectedPlaylist = value;
                 RaisePropertyChanged("SelectedPlaylist");
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+                SetCanAddSelectedItemToSelectedPlaylist();
             }
         }
 
@@ -60,6 +61,17 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private bool _canAddSelectedItemToSelectedPlaylist = false;
+        public bool CanAddSelectedItemToSelectedPlaylist
+        {
+            get { return _canAddSelectedItemToSelectedPlaylist; }
+            set
+            {
+                _canAddSelectedItemToSelectedPlaylist = value;
+                RaisePropertyChanged("CanAddSelectedItemToSelectedPlaylist");
+            }
+        }
+
         public MainViewModel()
         {
             EventAggregator = new EventAggregator();
@@ -69,55 +81,60 @@ namespace EasyPlaylist.ViewModels
             // Playlists
             // =========
 
-            // Récupère les playlists sauvegardées
-            if (System.IO.File.Exists(@"Playlists.txt"))
-            {
-                string json = System.IO.File.ReadAllText(@"Playlists.txt");
-                var jsonSerializerSettings = new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                };
-                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
+            //// Récupère les playlists sauvegardées
+            //if (System.IO.File.Exists(@"Playlists.txt"))
+            //{
+            //    string json = System.IO.File.ReadAllText(@"Playlists.txt");
+            //    var jsonSerializerSettings = new JsonSerializerSettings()
+            //    {
+            //        TypeNameHandling = TypeNameHandling.All,
+            //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            //    };
+            //    ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
 
-                if (deserializedPlaylist != null)
-                {
-                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
-                    {
-                        // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator);
-                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
-                        hierarchicalTreeViewModel.Name = deserializedHierarchicalTreeVM.Name;
-                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
-                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
-                        hierarchicalTreeViewModel.MoveItemEnabled = true;
-                        hierarchicalTreeViewModel.IsEditable = true;
-                        AddPlaylist(hierarchicalTreeViewModel);
-                    }
-                }
-            }
+            //    if (deserializedPlaylist != null)
+            //    {
+            //        foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
+            //        {
+            //            // Copie toutes les propriétés utiles de la playlist déserialisée
+            //            HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Name);
+            //            hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+            //            hierarchicalTreeViewModel.CopyItemInEnabled = true;
+            //            hierarchicalTreeViewModel.CopyItemOutEnabled = false;
+            //            hierarchicalTreeViewModel.MoveItemEnabled = true;
+            //            hierarchicalTreeViewModel.IsEditable = true;
+            //            AddPlaylist(hierarchicalTreeViewModel);
+            //        }
+            //    }
+            //}
 
             if (Playlists.Any())
             {
                 SelectedPlaylist = Playlists.First();
             }
-            
+
             // ========
             // Explorer
             // ========
-            Explorer = new HierarchicalTreeViewModel(EventAggregator);
-            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             // Récupère le dossier et ses sous dossiers et fichiers
+            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             FolderViewModel musicFolder = GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
+            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
+            {
+                CopyItemInEnabled = false,
+                CopyItemOutEnabled = true,
+                MoveItemEnabled = false,
+                IsEditable = false
+            };
             Explorer.AddMenuItems(musicFolder.Items.ToList());
-            Explorer.CopyItemInEnabled = false;
-            Explorer.CopyItemOutEnabled = true;
-            Explorer.MoveItemEnabled = false;
-            Explorer.IsEditable = false;
 
             CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+            });
+            // Lorsque la sélection d'un item change
+            EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) => {
+                SetCanAddSelectedItemToSelectedPlaylist();
             });
         }
 
@@ -125,7 +142,7 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
 
@@ -144,22 +161,11 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
-                    try
+                    if (SavePlaylists())
                     {
-                        var jsonSerializerSettings = new JsonSerializerSettings()
-                        {
-                            TypeNameHandling = TypeNameHandling.All,
-                            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                        };
-                        string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
-                        System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
                         System.Windows.MessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, MessageBoxImage.None);
-                    }
-                    catch
-                    {
-                        System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
                     }
                 });
             }
@@ -169,16 +175,20 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
-                    newDefineNamePopupViewModel.ItemName = "New playlist";
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel
+                    {
+                        ItemName = "New playlist"
+                    };
                     newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
-                    RadWindow radWindow = new RadWindow();
-                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Header = "New playlist";
-                    radWindow.Content = newDefineNamePopupView;
+                    RadWindow radWindow = new RadWindow
+                    {
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Header = "New playlist",
+                        Content = newDefineNamePopupView
+                    };
                     radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
                     {
                         RadWindow popup = sender as RadWindow;
@@ -186,13 +196,15 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator);
-                            newPlaylist.Name = namePopupViewModel.ItemName;
-                            newPlaylist.CopyItemInEnabled = true;
-                            newPlaylist.CopyItemOutEnabled = false;
-                            newPlaylist.MoveItemEnabled = true;
-                            newPlaylist.IsEditable = true;
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
+                            {
+                                CopyItemInEnabled = true,
+                                CopyItemOutEnabled = false,
+                                MoveItemEnabled = true,
+                                IsEditable = true
+                            };
                             AddPlaylist(newPlaylist);
+                            SelectedPlaylist = newPlaylist;
                         }
                     };
                     radWindow.Show();
@@ -200,38 +212,69 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand RemoveSelectedPlaylist
+        public ICommand OnClose
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
-                    if(SelectedPlaylist != null)
+                    MessageBoxResult result = System.Windows.MessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNo);
+                    switch (result)
                     {
-                        string playlistToRemoveName = SelectedPlaylist.Name;
-                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to remove the playlist \"{playlistToRemoveName}\"", "Remove playlist", MessageBoxButton.YesNo);
-                        switch (result)
-                        {
-                            case MessageBoxResult.Yes:
-                                // Retire la playlist
-                                Playlists.Remove(SelectedPlaylist);
-                                // Sélectionne la première playlist restante si elle existe
-                                if (Playlists.Any())
-                                {
-                                    SelectedPlaylist = Playlists.First();
-                                }
-                                else
-                                {
-                                    SelectedPlaylist = null;
-                                }
-                                break;
-                        }
+                        case MessageBoxResult.Yes:
+                            SavePlaylists();
+                            break;
                     }
                 });
             }
         }
 
-        
+        /// <summary>
+        /// Ajoute l'élément sélectionné dans l'explorer dans l'élément sélectionné de la playlist sélectionnée
+        /// </summary>
+        public DelegateCommand AddSelectedItemToSelectedPlaylist
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    FolderViewModel folder = null;
+                    // S'il y a un élément sélectionné dans la playlist
+                    if(SelectedPlaylist.SelectedItem != null)
+                    {
+                        // Si l'élément sélectionné dans la playlist est un dossier
+                        if (SelectedPlaylist.SelectedItem.IsFolder)
+                        {
+                            folder = SelectedPlaylist.SelectedItem as FolderViewModel;
+                        }
+                        else
+                        {
+                            folder = SelectedPlaylist.SelectedItem.GetParentFolder();
+                        }
+                    }
+                    else
+                    {
+                        folder = SelectedPlaylist.RootFolder;
+                    }
+                    folder.AddItem(Explorer.SelectedItem);
+                    folder.IsExpanded = true;
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retire l'élément sélectionné dans la playlist sélectionnée de la playlist sélectionnée
+        /// </summary>
+        public ICommand RemoveSelectedItemFromSelectedPlaylist
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    SelectedPlaylist.SelectedItem.GetParentFolder().RemoveItem(SelectedPlaylist.SelectedItem);
+                });
+            }
+        }
 
         /// <summary>
         /// Récupère le modèle de vue du dossier ainsi que de tous ses sous dossiers et fichiers
@@ -304,19 +347,31 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
-        /// Vérifie et marque les fichiers du dossier passé en paramètre selon s'ils sont présent dans la liste des tag id passée en paramètre
+        /// Vérifie et marque les fichiers du dossier passé en paramètre selon 
+        /// s'ils sont présent dans la liste des tag id passée en paramètre.
+        /// Retourne : - Exists si le dossier ne contient que des fichiers et dossiers qui existent dans la playlist, 
+        ///            - NotExists si le dossier ne contient que des fichiers et dossiers qui n'existent pas dans la playlist, 
+        ///            - PartialExists sinon, 
         /// </summary>
         /// <param name="folderVM"></param>
         /// <param name="playlistFileTagIDs"></param>
-        private void CheckIfItemsExistInPlaylistRecursively(FolderViewModel folderVM, List<string> playlistFileTagIDs)
+        /// <returns>aaa</returns>
+        private ExistsInPlaylistStatusEnum CheckIfItemsExistInPlaylistRecursively(FolderViewModel folderVM, List<string> playlistFileTagIDs)
         {
-            foreach(FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
+            ExistsInPlaylistStatusEnum existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.PartialExists;
+
+            // Pour chaque dossier du dossier
+            List<FolderViewModel> folders = folderVM.Items.OfType<FolderViewModel>().ToList();
+            foreach (FolderViewModel subFolderVM in folders)
             {
-                CheckIfItemsExistInPlaylistRecursively(subFolderVM, playlistFileTagIDs);
+                subFolderVM.ExistsInPlaylistStatus = CheckIfItemsExistInPlaylistRecursively(subFolderVM, playlistFileTagIDs);
             }
 
-            foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+            // Pour chaque fichier du dossier
+            List<FileViewModel> files = folderVM.Items.OfType<FileViewModel>().ToList();
+            foreach (FileViewModel fileVM in files)
             {
+                // Si la playlist contient déjà le fichier
                 if (playlistFileTagIDs.Any(x => x == fileVM.FileTagID))
                 {
                     fileVM.ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.Exists;
@@ -326,6 +381,45 @@ namespace EasyPlaylist.ViewModels
                     fileVM.ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.NotExists;
                 }
             }
+
+            // Si aucun fichier/dossier n'existe
+            if (!folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.Exists))
+            {
+                existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.NotExists;
+            }
+            // Si aucun fichiers/dossier n'existe pas (tous les fichiers/dossiers existent)
+            else if (!folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.NotExists))
+            {
+                existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.Exists;
+            }
+
+            return existsInPlaylistStatusEnum;
+        }
+
+        private bool SavePlaylists()
+        {
+            
+            try
+            {
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+                string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
+                System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
+                return true;
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                return false;
+            }
+        }
+
+        private void SetCanAddSelectedItemToSelectedPlaylist()
+        {
+            CanAddSelectedItemToSelectedPlaylist = Explorer.SelectedItem != null && SelectedPlaylist != null;
         }
     }
 }

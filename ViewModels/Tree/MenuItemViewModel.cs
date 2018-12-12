@@ -1,4 +1,5 @@
-﻿using EasyPlaylist.Views;
+﻿using EasyPlaylist.Enums;
+using EasyPlaylist.Views;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
@@ -57,6 +58,22 @@ namespace EasyPlaylist.ViewModels
                 RaisePropertyChanged("IsExpanded");
             }
         }
+        
+        public abstract bool IsFolder { get; }
+
+        private ExistsInPlaylistStatusEnum _existsInPlaylistStatus;
+        /// <summary>
+        /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
+        /// </summary>
+        public ExistsInPlaylistStatusEnum ExistsInPlaylistStatus
+        {
+            get { return _existsInPlaylistStatus; }
+            set
+            {
+                _existsInPlaylistStatus = value;
+                RaisePropertyChanged("ExistsInPlaylistStatus");
+            }
+        }
 
         public MenuItemViewModel(IEventAggregator eventAggregator, string path, string title)
         {
@@ -78,7 +95,7 @@ namespace EasyPlaylist.ViewModels
         {
             get
             {
-                return new DelegateCommand(() =>
+                return new DelegateCommand((parameter) =>
                 {
                     DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
                     DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();

@@ -5,23 +5,44 @@ namespace EasyPlaylist
 {
     class DelegateCommand : ICommand
     {
-        private Action _executeMethod;
+        private readonly Predicate<object> _canExecute;
+        private readonly Action<object> _execute;
 
-        public DelegateCommand(Action executeMethod)
+        public event EventHandler CanExecuteChanged;
+
+        public DelegateCommand(Action<object> execute)
+                       : this(execute, null)
         {
-            _executeMethod = executeMethod;
+        }
+
+        public DelegateCommand(Action<object> execute,
+                       Predicate<object> canExecute)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
         }
 
         public bool CanExecute(object parameter)
         {
-            return true;
-        }
+            if (_canExecute == null)
+            {
+                return true;
+            }
 
-        public event EventHandler CanExecuteChanged;
+            return _canExecute(parameter);
+        }
 
         public void Execute(object parameter)
         {
-            _executeMethod.Invoke();
+            _execute(parameter);
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            if (CanExecuteChanged != null)
+            {
+                CanExecuteChanged(this, EventArgs.Empty);
+            }
         }
     }
 }

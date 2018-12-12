@@ -140,6 +140,7 @@
     <Compile Include="Converters\NullToFalseConverter.cs" />
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="Enums\ExistsInPlaylistStatusEnum.cs" />
+    <Compile Include="Events\SelectedItemChangedEvent.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
     <Compile Include="Views\DefineNamePopupView.xaml.cs">

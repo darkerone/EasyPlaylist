@@ -13,6 +13,8 @@ namespace EasyPlaylist.ViewModels
 {
     class FolderViewModel : MenuItemViewModel
     {
+        public override bool IsFolder { get { return true; } }
+
         [JsonConstructor]
         public FolderViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
         {
@@ -70,8 +72,9 @@ namespace EasyPlaylist.ViewModels
 
         public void AddItems(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
         {
-            Items.AddRange(menuItemsVMToAdd);
-            foreach (MenuItemViewModel menuItemVM in menuItemsVMToAdd)
+            // Copie les items
+            List<MenuItemViewModel> copiedMenuItemsVM = menuItemsVMToAdd.Select(x => x.GetItemCopy()).ToList();
+            foreach (MenuItemViewModel menuItemVM in copiedMenuItemsVM)
             {
                 // Redéfinit l'item parent
                 menuItemVM.ParentFolder = this;
@@ -79,13 +82,14 @@ namespace EasyPlaylist.ViewModels
                 // Si le nom existe déjà, on incrémente un index entre parenthèse
                 string nameTmp = menuItemVM.Title;
                 int index = 1;
-                while (Items.Any(x => x.Title == nameTmp && x != menuItemVM))
+                while (Items.Any(x => x.Title == nameTmp))
                 {
                     nameTmp = menuItemVM.Title + $" ({index})";
                     index++;
                 }
                 menuItemVM.Title = nameTmp;
             }
+            Items.AddRange(copiedMenuItemsVM);
         }
 
         /// <summary>
