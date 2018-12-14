@@ -81,36 +81,31 @@ namespace EasyPlaylist.ViewModels
             // Playlists
             // =========
 
-            //// Récupère les playlists sauvegardées
-            //if (System.IO.File.Exists(@"Playlists.txt"))
-            //{
-            //    string json = System.IO.File.ReadAllText(@"Playlists.txt");
-            //    var jsonSerializerSettings = new JsonSerializerSettings()
-            //    {
-            //        TypeNameHandling = TypeNameHandling.All,
-            //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            //    };
-            //    ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
-
-            //    if (deserializedPlaylist != null)
-            //    {
-            //        foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
-            //        {
-            //            // Copie toutes les propriétés utiles de la playlist déserialisée
-            //            HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Name);
-            //            hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
-            //            hierarchicalTreeViewModel.CopyItemInEnabled = true;
-            //            hierarchicalTreeViewModel.CopyItemOutEnabled = false;
-            //            hierarchicalTreeViewModel.MoveItemEnabled = true;
-            //            hierarchicalTreeViewModel.IsEditable = true;
-            //            AddPlaylist(hierarchicalTreeViewModel);
-            //        }
-            //    }
-            //}
-
-            if (Playlists.Any())
+            // Récupère les playlists sauvegardées
+            if (System.IO.File.Exists(@"Playlists.txt"))
             {
-                SelectedPlaylist = Playlists.First();
+                string json = System.IO.File.ReadAllText(@"Playlists.txt");
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                };
+                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
+
+                if (deserializedPlaylist != null)
+                {
+                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
+                    {
+                        // Copie toutes les propriétés utiles de la playlist déserialisée
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Name);
+                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
+                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
+                        hierarchicalTreeViewModel.MoveItemEnabled = true;
+                        hierarchicalTreeViewModel.IsEditable = true;
+                        AddPlaylist(hierarchicalTreeViewModel);
+                    }
+                }
             }
 
             // ========
@@ -136,6 +131,10 @@ namespace EasyPlaylist.ViewModels
             EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) => {
                 SetCanAddSelectedItemToSelectedPlaylist();
             });
+            Explorer.RootFolder.IsExpanded = true;
+
+            // Effectué après l'initialisation de l'explorer
+            SelectedPlaylist = Playlists.FirstOrDefault();
         }
 
         public ICommand Browse
@@ -166,6 +165,27 @@ namespace EasyPlaylist.ViewModels
                     if (SavePlaylists())
                     {
                         System.Windows.MessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, MessageBoxImage.None);
+                    }
+                });
+            }
+        }
+
+        public ICommand RemoveSelectedPlaylist
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    if (SavePlaylists())
+                    {
+                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to delete playlist {SelectedPlaylist.Name} ?", "Remove playlist", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        switch (result)
+                        {
+                            case MessageBoxResult.Yes:
+                                RemovePlaylist(SelectedPlaylist);
+                                SelectedPlaylist = Playlists.FirstOrDefault();
+                                break;
+                        }
                     }
                 });
             }
@@ -347,6 +367,15 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
+        /// Retire une playlist de la liste des playlists
+        /// </summary>
+        /// <param name="playlistToRemove"></param>
+        public void RemovePlaylist(HierarchicalTreeViewModel playlistToRemove)
+        {
+            Playlists.Remove(playlistToRemove);
+        }
+
+        /// <summary>
         /// Vérifie et marque les fichiers du dossier passé en paramètre selon 
         /// s'ils sont présent dans la liste des tag id passée en paramètre.
         /// Retourne : - Exists si le dossier ne contient que des fichiers et dossiers qui existent dans la playlist, 
@@ -382,10 +411,18 @@ namespace EasyPlaylist.ViewModels
                 }
             }
 
-            // Si aucun fichier/dossier n'existe
+            // Si aucun fichier/dossier n'existe complètement
             if (!folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.Exists))
             {
-                existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.NotExists;
+                // Si certains existent 
+                if(folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.PartialExists))
+                {
+                    existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.PartialExists;
+                }
+                else
+                {
+                    existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.NotExists;
+                }
             }
             // Si aucun fichiers/dossier n'existe pas (tous les fichiers/dossiers existent)
             else if (!folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.NotExists))
