@@ -1,5 +1,6 @@
 ﻿using EasyPlaylist.Events;
 using EasyPlaylist.Views;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using System;
@@ -78,6 +79,14 @@ namespace EasyPlaylist.ViewModels
 
         #endregion
 
+        /// <summary>
+        /// Contructeur pour désérialization
+        /// </summary>
+        [JsonConstructor]
+        public HierarchicalTreeViewModel()
+        {
+        }
+
         public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
         {
             EventAggregator = eventAggregator;
@@ -91,6 +100,7 @@ namespace EasyPlaylist.ViewModels
 
         #region Commands
 
+        [JsonIgnore]
         public ICommand RemoveSelectedItem
         {
             get
@@ -107,6 +117,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
         public ICommand OpenAddFolderPopup
         {
             get
@@ -137,6 +148,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
         
+        [JsonIgnore]
         public ICommand Export
         {
             get
@@ -160,6 +172,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
         public ICommand RenamePlaylist
         {
             get

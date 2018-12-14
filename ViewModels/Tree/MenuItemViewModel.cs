@@ -1,5 +1,6 @@
 ﻿using EasyPlaylist.Enums;
 using EasyPlaylist.Views;
+using Newtonsoft.Json;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,7 @@ namespace EasyPlaylist.ViewModels
             IsExpanded = false;
         }
 
+        [JsonIgnore]
         public ICommand Rename
         {
             get
