@@ -137,5 +137,27 @@ namespace EasyPlaylist.ViewModels
                 DefineAllSubParentFoldersIn(subFolder);
             }
         }
+
+        /// <summary>
+        /// Récupère la liste des fichiers du dossier
+        /// </summary>
+        /// <param name="recursive">True pour récupérer les fichiers de manière récursive</param>
+        /// <returns></returns>
+        public List<FileViewModel> GetFiles(bool recursive = false)
+        {
+            List<FileViewModel> files = Items.OfType<FileViewModel>().ToList();
+
+            if (recursive)
+            {
+                // Pour tous les dossiers du dossier courant
+                foreach (FolderViewModel folder in Items.OfType<FolderViewModel>())
+                {
+                    // On récupère les fichiers
+                    files.AddRange(folder.GetFiles(recursive));
+                }
+            }
+
+            return files;
+        }
     }
 }

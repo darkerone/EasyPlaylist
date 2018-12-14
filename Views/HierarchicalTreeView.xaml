@@ -21,12 +21,12 @@
                     Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
             <StackPanel  Orientation="Horizontal">
                 <Fluent:Button
-                            Header="Rename playlist" 
+                            Header="Playlist settings" 
                             Icon="pack://application:,,,/Icones/RenamePagePublisher.png" 
                             LargeIcon="pack://application:,,,/Icones/RenamePagePublisher.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding RenamePlaylist}">
+                            Command="{Binding OpenPlaylistSettings}">
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Export playlist" 

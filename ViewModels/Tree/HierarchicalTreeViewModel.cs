@@ -63,14 +63,14 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private string _name;
-        public string Name
+        private HierarchicalTreeSettingsViewModel _settings;
+        public HierarchicalTreeSettingsViewModel Settings
         {
-            get { return _name; }
+            get { return _settings; }
             set
             {
-                _name = value;
-                RaisePropertyChanged("Name");
+                _settings = value;
+                RaisePropertyChanged("Settings");
             }
         }
 
@@ -92,7 +92,11 @@ namespace EasyPlaylist.ViewModels
         public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
         {
             EventAggregator = eventAggregator;
-            Name = name;
+            Settings = new HierarchicalTreeSettingsViewModel()
+            {
+                Name = name,
+                ExportFlatPlaylist = false
+            };
             RootFolders = new ObservableCollection<MenuItemViewModel>();
             RootFolder = new FolderViewModel(eventAggregator, name, null);
             RootFolders.Add(RootFolder);
@@ -135,7 +139,8 @@ namespace EasyPlaylist.ViewModels
                         radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                         radWindow.Header = "Rename";
                         radWindow.Content = newDefineNamePopupView;
-                        radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                        radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                        {
                             RadWindow popup = sender as RadWindow;
                             DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
                             DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
@@ -165,7 +170,8 @@ namespace EasyPlaylist.ViewModels
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     radWindow.Header = "New folder";
                     radWindow.Content = newDefineNamePopupView;
-                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                    {
                         RadWindow popup = sender as RadWindow;
                         DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
                         DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
@@ -180,7 +186,7 @@ namespace EasyPlaylist.ViewModels
                 }, (parameter) => { return true; });
             }
         }
-        
+
         [JsonIgnore]
         public ICommand Export
         {
@@ -205,13 +211,13 @@ namespace EasyPlaylist.ViewModels
                                 {
                                     case MessageBoxResult.Yes:
                                         Directory.Delete(fbd.SelectedPath + "\\" + RootFolder.Title, true);
-                                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
+                                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
                                         break;
                                 }
                             }
                             else
                             {
-                                ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
+                                ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
                             }
                             MessageBoxResult exportedPlaylistMessageBoxResult = System.Windows.MessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
                             switch (exportedPlaylistMessageBoxResult)
@@ -220,11 +226,6 @@ namespace EasyPlaylist.ViewModels
                                     Process.Start(fbd.SelectedPath + "\\" + RootFolder.Title);
                                     break;
                             }
-                            //RadWindow.Alert(new DialogParameters()
-                            //{
-                            //    Content = $"Playlist exported to \"{fbd.SelectedPath}\"",
-                            //    Header = "Success"
-                            //});
                         }
                     }
                     catch (Exception ex)
@@ -236,28 +237,34 @@ namespace EasyPlaylist.ViewModels
         }
 
         [JsonIgnore]
-        public ICommand RenamePlaylist
+        public ICommand OpenPlaylistSettings
         {
             get
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
-                    newDefineNamePopupViewModel.ItemName = Name;
-                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
+                    HierarchicalTreeSettingsView playlistSettingsPopupView = new HierarchicalTreeSettingsView();
+                    // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
+                    playlistSettingsPopupView.DataContext = new HierarchicalTreeSettingsViewModel()
+                    {
+                        Name = Settings.Name,
+                        ExportFlatPlaylist = Settings.ExportFlatPlaylist
+                    };
                     RadWindow radWindow = new RadWindow();
-                    radWindow.Header = "Rename playlist";
+                    radWindow.Header = "Playlist settings";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = newDefineNamePopupView;
+                    radWindow.Content = playlistSettingsPopupView;
 
-                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                    {
                         RadWindow popup = sender as RadWindow;
-                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-                        DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                        HierarchicalTreeSettingsView hierarchicalTreeSettingsView = popup.Content as HierarchicalTreeSettingsView;
+                        HierarchicalTreeSettingsViewModel hierarchicalTreeSettingsViewModel = hierarchicalTreeSettingsView.DataContext as HierarchicalTreeSettingsViewModel;
                         if (e.DialogResult == true)
                         {
-                            Name = defineNamePopupViewModel.ItemName;
+                            Settings.Name = hierarchicalTreeSettingsViewModel.Name;
+                            RootFolder.Title = hierarchicalTreeSettingsViewModel.Name;
+                            Settings.ExportFlatPlaylist = hierarchicalTreeSettingsViewModel.ExportFlatPlaylist;
                         }
                     };
 
@@ -374,29 +381,43 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="destinationFolder"></param>
         /// <param name="folderVM"></param>
-        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM)
+        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM, bool flatedPlaylist = false)
         {
-            string folderPath = destinationFolder + "\\" + folderVM.Title;
-
             // Créé le dossier
             bool success = folderVM.WriteFolder(destinationFolder);
 
+            string folderPath = destinationFolder + "\\" + folderVM.Title;
+
             if (success)
             {
-                // Créé les sous dossiers du dossier
-                foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
+                // Dans le cas où l'on veut que tous les fichiers de la playlist soient exportés dans le dossier racine
+                if (flatedPlaylist)
                 {
-                    ExportFoldersAndFiles(folderPath, subFolderVM);
-                }
+                    // Récupère tous les fichiers
+                    List<FileViewModel> filesToExport = folderVM.GetFiles(true);
 
-                // Créé les fichiers du dossier
-                foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+                    // Ecris les fichiers
+                    foreach (FileViewModel file in filesToExport)
+                    {
+                        file.WriteFile(folderPath);
+                    }
+                }
+                else
                 {
-                    fileVM.WriteFile(folderPath);
+                    // Créé les sous dossiers du dossier
+                    foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
+                    {
+                        ExportFoldersAndFiles(folderPath, subFolderVM);
+                    }
+
+                    // Créé les fichiers du dossier
+                    foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
+                    {
+                        fileVM.WriteFile(folderPath);
+                    }
                 }
             }
         }
-        
 
         /// <summary>
         /// Récupère de manière récursive tous les ID des fichiers du dossier passé en paramètre
@@ -411,7 +432,7 @@ namespace EasyPlaylist.ViewModels
                 fileTagIDs.AddRange(GetAllFileTagIDsRecursively(subFolderVM));
             }
 
-            foreach(FileViewModel fileVM in folderViewModel.Items.OfType<FileViewModel>())
+            foreach (FileViewModel fileVM in folderViewModel.Items.OfType<FileViewModel>())
             {
                 fileTagIDs.Add(fileVM.FileTagID);
             }
@@ -419,7 +440,7 @@ namespace EasyPlaylist.ViewModels
             return fileTagIDs;
         }
 
-        
+
 
         #endregion
     }

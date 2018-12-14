@@ -87,7 +87,7 @@
             </StackPanel>
             <telerik:RadTabControl Background="AliceBlue"
                                ItemsSource="{Binding Playlists}" 
-                               DisplayMemberPath="Name"
+                               DisplayMemberPath="Settings.Name"
                                SelectedItem="{Binding SelectedPlaylist}">
                 <telerik:RadTabControl.ContentTemplate>
                     <DataTemplate>

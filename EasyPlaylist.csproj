@@ -153,6 +153,10 @@
     <Compile Include="Events\SelectedItemChangedEvent.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
+    <Compile Include="ViewModels\HierarchicalTreeSettingsViewModel.cs" />
+    <Compile Include="Views\HierarchicalTreeSettingsView.xaml.cs">
+      <DependentUpon>HierarchicalTreeSettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\DefineNamePopupView.xaml.cs">
       <DependentUpon>DefineNamePopupView.xaml</DependentUpon>
     </Compile>
@@ -173,6 +177,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\HierarchicalTreeSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\DefineNamePopupView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -97,12 +97,13 @@ namespace EasyPlaylist.ViewModels
                     foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
                     {
                         // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Name);
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
                         hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
                         hierarchicalTreeViewModel.CopyItemInEnabled = true;
                         hierarchicalTreeViewModel.CopyItemOutEnabled = false;
                         hierarchicalTreeViewModel.MoveItemEnabled = true;
                         hierarchicalTreeViewModel.IsEditable = true;
+                        hierarchicalTreeViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
                         AddPlaylist(hierarchicalTreeViewModel);
                     }
                 }
@@ -178,7 +179,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (SavePlaylists())
                     {
-                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to delete playlist {SelectedPlaylist.Name} ?", "Remove playlist", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to delete playlist {SelectedPlaylist.Settings.Name} ?", "Remove playlist", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                         switch (result)
                         {
                             case MessageBoxResult.Yes:
@@ -354,14 +355,14 @@ namespace EasyPlaylist.ViewModels
         public void AddPlaylist(HierarchicalTreeViewModel newPlaylist)
         {
             // Si le nom existe déjà, on incrémente un index entre parenthèse
-            string nameTmp = newPlaylist.Name;
+            string nameTmp = newPlaylist.Settings.Name;
             int index = 1;
-            while (Playlists.Any(x => x.Name == nameTmp && x != newPlaylist))
+            while (Playlists.Any(x => x.Settings.Name == nameTmp && x != newPlaylist))
             {
-                nameTmp = newPlaylist.Name + $" ({index})";
+                nameTmp = newPlaylist.Settings.Name + $" ({index})";
                 index++;
             }
-            newPlaylist.Name = nameTmp;
+            newPlaylist.Settings.Name = nameTmp;
 
             Playlists.Add(newPlaylist);
         }
