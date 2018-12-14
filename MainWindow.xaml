@@ -7,8 +7,9 @@
         xmlns:controls="clr-namespace:EasyPlaylist.Views"
         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1050">
+        Title="MainWindow" Height="700" Width="1080">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding OnClose}" />
@@ -23,29 +24,68 @@
 
 
         <DockPanel Grid.Column="0">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <telerik:RadButton Content="Browse" Command="{Binding Browse}" HorizontalAlignment="Left"></telerik:RadButton>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="-4.8,0,5.2,0">
+                <Fluent:Button
+                            Header="Browse" 
+                            Icon="pack://application:,,,/Icones/ReopenFromServer.png" 
+                            LargeIcon="pack://application:,,,/Icones/ReopenFromServer.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding Browse}">
+                </Fluent:Button>
             </StackPanel>
-            <controls:HierarchicalTreeView DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
+            <telerik:RadTabControl>
+                <telerik:RadTabItem Header="Explorer">
+                    <telerik:RadTabItem.Content>
+                        <controls:HierarchicalTreeView DataContext="{Binding Explorer}"></controls:HierarchicalTreeView>
+                    </telerik:RadTabItem.Content>
+                </telerik:RadTabItem>
+            </telerik:RadTabControl>
         </DockPanel>
 
         <StackPanel 
             Grid.Column="1" 
             VerticalAlignment="Center" 
             HorizontalAlignment="Center">
-            <Button Content="&gt;" Command="{Binding AddSelectedItemToSelectedPlaylist}" IsEnabled="{Binding CanAddSelectedItemToSelectedPlaylist}" FontSize="36" VerticalAlignment="Center" Height="100"></Button>
+            <Fluent:Button
+                            Icon="pack://application:,,,/Icones/TableRowsInsertWord2.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableRowsInsertWord2.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Large"
+                            Command="{Binding AddSelectedItemToSelectedPlaylist}"
+                            IsEnabled="{Binding CanAddSelectedItemToSelectedPlaylist}">
+            </Fluent:Button>
         </StackPanel>
 
         <DockPanel Grid.Column="2">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                <telerik:RadButton Content="Add playlist" Command="{Binding AddNewPlaylist}"></telerik:RadButton>
-                <telerik:RadButton Content="Save playlists" Command="{Binding SavePlaylist}"></telerik:RadButton>
-                <telerik:RadButton 
-                Content="Remove selected playlist" 
-                Command="{Binding RemoveSelectedPlaylist}"
-                IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}"></telerik:RadButton>
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="-4.8,0,5.2,0">
+                <Fluent:Button
+                            Header="Add playlist" 
+                            Icon="pack://application:,,,/Icones/TableOfContentsAddTextGallery.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableOfContentsAddTextGallery.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding AddNewPlaylist}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Save playlists" 
+                            Icon="pack://application:,,,/Icones/SaveAll.png" 
+                            LargeIcon="pack://application:,,,/Icones/SaveAll.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding SavePlaylist}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Remove selected playlist" 
+                            Icon="pack://application:,,,/Icones/TableOfContentsRemove.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableOfContentsRemove.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding RemoveSelectedPlaylist}"
+                            IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}">
+                </Fluent:Button>
             </StackPanel>
-            <telerik:RadTabControl 
+            <telerik:RadTabControl Background="AliceBlue"
                                ItemsSource="{Binding Playlists}" 
                                DisplayMemberPath="Name"
                                SelectedItem="{Binding SelectedPlaylist}">

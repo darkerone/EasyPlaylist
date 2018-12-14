@@ -39,6 +39,12 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ControlzEx, Version=3.0.2.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\ControlzEx.3.0.2.4\lib\net45\ControlzEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Fluent, Version=4.0.3.394, Culture=neutral, PublicKeyToken=3e436e32a8c5546f, processorArchitecture=MSIL">
+      <HintPath>packages\Fluent.Ribbon.4.0.3.394\lib\net45\Fluent.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
@@ -82,7 +88,7 @@
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>packages\Prism.Wpf.6.3.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>packages\ControlzEx.3.0.2.4\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml" />
@@ -209,6 +215,39 @@
   <ItemGroup>
     <Folder Include="DesignData\" />
     <Folder Include="ViewModels\Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\AddAccount.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\ReopenFromServer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\TableOfContentsAddTextGallery.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\TableOfContentsRemove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\SaveAll.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\RenamePagePublisher.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\TableExportMenu.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\AddFolder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\RecordsDeleteRecord.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\TableRowsInsertWord2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\Rename.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,23 +10,59 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:EasyPlaylist.Views"
+             xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500"
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}" 
-                        Content="Remove selected" 
-                        Command="{Binding RemoveSelectedItem}"
-                        IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}"></telerik:RadButton>
-            <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
-                        Content="Add folder" 
-                        Command="{Binding OpenAddFolderPopup}"></telerik:RadButton>
-            <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
-                        Content="Export playlist" 
-                        Command="{Binding Export}"></telerik:RadButton>
-            <telerik:RadButton Visibility="{Binding IsEditable, Converter={StaticResource FalseToHiddenVisibilityConverter}}"
-                        Content="Rename playlist" 
-                        Command="{Binding RenamePlaylist}"></telerik:RadButton>
+        <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top" 
+                    Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+            <StackPanel  Orientation="Horizontal">
+                <Fluent:Button
+                            Header="Rename playlist" 
+                            Icon="pack://application:,,,/Icones/RenamePagePublisher.png" 
+                            LargeIcon="pack://application:,,,/Icones/RenamePagePublisher.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding RenamePlaylist}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Export playlist" 
+                            Icon="pack://application:,,,/Icones/TableExportMenu.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableExportMenu.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding Export}">
+                </Fluent:Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Fluent:Button
+                            Header="Add folder" 
+                            Icon="pack://application:,,,/Icones/AddFolder.png" 
+                            LargeIcon="pack://application:,,,/Icones/AddFolder.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding OpenAddFolderPopup}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Rename selected" 
+                            Icon="pack://application:,,,/Icones/Rename.png" 
+                            LargeIcon="pack://application:,,,/Icones/Rename.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding RenameSelectedItem}"
+                            IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Remove selected" 
+                            Icon="pack://application:,,,/Icones/RecordsDeleteRecord.png" 
+                            LargeIcon="pack://application:,,,/Icones/RecordsDeleteRecord.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding RemoveSelectedItem}"
+                            IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
+                </Fluent:Button>
+            </StackPanel>
         </StackPanel>
         <telerik:RadTreeView
                 x:Name="HierarchicalTree"
