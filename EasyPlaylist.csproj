@@ -143,6 +143,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\InverseValueConverter.cs" />
+    <Compile Include="Converters\MultiAddValueConverter.cs" />
+    <Compile Include="Converters\FalseToCollapsedVisibilityConverter.cs" />
+    <Compile Include="Converters\AddValueConverter.cs" />
     <Compile Include="Converters\NullToFalseConverter.cs" />
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="Enums\ExistsInPlaylistStatusEnum.cs" />

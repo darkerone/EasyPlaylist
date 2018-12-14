@@ -6,6 +6,8 @@ using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -46,7 +48,7 @@ namespace EasyPlaylist.ViewModels
             {
                 _selectedItem = value;
                 RaisePropertyChanged("SelectedItem");
-                EventAggregator.GetEvent<SelectedItemChangedEvent>().Publish(_selectedItem);
+                EventAggregator?.GetEvent<SelectedItemChangedEvent>().Publish(_selectedItem);
             }
         }
 
@@ -94,7 +96,6 @@ namespace EasyPlaylist.ViewModels
             RootFolders = new ObservableCollection<MenuItemViewModel>();
             RootFolder = new FolderViewModel(eventAggregator, name, null);
             RootFolders.Add(RootFolder);
-            RootFolder.IsExpanded = true;
             SelectedItem = RootFolder;
         }
 
@@ -112,6 +113,38 @@ namespace EasyPlaylist.ViewModels
                         FolderViewModel parentFolder = SelectedItem.GetParentFolder();
                         RemoveMenuItem(SelectedItem);
                         SelectedItem = parentFolder;
+                    }
+                });
+            }
+        }
+
+        [JsonIgnore]
+        public ICommand RenameSelectedItem
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    if (SelectedItem != null)
+                    {
+                        DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                        DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+                        newDefineNamePopupViewModel.ItemName = SelectedItem.Title;
+                        newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
+                        RadWindow radWindow = new RadWindow();
+                        radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                        radWindow.Header = "Rename";
+                        radWindow.Content = newDefineNamePopupView;
+                        radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                            RadWindow popup = sender as RadWindow;
+                            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+                            DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                            if (e.DialogResult == true)
+                            {
+                                SelectedItem.Title = definePopupViewModel.ItemName;
+                            }
+                        };
+                        radWindow.Show();
                     }
                 });
             }
@@ -155,18 +188,48 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    FolderBrowserDialog fbd = new FolderBrowserDialog();
-
-                    DialogResult result = fbd.ShowDialog();
-
-                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    try
                     {
-                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
-                        RadWindow.Alert(new DialogParameters()
+                        FolderBrowserDialog fbd = new FolderBrowserDialog();
+                        fbd.Description = "Destination folder (a folder with playlist name will be created)";
+
+                        // Demande à l'utilisateur de choisir le dossier de destination
+                        DialogResult result = fbd.ShowDialog();
+                        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                         {
-                            Content = $"Playlist exported to \"{fbd.SelectedPath}\"",
-                            Header = "Success"
-                        });
+                            // Si la playlist existe déjà dans le dossier sélectionné
+                            if (Directory.Exists(fbd.SelectedPath + "\\" + RootFolder.Title))
+                            {
+                                MessageBoxResult alreadyExistsMessageBoxResult = System.Windows.MessageBox.Show($"The folder \"{RootFolder.Title}\" already exists in \"{fbd.SelectedPath}\", do you want to replace it ?", "Already exists", MessageBoxButton.YesNo);
+                                switch (alreadyExistsMessageBoxResult)
+                                {
+                                    case MessageBoxResult.Yes:
+                                        Directory.Delete(fbd.SelectedPath + "\\" + RootFolder.Title, true);
+                                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                ExportFoldersAndFiles(fbd.SelectedPath, RootFolder);
+                            }
+                            MessageBoxResult exportedPlaylistMessageBoxResult = System.Windows.MessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
+                            switch (exportedPlaylistMessageBoxResult)
+                            {
+                                case MessageBoxResult.Yes:
+                                    Process.Start(fbd.SelectedPath + "\\" + RootFolder.Title);
+                                    break;
+                            }
+                            //RadWindow.Alert(new DialogParameters()
+                            //{
+                            //    Content = $"Playlist exported to \"{fbd.SelectedPath}\"",
+                            //    Header = "Success"
+                            //});
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show($"An exception occured while writting file :\n- {ex.Message}", "Exception", MessageBoxButton.OK);
                     }
                 });
             }

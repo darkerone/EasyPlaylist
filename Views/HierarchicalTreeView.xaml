@@ -14,6 +14,8 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500"
+             Loaded="UserControl_Loaded"
+             x:Name="HierarchicalTreeView_UserControl">
     <DockPanel>
         <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top" 
                     Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
@@ -72,12 +74,30 @@
                 IsDragDropEnabled="True"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 telerik:AnimationManager.IsAnimationEnabled="False"
-                IsExpandOnSingleClickEnabled="True">
+                IsExpandOnDblClickEnabled="True"
+                telerik:TextSearch.TextPath="Title"
+                PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14">
+            <!--On définit la hauteur du composant en la calculant car elle ne s'adapte pas correctement avec le RadTabControl et les DockPanel-->
+            <telerik:RadTreeView.Height>
+                <MultiBinding Converter="{StaticResource MultiAddValueConverter}">
+                    <!--Hauteur du RadTabControl-->
+                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type telerik:RadTabControl}}" Path="ActualHeight" />
+                    <!--Hauteur des onglets du RadTabControl-->
+                    <Binding>
+                        <Binding.Source>
+                            <sys:Double>-30</sys:Double>
+                        </Binding.Source>
+                    </Binding>
+                    <!--Hauteur des boutons-->
+                    <Binding ElementName="HierarchicalTree_Buttons" Path="ActualHeight" Converter="{StaticResource InverseValueConverter}" />
+                </MultiBinding>
+            </telerik:RadTreeView.Height>
             <telerik:RadTreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Items}">
                     <HierarchicalDataTemplate.ItemContainerStyle>
                         <Style TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
                             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                            <Setter Property="MinHeight" Value="10"></Setter>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Default}">
                                     <Setter Property="Foreground" Value="Black" />
@@ -95,7 +115,7 @@
                         </Style>
                     </HierarchicalDataTemplate.ItemContainerStyle>
                     <TextBlock Text="{Binding Title}">
-                            <telerik:RadContextMenu.ContextMenu>
+                            <!--<telerik:RadContextMenu.ContextMenu>
                                 <telerik:RadContextMenu>
                                     <telerik:RadMenuItem 
                                         Header="Rename" 
@@ -104,7 +124,7 @@
                                         Header="Delete" 
                                         Command="{Binding RemoveSelectedItem}"/>
                                 </telerik:RadContextMenu>
-                            </telerik:RadContextMenu.ContextMenu>
+                            </telerik:RadContextMenu.ContextMenu>-->
                     </TextBlock>
                 </HierarchicalDataTemplate>
             </telerik:RadTreeView.ItemTemplate>

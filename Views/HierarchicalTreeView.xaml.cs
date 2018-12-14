@@ -29,9 +29,9 @@ namespace EasyPlaylist.Views
         {
             InitializeComponent();
 
-            DragDropManager.AddDragOverHandler(HierarchicalTree, OnDragOver, true);
-            DragDropManager.AddDropHandler(HierarchicalTree, OnDropCompleted, true);
-            DragDropManager.AddDragDropCompletedHandler(HierarchicalTree, OnDragDropCompleted, true);
+            //DragDropManager.AddDragOverHandler(HierarchicalTree, OnDragOver, true);
+            //DragDropManager.AddDropHandler(HierarchicalTree, OnDropCompleted, true);
+            //DragDropManager.AddDragDropCompletedHandler(HierarchicalTree, OnDragDropCompleted, true);
         }
 
         private void OnDragOver(object sender, Telerik.Windows.DragDrop.DragEventArgs e)
@@ -197,5 +197,40 @@ namespace EasyPlaylist.Views
         }
 
         #endregion
+
+        /// <summary>
+        /// Une fois l'arbre chargé
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+            if(viewModel != null)
+            {
+                // On étend l'item racine
+                HierarchicalTree.ExpandItemByPath(viewModel.RootFolder.Title);
+            }
+        }
+
+        /// <summary>
+        /// Avant de réduire un item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HierarchicalTree_PreviewCollapsed(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+            if (viewModel != null)
+            {
+                // Si l'item est la racine
+                Control itemControl = e.OriginalSource as Control;
+                if (itemControl.DataContext == viewModel.RootFolder)
+                {
+                    // On empêche la réduction pour qu'il reste ouvert
+                    e.Handled = true;
+                }
+            }
+        }
     }
 }
