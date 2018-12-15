@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using Prism.Events;
 using EasyPlaylist.Enums;
+using System.Globalization;
 
 namespace EasyPlaylist.ViewModels
 {
@@ -19,13 +20,27 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Identifiant du fichier (md5 du fichier)
         /// </summary>
-        public string FileTagID
+        public string FileTagId
         {
             get { return _fileTagId; }
             set
             {
                 _fileTagId = value;
-                RaisePropertyChanged("FileTagID");
+                RaisePropertyChanged("FileTagId");
+            }
+        }
+
+        private DateTime _fileTagIdCreationDate;
+        /// <summary>
+        /// Date à laquelle l'identifiant du fichier a été créé
+        /// </summary>
+        public DateTime FileTagIdCreationDate
+        {
+            get { return _fileTagIdCreationDate; }
+            set
+            {
+                _fileTagIdCreationDate = value;
+                RaisePropertyChanged("FileTagIdCreationDate");
             }
         }
 
@@ -42,29 +57,33 @@ namespace EasyPlaylist.ViewModels
 
             // Lecture du tag EasyPlaylistID
             PrivateFrame readPrivateFrame = PrivateFrame.Get(tag, "EasyPlaylistID", false); // 3ieme paramètre à false pour lire
-            
+
 
             // Si un tag est déjà présent
-            if(readPrivateFrame != null && readPrivateFrame.PrivateData.Data != null)
+            if (readPrivateFrame != null && readPrivateFrame.PrivateData.Data != null)
             {
-                FileTagID = Encoding.Unicode.GetString(readPrivateFrame.PrivateData.Data);
+                FileTagId = Encoding.Unicode.GetString(readPrivateFrame.PrivateData.Data);
+                FileTagIdCreationDate = GetDateFromEasyPlaylistID(FileTagId);
+                DateTime currentDate = DateTime.Now;
+                // Le fichier est récent sont id a été ajouté aujourd'hui
+                IsRecent = FileTagIdCreationDate.Year == currentDate.Year
+                            && FileTagIdCreationDate.Month == currentDate.Month
+                            && FileTagIdCreationDate.Day == currentDate.Day;
             }
             else
             {
-                using (var md5 = MD5.Create())
-                {
-                    using (var stream = System.IO.File.OpenRead(path))
-                    {
-                        FileTagID = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty);
-                    }
-                }
+                FileTagId = GenerateNewEasyPlaylistID(path);
+                FileTagIdCreationDate = GetDateFromEasyPlaylistID(FileTagId);
 
                 // Ecriture du tag EasyPlaylistID
                 PrivateFrame writePrivateFrame = PrivateFrame.Get(tag, "EasyPlaylistID", true); // 3ieme paramètre à true pour écrire
-                writePrivateFrame.PrivateData = System.Text.Encoding.Unicode.GetBytes(FileTagID);
+                writePrivateFrame.PrivateData = System.Text.Encoding.Unicode.GetBytes(FileTagId);
                 fileInfos.Save(); // Enregistre le tag dans le fichier
+
+                // On considère un fichier récent s'il n'avait pas d'Id auparavant
+                IsRecent = true;
             }
-            
+
         }
 
         public override MenuItemViewModel GetItemCopy()
@@ -88,6 +107,49 @@ namespace EasyPlaylist.ViewModels
             System.IO.File.Copy(Path, destinationFolder + "\\" + Title + System.IO.Path.GetExtension(Path));
 
             return true;
+        }
+
+        /// <summary>
+        /// Génère un Id pour le fichier (avec la date du jour)
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string GenerateNewEasyPlaylistID(string path)
+        {
+            string easyPlaylistID;
+
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = System.IO.File.OpenRead(path))
+                {
+                    DateTime currentDate = DateTime.Now;
+                    string currentDateString = currentDate.ToString("yyyyMMddTHH:mm:ssZ");
+                    easyPlaylistID = currentDateString + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty);
+                }
+            }
+
+            return easyPlaylistID;
+        }
+
+        /// <summary>
+        /// Récupère la date qui se trouve dans l'Id du fichier
+        /// </summary>
+        /// <param name="easyPlaylistID"></param>
+        /// <returns></returns>
+        private DateTime GetDateFromEasyPlaylistID(string easyPlaylistID)
+        {
+            DateTime date;
+
+            if (!DateTime.TryParseExact(easyPlaylistID.Substring(0, 18),
+                                    "yyyyMMddTHH:mm:ssZ",
+                                    CultureInfo.InvariantCulture,
+                                    DateTimeStyles.None,
+                                    out date))
+            {
+                date = new DateTime(1970, 1, 1);
+            }
+
+            return date;
         }
     }
 }

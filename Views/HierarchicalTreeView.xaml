@@ -111,6 +111,12 @@
                                 <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.PartialExists}">
                                     <Setter Property="Foreground" Value="Orange" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding IsRecent}" Value="True">
+                                    <Setter Property="Background" Value="#FFFFFFBB" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsRecent}" Value="False">
+                                    <Setter Property="Background" Value="Transparent" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </HierarchicalDataTemplate.ItemContainerStyle>

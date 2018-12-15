@@ -76,6 +76,21 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private bool _isRecent;
+        /// <summary>
+        /// Définit si l'item est considéré comme récent ou non.
+        /// Un dossier est récent s'il contient au moins un fichier récent
+        /// </summary>
+        public bool IsRecent
+        {
+            get { return _isRecent; }
+            set
+            {
+                _isRecent = value;
+                RaisePropertyChanged("IsRecent");
+            }
+        }
+
         public MenuItemViewModel(IEventAggregator eventAggregator, string path, string title)
         {
             Path = path;

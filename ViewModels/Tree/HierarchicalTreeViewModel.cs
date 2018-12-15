@@ -434,7 +434,7 @@ namespace EasyPlaylist.ViewModels
 
             foreach (FileViewModel fileVM in folderViewModel.Items.OfType<FileViewModel>())
             {
-                fileTagIDs.Add(fileVM.FileTagID);
+                fileTagIDs.Add(fileVM.FileTagId);
             }
 
             return fileTagIDs;

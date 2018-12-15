@@ -47,29 +47,54 @@ namespace EasyPlaylist.ViewModels
             return folderCopy;
         }
 
+        /// <summary>
+        /// Retire un item du dossier.
+        /// Fait appel à RemoveItems pour éviter les multiples CollectionChanged
+        /// </summary>
+        /// <param name="menuItemToRemoveVM"></param>
         public void RemoveItem(MenuItemViewModel menuItemToRemoveVM)
         {
             RemoveItems(new List<MenuItemViewModel>() { menuItemToRemoveVM });
         }
 
+        /// <summary>
+        /// Retire des items du dossier
+        /// </summary>
+        /// <param name="menuItemsToRemoveVM"></param>
         public void RemoveItems(IEnumerable<MenuItemViewModel> menuItemsToRemoveVM)
         {
             foreach (MenuItemViewModel menuItemToRemoveVM in menuItemsToRemoveVM)
             {
                 Items.Remove(menuItemToRemoveVM);
             }
+
+            // Un dossier est récent si au moins un de ses item est récent
+            IsRecent = Items.Any(x => x.IsRecent);
         }
 
+        /// <summary>
+        /// Retire tous les items du dossier
+        /// </summary>
         public void RemoveAllItems()
         {
             Items.Clear();
+            IsRecent = false;
         }
 
+        /// <summary>
+        /// Ajoute un item au dossier.
+        /// Fait appel à AddItems pour éviter les multiples CollectionChanged
+        /// </summary>
+        /// <param name="menuItemVMToAdd"></param>
         public void AddItem(MenuItemViewModel menuItemVMToAdd)
         {
             AddItems(new List<MenuItemViewModel>() { menuItemVMToAdd });
         }
 
+        /// <summary>
+        /// Ajoute des items au dossier
+        /// </summary>
+        /// <param name="menuItemsVMToAdd"></param>
         public void AddItems(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
         {
             // Copie les items
@@ -90,6 +115,9 @@ namespace EasyPlaylist.ViewModels
                 menuItemVM.Title = nameTmp;
             }
             Items.AddRange(copiedMenuItemsVM);
+
+            // Un dossier est récent si au moins un de ses item est récent
+            IsRecent = Items.Any(x => x.IsRecent);
         }
 
         /// <summary>

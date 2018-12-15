@@ -402,7 +402,7 @@ namespace EasyPlaylist.ViewModels
             foreach (FileViewModel fileVM in files)
             {
                 // Si la playlist contient déjà le fichier
-                if (playlistFileTagIDs.Any(x => x == fileVM.FileTagID))
+                if (playlistFileTagIDs.Any(x => x == fileVM.FileTagId))
                 {
                     fileVM.ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.Exists;
                 }
