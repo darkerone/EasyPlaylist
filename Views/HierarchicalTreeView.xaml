@@ -76,6 +76,7 @@
                 telerik:AnimationManager.IsAnimationEnabled="False"
                 IsExpandOnDblClickEnabled="True"
                 telerik:TextSearch.TextPath="Title"
+                DataContextChanged="HierarchicalTree_DataContextChanged"
                 PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14">
             <!--On définit la hauteur du composant en la calculant car elle ne s'adapte pas correctement avec le RadTabControl et les DockPanel-->
             <telerik:RadTreeView.Height>

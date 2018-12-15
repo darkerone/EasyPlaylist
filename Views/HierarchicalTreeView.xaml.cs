@@ -205,12 +205,7 @@ namespace EasyPlaylist.Views
         /// <param name="e"></param>
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
-            if(viewModel != null)
-            {
-                // On étend l'item racine
-                HierarchicalTree.ExpandItemByPath(viewModel.RootFolder.Title);
-            }
+            ExpandRootFolder();
         }
 
         /// <summary>
@@ -230,6 +225,30 @@ namespace EasyPlaylist.Views
                     // On empêche la réduction pour qu'il reste ouvert
                     e.Handled = true;
                 }
+            }
+        }
+
+        private void ExpandRootFolder()
+        {
+            HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+            if (viewModel != null)
+            {
+                // On étend l'item racine
+                HierarchicalTree.ExpandItemByPath(viewModel.RootFolder.Title);
+            }
+        }
+
+        private void RootFolders_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            ExpandRootFolder();
+        }
+
+        private void HierarchicalTree_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+            if (viewModel != null)
+            {
+                viewModel.RootFolder.Items.CollectionChanged += RootFolders_CollectionChanged;
             }
         }
     }

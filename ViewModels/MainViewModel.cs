@@ -19,7 +19,18 @@ using Telerik.Windows.Controls;
 namespace EasyPlaylist.ViewModels
 {
     class MainViewModel : BaseViewModel
-    {        
+    {
+        private string _currentFolderPath;
+        public string CurrentFolderPath
+        {
+            get { return _currentFolderPath; }
+            set
+            {
+                _currentFolderPath = value;
+                RaisePropertyChanged("CurrentFolderPath");
+            }
+        }
+
         private HierarchicalTreeViewModel _explorer;
         public HierarchicalTreeViewModel Explorer
         {
@@ -72,6 +83,19 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private FileSystemWatcher _watcher;
+
+        private bool _isIhmEnabled = true;
+        public bool IsIhmEnabled
+        {
+            get { return _isIhmEnabled; }
+            set
+            {
+                _isIhmEnabled = value;
+                RaisePropertyChanged("IsIhmEnabled");
+            }
+        }
+
         public MainViewModel()
         {
             EventAggregator = new EventAggregator();
@@ -80,51 +104,18 @@ namespace EasyPlaylist.ViewModels
             // =========
             // Playlists
             // =========
-
-            // Récupère les playlists sauvegardées
-            if (System.IO.File.Exists(@"Playlists.txt"))
-            {
-                string json = System.IO.File.ReadAllText(@"Playlists.txt");
-                var jsonSerializerSettings = new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                };
-                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
-
-                if (deserializedPlaylist != null)
-                {
-                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
-                    {
-                        // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
-                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
-                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
-                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
-                        hierarchicalTreeViewModel.MoveItemEnabled = true;
-                        hierarchicalTreeViewModel.IsEditable = true;
-                        hierarchicalTreeViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
-                        AddPlaylist(hierarchicalTreeViewModel);
-                    }
-                }
-            }
+            RestorePlaylists();
 
             // ========
             // Explorer
             // ========
-            // Récupère le dossier et ses sous dossiers et fichiers
-            string defaultMyMusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            FolderViewModel musicFolder = GetFolderViewModel(defaultMyMusicFolderPath, "Musiques");
-            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
-            {
-                CopyItemInEnabled = false,
-                CopyItemOutEnabled = true,
-                MoveItemEnabled = false,
-                IsEditable = false
-            };
-            Explorer.AddMenuItems(musicFolder.Items.ToList());
+            CurrentFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            InitExplorerFolders(CurrentFolderPath);
 
-            CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+            // ======
+            // Events
+            // ======
+            // Lorsque les items d'un dossier change
             EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             });
@@ -132,7 +123,6 @@ namespace EasyPlaylist.ViewModels
             EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) => {
                 SetCanAddSelectedItemToSelectedPlaylist();
             });
-            Explorer.RootFolder.IsExpanded = true;
 
             // Effectué après l'initialisation de l'explorer
             SelectedPlaylist = Playlists.FirstOrDefault();
@@ -150,8 +140,9 @@ namespace EasyPlaylist.ViewModels
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        Explorer.RootFolder.RemoveAllItems();
-                        Explorer.RootFolder.AddItem(GetFolderViewModel(fbd.SelectedPath, Path.GetFileName(fbd.SelectedPath)));
+                        InitExplorerFolders(fbd.SelectedPath);
+                        //Explorer.RootFolder.RemoveAllItems();
+                        //Explorer.RootFolder.AddItem(GetFolderViewModel(fbd.SelectedPath, Path.GetFileName(fbd.SelectedPath)));
                     }
                 });
             }
@@ -458,6 +449,120 @@ namespace EasyPlaylist.ViewModels
         private void SetCanAddSelectedItemToSelectedPlaylist()
         {
             CanAddSelectedItemToSelectedPlaylist = Explorer.SelectedItem != null && SelectedPlaylist != null;
+        }
+
+        /// <summary>
+        /// Restaure les playlists sauvegardées
+        /// </summary>
+        private void RestorePlaylists()
+        {
+            // Récupère les playlists sauvegardées
+            if (System.IO.File.Exists(@"Playlists.txt"))
+            {
+                string json = System.IO.File.ReadAllText(@"Playlists.txt");
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                };
+                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
+
+                if (deserializedPlaylist != null)
+                {
+                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
+                    {
+                        // Copie toutes les propriétés utiles de la playlist déserialisée
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
+                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
+                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
+                        hierarchicalTreeViewModel.MoveItemEnabled = true;
+                        hierarchicalTreeViewModel.IsEditable = true;
+                        hierarchicalTreeViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
+                        AddPlaylist(hierarchicalTreeViewModel);
+                    }
+                }
+            }
+        }
+
+        private void InitExplorerFolders(string folderPath)
+        {
+            if(_watcher == null)
+            {
+                _watcher = new FileSystemWatcher();
+                
+                /* Watch for changes in LastAccess and LastWrite times, and the renaming of files or directories. */
+                _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+                // Only watch mp3 files.
+                _watcher.Filter = "*.mp3";
+                _watcher.IncludeSubdirectories = true;
+                // Path to watch
+                _watcher.Path = folderPath;
+
+                // Add event handlers.
+                _watcher.Changed += new FileSystemEventHandler(OnExplorerFolderChanged);
+                _watcher.Created += new FileSystemEventHandler(OnExplorerFolderChanged);
+                _watcher.Deleted += new FileSystemEventHandler(OnExplorerFolderChanged);
+                _watcher.Renamed += new RenamedEventHandler(OnExplorerFolderChanged);
+
+                // Begin watching.
+                _watcher.EnableRaisingEvents = true;
+            }
+
+            _watcher.Path = folderPath;
+
+            RefreshExplorer();
+        }
+
+        // Define the event handlers.
+        private void OnExplorerFolderChanged(object source, FileSystemEventArgs e)
+        {
+            // Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                // TODO : effectuer les changement dans l'explorer en fonction de l'évennement
+                IsIhmEnabled = false;
+                // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
+                System.Windows.Forms.Application.DoEvents();
+                RefreshExplorer();
+                IsIhmEnabled = true;
+            });
+        }
+
+        /// <summary>
+        /// Raffraichi l'explorer
+        /// </summary>
+        private void RefreshExplorer()
+        {
+            // Mémorise l'état des dossiers de l'explorer pour le rétablir après la mise à jour
+            List<FolderViewModel> oldFolders = null;
+            if (Explorer != null)
+            {
+                oldFolders = Explorer.RootFolder.GetFolders(true);
+            }
+
+            // Récupère le dossier et ses sous dossiers et fichiers
+            FolderViewModel musicFolder = GetFolderViewModel(CurrentFolderPath, "Musiques");
+            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
+            {
+                CopyItemInEnabled = false,
+                CopyItemOutEnabled = true,
+                MoveItemEnabled = false,
+                IsEditable = false
+            };
+            Explorer.AddMenuItems(musicFolder.Items.ToList());
+
+            CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
+
+            if(oldFolders != null)
+            {
+                // Etend les dossiers qui l'étaient
+                List<FolderViewModel> newFolders = Explorer.RootFolder.GetFolders(true);
+                foreach (FolderViewModel folder in newFolders)
+                {
+                    folder.IsExpanded = oldFolders.Any(x => x.Path == folder.Path && x.IsExpanded);
+                }
+            }
         }
     }
 }

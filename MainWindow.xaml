@@ -15,7 +15,7 @@
             <i:InvokeCommandAction Command="{Binding OnClose}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
+    <Grid IsEnabled="{Binding IsIhmEnabled}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="auto" />

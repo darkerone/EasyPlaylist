@@ -187,5 +187,49 @@ namespace EasyPlaylist.ViewModels
 
             return files;
         }
+
+        /// <summary>
+        /// Récupère la liste des items du dossier
+        /// </summary>
+        /// <param name="recursive">True pour récupérer les items de manière récursive</param>
+        /// <returns></returns>
+        public List<MenuItemViewModel> GetItems(bool recursive = false)
+        {
+            List<MenuItemViewModel> items = Items.ToList();
+
+            if (recursive)
+            {
+                // Pour tous les dossiers du dossier courant
+                foreach (FolderViewModel folder in Items.OfType<FolderViewModel>())
+                {
+                    // On récupère les fichiers
+                    items.AddRange(folder.GetItems(recursive));
+                }
+            }
+
+            return items;
+        }
+
+        /// <summary>
+        /// Récupère la liste des dossiers du dossier
+        /// </summary>
+        /// <param name="recursive">True pour récupérer les dossiers de manière récursive</param>
+        /// <returns></returns>
+        public List<FolderViewModel> GetFolders(bool recursive = false)
+        {
+            List<FolderViewModel> folders = Items.OfType<FolderViewModel>().ToList();
+
+            if (recursive)
+            {
+                // Pour tous les dossiers du dossier courant
+                foreach (FolderViewModel folder in Items.OfType<FolderViewModel>())
+                {
+                    // On récupère les fichiers
+                    folders.AddRange(folder.GetFolders(recursive));
+                }
+            }
+
+            return folders;
+        }
     }
 }
