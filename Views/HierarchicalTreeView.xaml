@@ -17,27 +17,33 @@
              Loaded="UserControl_Loaded"
              x:Name="HierarchicalTreeView_UserControl">
     <DockPanel>
-        <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top" 
-                    Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
-            <StackPanel  Orientation="Horizontal">
-                <Fluent:Button
+        <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top">
+            <DockPanel>
+                <TextBox DockPanel.Dock="Right" x:Name="TextBox_Search" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="100">
+                </TextBox>
+                <StackPanel  Orientation="Horizontal">
+                    <Fluent:Button
                             Header="Playlist settings" 
                             Icon="pack://application:,,,/Icones/RenamePagePublisher.png" 
                             LargeIcon="pack://application:,,,/Icones/RenamePagePublisher.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding OpenPlaylistSettings}">
-                </Fluent:Button>
-                <Fluent:Button
+                            Command="{Binding OpenPlaylistSettings}"
+                            Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+                    </Fluent:Button>
+                    <Fluent:Button
                             Header="Export playlist" 
                             Icon="pack://application:,,,/Icones/TableExportMenu.png" 
                             LargeIcon="pack://application:,,,/Icones/TableExportMenu.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding Export}">
-                </Fluent:Button>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
+                            Command="{Binding Export}"
+                            Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+                    </Fluent:Button>
+                </StackPanel>
+            </DockPanel>
+            <StackPanel Orientation="Horizontal" 
+                        Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 <Fluent:Button
                             Header="Add folder" 
                             Icon="pack://application:,,,/Icones/AddFolder.png" 
@@ -117,6 +123,14 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsRecent}" Value="False">
                                     <Setter Property="Background" Value="Transparent" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSearchResult}" Value="False">
+                                    <Setter Property="Opacity" Value="0.4" />
+                                    <Setter Property="FontSize" Value="12" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSearchResult}" Value="True">
+                                    <Setter Property="Opacity" Value="1" />
+                                    <Setter Property="FontSize" Value="14" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

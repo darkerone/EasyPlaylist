@@ -225,6 +225,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Controls\" />
     <Folder Include="DesignData\" />
     <Folder Include="ViewModels\Interfaces\" />
   </ItemGroup>
@@ -260,6 +261,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icones\Rename.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\SearchUI.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

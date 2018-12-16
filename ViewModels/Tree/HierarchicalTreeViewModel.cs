@@ -34,6 +34,18 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private string _searchText;
+        public string SearchText
+        {
+            get { return _searchText; }
+            set
+            {
+                _searchText = value;
+                RaisePropertyChanged("SearchText");
+                DoSearch();
+            }
+        }
+
         /// <summary>
         /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
         /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
@@ -273,6 +285,18 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
+        public ICommand Search
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DoSearch();
+                });
+            }
+        }
+
         #endregion
 
         #region Public methods
@@ -440,7 +464,53 @@ namespace EasyPlaylist.ViewModels
             return fileTagIDs;
         }
 
-
+        private void DoSearch()
+        {
+            string searchTextString = SearchText == null ? "" : SearchText.ToLower();
+            List<MenuItemViewModel> items = RootFolder.GetItems(true);
+            // Si aucun recherche n'est effectuée
+            if (searchTextString == "")
+            {
+                // Marque tous les items comme trouvés
+                foreach (MenuItemViewModel item in items)
+                {
+                    item.IsExpanded = false;
+                    item.IsSearchResult = true;
+                }
+            }
+            else
+            {
+                // Marque les items trouvés et les réduit
+                foreach (MenuItemViewModel item in items)
+                {
+                    item.IsExpanded = false;
+                    if (item.Title.ToLower().Contains(searchTextString))
+                    {
+                        item.IsSearchResult = true;
+                    }
+                    else
+                    {
+                        item.IsSearchResult = false;
+                    }
+                }
+                // Etend les dossiers jusqu'aux fichiers trouvés
+                foreach (MenuItemViewModel item in items)
+                {
+                    if (item.IsSearchResult)
+                    {
+                        item.ExpandToHere();
+                    }
+                }
+                // Considère les dossiers contenant les fichiers trouvés comme des dossiers trouvés
+                foreach (MenuItemViewModel item in items.OfType<FolderViewModel>())
+                {
+                    if (item.IsExpanded)
+                    {
+                        item.IsSearchResult = true;
+                    }
+                }
+            }
+        }
 
         #endregion
     }

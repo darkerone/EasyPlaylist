@@ -59,7 +59,18 @@ namespace EasyPlaylist.ViewModels
                 RaisePropertyChanged("IsExpanded");
             }
         }
-        
+
+        private bool _isSearchResult = true;
+        public bool IsSearchResult
+        {
+            get { return _isSearchResult; }
+            set
+            {
+                _isSearchResult = value;
+                RaisePropertyChanged("IsSearchResult");
+            }
+        }
+
         public abstract bool IsFolder { get; }
 
         private ExistsInPlaylistStatusEnum _existsInPlaylistStatus;
@@ -145,6 +156,15 @@ namespace EasyPlaylist.ViewModels
         public FolderViewModel GetParentFolder()
         {
             return ParentFolder;
+        }
+
+        public void ExpandToHere()
+        {
+            if(ParentFolder != null)
+            {
+                ParentFolder.IsExpanded = true;
+                ParentFolder.ExpandToHere();
+            }
         }
     }
 }
