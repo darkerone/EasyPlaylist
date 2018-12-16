@@ -12,14 +12,67 @@
              xmlns:controls="clr-namespace:EasyPlaylist.Views"
              xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:customControls="clr-namespace:EasyPlaylist.CustomControls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500"
              Loaded="UserControl_Loaded"
              x:Name="HierarchicalTreeView_UserControl">
+    <UserControl.Resources>
+        <!--Style des items de l'explorer-->
+        <Style x:Key="ExplorerItem" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+            <Setter Property="MinHeight" Value="10"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Default}">
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Exists}">
+                    <Setter Property="Foreground" Value="Green" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.NotExists}">
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.PartialExists}">
+                    <Setter Property="Foreground" Value="Orange" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsRecent}" Value="True">
+                    <Setter Property="Background" Value="#FFFFFFBB" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsRecent}" Value="False">
+                    <Setter Property="Background" Value="Transparent" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSearchResult}" Value="False">
+                    <Setter Property="Opacity" Value="0.4" />
+                    <Setter Property="FontSize" Value="12" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSearchResult}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="FontSize" Value="14" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <!--Style des items des playlists-->
+        <Style x:Key="PlaylistItem" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
+            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+            <Setter Property="MinHeight" Value="10"></Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFileExisting}" Value="False">
+                    <Setter Property="Foreground" Value="Red" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsFileExisting}" Value="True">
+                    <Setter Property="Foreground" Value="Black" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <customControls:HierarchicalStyleSelector x:Key="HierarchicalStyleSelector"
+                                                  ExplorerItem="{StaticResource ExplorerItem}"
+                                                  PlaylistItem="{StaticResource PlaylistItem}" />
+    </UserControl.Resources>
     <DockPanel>
         <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top">
             <DockPanel>
-                <TextBox DockPanel.Dock="Right" x:Name="TextBox_Search" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="100">
+                <TextBox DockPanel.Dock="Right" x:Name="TextBox_Search" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="150">
                 </TextBox>
                 <StackPanel  Orientation="Horizontal">
                     <Fluent:Button
@@ -82,6 +135,7 @@
                 telerik:AnimationManager.IsAnimationEnabled="False"
                 IsExpandOnDblClickEnabled="True"
                 telerik:TextSearch.TextPath="Title"
+                ItemContainerStyleSelector="{StaticResource HierarchicalStyleSelector}"
                 DataContextChanged="HierarchicalTree_DataContextChanged"
                 PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14">
             <!--On définit la hauteur du composant en la calculant car elle ne s'adapte pas correctement avec le RadTabControl et les DockPanel-->
@@ -101,40 +155,6 @@
             </telerik:RadTreeView.Height>
             <telerik:RadTreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                    <HierarchicalDataTemplate.ItemContainerStyle>
-                        <Style TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                            <Setter Property="MinHeight" Value="10"></Setter>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Default}">
-                                    <Setter Property="Foreground" Value="Black" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.Exists}">
-                                    <Setter Property="Foreground" Value="Green" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.NotExists}">
-                                    <Setter Property="Foreground" Value="Red" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ExistsInPlaylistStatus}" Value="{x:Static enums:ExistsInPlaylistStatusEnum.PartialExists}">
-                                    <Setter Property="Foreground" Value="Orange" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsRecent}" Value="True">
-                                    <Setter Property="Background" Value="#FFFFFFBB" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsRecent}" Value="False">
-                                    <Setter Property="Background" Value="Transparent" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSearchResult}" Value="False">
-                                    <Setter Property="Opacity" Value="0.4" />
-                                    <Setter Property="FontSize" Value="12" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding IsSearchResult}" Value="True">
-                                    <Setter Property="Opacity" Value="1" />
-                                    <Setter Property="FontSize" Value="14" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </HierarchicalDataTemplate.ItemContainerStyle>
                     <TextBlock Text="{Binding Title}">
                             <!--<telerik:RadContextMenu.ContextMenu>
                                 <telerik:RadContextMenu>

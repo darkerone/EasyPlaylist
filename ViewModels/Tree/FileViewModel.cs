@@ -48,14 +48,39 @@ namespace EasyPlaylist.ViewModels
 
         public override bool IsFolder { get { return false; } }
 
+        private bool _isFileExisting;
+        /// <summary>
+        /// Définit si le fichier existe sur le disque dur
+        /// </summary>
+        public bool IsFileExisting
+        {
+            get { return _isFileExisting; }
+            set
+            {
+                _isFileExisting = value;
+                RaisePropertyChanged("IsFileExisting");
+            }
+        }
+
         #endregion
 
         [JsonConstructor]
         public FileViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
         {
             ExistsInPlaylistStatus = ExistsInPlaylistStatusEnum.Default;
+            TagLib.File fileInfos = null;
 
-            TagLib.File fileInfos = TagLib.File.Create(path);
+            try
+            {
+                fileInfos = TagLib.File.Create(path);
+                IsFileExisting = true;
+            }
+            catch
+            {
+                // Dans le cas où le fichier n'a pas été trouvé
+                IsFileExisting = false;
+                return;
+            }
 
             TagLib.Id3v2.Tag tag = (TagLib.Id3v2.Tag)fileInfos.GetTag(TagTypes.Id3v2); // You can add a true parameter to the GetTag function if the file doesn't already have a tag.
 

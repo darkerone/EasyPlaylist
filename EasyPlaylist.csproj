@@ -143,6 +143,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\HierarchicalStyleSelector.cs" />
     <Compile Include="Converters\InverseValueConverter.cs" />
     <Compile Include="Converters\MultiAddValueConverter.cs" />
     <Compile Include="Converters\FalseToCollapsedVisibilityConverter.cs" />
@@ -225,7 +226,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controls\" />
     <Folder Include="DesignData\" />
     <Folder Include="ViewModels\Interfaces\" />
   </ItemGroup>

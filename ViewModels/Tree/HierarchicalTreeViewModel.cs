@@ -89,10 +89,18 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private List<string> _errors = new List<string>();
+        public List<string> Errors
+        {
+            get { return _errors; }
+        }
+
+
         public bool MoveItemEnabled { get; set; }
         public bool CopyItemInEnabled { get; set; }
         public bool CopyItemOutEnabled { get; set; }
         public bool IsEditable { get; set; }
+        public bool IsPlaylist { get; set; }
 
         #endregion
 
@@ -358,6 +366,24 @@ namespace EasyPlaylist.ViewModels
         public List<string> GetAllFileTagIDs()
         {
             return GetAllFileTagIDsRecursively(RootFolder);
+        }
+
+        /// <summary>
+        /// Vérifie si la playlist contient des erreurs
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckErrors()
+        {
+            Errors.Clear();
+            foreach (FileViewModel file in RootFolder.GetFiles(true))
+            {
+                // Vérifie si le fichier existe sur le disque dur
+                if (!file.IsFileExisting)
+                {
+                    Errors.Add($"\"{file.Path}\" does not exists.");
+                }
+            }
+            return Errors.Any();
         }
 
         #endregion

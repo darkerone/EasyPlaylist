@@ -219,7 +219,8 @@ namespace EasyPlaylist.ViewModels
                                 CopyItemInEnabled = true,
                                 CopyItemOutEnabled = false,
                                 MoveItemEnabled = true,
-                                IsEditable = true
+                                IsEditable = true,
+                                IsPlaylist = true
                             };
                             AddPlaylist(newPlaylist);
                             SelectedPlaylist = newPlaylist;
@@ -507,8 +508,10 @@ namespace EasyPlaylist.ViewModels
                 };
                 ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
 
+                string errors = "";
                 if (deserializedPlaylist != null)
                 {
+                    // Pour chaque playlist
                     foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
                     {
                         // Copie toutes les propriétés utiles de la playlist déserialisée
@@ -518,9 +521,25 @@ namespace EasyPlaylist.ViewModels
                         hierarchicalTreeViewModel.CopyItemOutEnabled = false;
                         hierarchicalTreeViewModel.MoveItemEnabled = true;
                         hierarchicalTreeViewModel.IsEditable = true;
+                        hierarchicalTreeViewModel.IsPlaylist = true;
                         hierarchicalTreeViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
                         AddPlaylist(hierarchicalTreeViewModel);
+
+                        if (hierarchicalTreeViewModel.CheckErrors())
+                        {
+                            errors += $"- Playlist \"{hierarchicalTreeViewModel.Settings.Name}\" contains errors :\n";
+                            foreach (string error in hierarchicalTreeViewModel.Errors)
+                            {
+                                errors += error + "\n";
+                            }
+                            errors += "\n";
+                        }
                     }
+                }
+
+                if (errors != "")
+                {
+                    MessageBoxResult result = System.Windows.MessageBox.Show(errors, "Errors", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
@@ -577,7 +596,8 @@ namespace EasyPlaylist.ViewModels
                 CopyItemInEnabled = false,
                 CopyItemOutEnabled = true,
                 MoveItemEnabled = false,
-                IsEditable = false
+                IsEditable = false,
+                IsPlaylist = false
             };
             Explorer.AddMenuItems(musicFolder.Items.ToList());
 
