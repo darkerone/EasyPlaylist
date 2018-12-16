@@ -20,6 +20,8 @@ namespace EasyPlaylist.ViewModels
 {
     class MainViewModel : BaseViewModel
     {
+        #region Properties
+
         private string _currentFolderPath;
         public string CurrentFolderPath
         {
@@ -96,6 +98,8 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        #endregion
+
         public MainViewModel()
         {
             EventAggregator = new EventAggregator();
@@ -127,6 +131,8 @@ namespace EasyPlaylist.ViewModels
             // Effectué après l'initialisation de l'explorer
             SelectedPlaylist = Playlists.FirstOrDefault();
         }
+
+        #region Events
 
         public ICommand Browse
         {
@@ -240,6 +246,29 @@ namespace EasyPlaylist.ViewModels
                 });
             }
         }
+
+        /// <summary>
+        /// Lorsqu'un dossier windows (surveillé) change
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
+        private void OnExplorerFolderChanged(object source, FileSystemEventArgs e)
+        {
+            // Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                // TODO : effectuer les changement dans l'explorer en fonction de l'évennement
+                IsIhmEnabled = false;
+                // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
+                System.Windows.Forms.Application.DoEvents();
+                RefreshExplorer();
+                IsIhmEnabled = true;
+            });
+        }
+
+        #endregion
+
+        #region Public methods
 
         /// <summary>
         /// Ajoute l'élément sélectionné dans l'explorer dans l'élément sélectionné de la playlist sélectionnée
@@ -367,6 +396,10 @@ namespace EasyPlaylist.ViewModels
             Playlists.Remove(playlistToRemove);
         }
 
+        #endregion
+
+        #region Private methods
+
         /// <summary>
         /// Vérifie et marque les fichiers du dossier passé en paramètre selon 
         /// s'ils sont présent dans la liste des tag id passée en paramètre.
@@ -425,6 +458,10 @@ namespace EasyPlaylist.ViewModels
             return existsInPlaylistStatusEnum;
         }
 
+        /// <summary>
+        /// Sauvegarde toutes les playlists
+        /// </summary>
+        /// <returns></returns>
         private bool SavePlaylists()
         {
             
@@ -446,6 +483,9 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        /// <summary>
+        /// Définit si l'on peut ajouter l'item sélectionné à la playlist sélectionnée
+        /// </summary>
         private void SetCanAddSelectedItemToSelectedPlaylist()
         {
             CanAddSelectedItemToSelectedPlaylist = Explorer.SelectedItem != null && SelectedPlaylist != null;
@@ -485,6 +525,10 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        /// <summary>
+        /// Initialise l'explorer
+        /// </summary>
+        /// <param name="folderPath"></param>
         private void InitExplorerFolders(string folderPath)
         {
             if(_watcher == null)
@@ -512,21 +556,6 @@ namespace EasyPlaylist.ViewModels
             _watcher.Path = folderPath;
 
             RefreshExplorer();
-        }
-
-        // Define the event handlers.
-        private void OnExplorerFolderChanged(object source, FileSystemEventArgs e)
-        {
-            // Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                // TODO : effectuer les changement dans l'explorer en fonction de l'évennement
-                IsIhmEnabled = false;
-                // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
-                System.Windows.Forms.Application.DoEvents();
-                RefreshExplorer();
-                IsIhmEnabled = true;
-            });
         }
 
         /// <summary>
@@ -564,5 +593,7 @@ namespace EasyPlaylist.ViewModels
                 }
             }
         }
+
+        #endregion
     }
 }

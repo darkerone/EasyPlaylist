@@ -23,6 +23,12 @@ namespace EasyPlaylist.ViewModels
     {
         #region Properties
 
+        /// <summary>
+        /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
+        /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
+        /// </summary>
+        public ObservableCollection<MenuItemViewModel> RootFolders { get; }
+
         private FolderViewModel _rootFolder;
         public FolderViewModel RootFolder
         {
@@ -35,6 +41,9 @@ namespace EasyPlaylist.ViewModels
         }
 
         private string _searchText;
+        /// <summary>
+        /// Texte utilisé pour effectuer une recherche
+        /// </summary>
         public string SearchText
         {
             get { return _searchText; }
@@ -45,12 +54,6 @@ namespace EasyPlaylist.ViewModels
                 DoSearch();
             }
         }
-
-        /// <summary>
-        /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
-        /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
-        /// </summary>
-        public ObservableCollection<MenuItemViewModel> RootFolders { get; }
 
         private MenuItemViewModel _selectedItem;
         public MenuItemViewModel SelectedItem
@@ -464,6 +467,9 @@ namespace EasyPlaylist.ViewModels
             return fileTagIDs;
         }
 
+        /// <summary>
+        /// Effectue une recherche par nom sur l'ensemble de la playlist
+        /// </summary>
         private void DoSearch()
         {
             string searchTextString = SearchText == null ? "" : SearchText.ToLower();

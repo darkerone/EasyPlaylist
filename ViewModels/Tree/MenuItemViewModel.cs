@@ -15,11 +15,14 @@ namespace EasyPlaylist.ViewModels
 {
     abstract class MenuItemViewModel : BaseViewModel
     {
+        #region Properties
+
         private string _title;
         /// <summary>
         /// Titre du dossier/fichier
         /// </summary>
-        public string Title {
+        public string Title
+        {
             get { return _title; }
             set
             {
@@ -102,6 +105,8 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        #endregion
+
         public MenuItemViewModel(IEventAggregator eventAggregator, string path, string title)
         {
             Path = path;
@@ -117,6 +122,8 @@ namespace EasyPlaylist.ViewModels
             EventAggregator = eventAggregator;
             IsExpanded = false;
         }
+
+        #region Events
 
         [JsonIgnore]
         public ICommand Rename
@@ -147,24 +154,41 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        #endregion
+
+        #region Public methods
+
         /// <summary>
         /// Renvoie une copie du menu item
         /// </summary>
         /// <returns></returns>
         abstract public MenuItemViewModel GetItemCopy();
 
+        /// <summary>
+        /// Renvoie le dossier parent
+        /// </summary>
+        /// <returns></returns>
         public FolderViewModel GetParentFolder()
         {
             return ParentFolder;
         }
 
+        /// <summary>
+        /// Etend tous les dossiers jusqu'à cet item
+        /// </summary>
         public void ExpandToHere()
         {
-            if(ParentFolder != null)
+            if (ParentFolder != null)
             {
                 ParentFolder.IsExpanded = true;
                 ParentFolder.ExpandToHere();
             }
         }
+
+        #endregion
+
+        #region Private methods
+
+        #endregion
     }
 }

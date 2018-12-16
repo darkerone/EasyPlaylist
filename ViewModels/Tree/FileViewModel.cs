@@ -16,6 +16,8 @@ namespace EasyPlaylist.ViewModels
 {
     class FileViewModel : MenuItemViewModel
     {
+        #region Properties
+
         private string _fileTagId;
         /// <summary>
         /// Identifiant du fichier (md5 du fichier)
@@ -45,6 +47,8 @@ namespace EasyPlaylist.ViewModels
         }
 
         public override bool IsFolder { get { return false; } }
+
+        #endregion
 
         [JsonConstructor]
         public FileViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
@@ -86,6 +90,12 @@ namespace EasyPlaylist.ViewModels
 
         }
 
+        #region Events
+
+        #endregion
+
+        #region Public methods
+
         public override MenuItemViewModel GetItemCopy()
         {
             return new FileViewModel(EventAggregator, Path, null);
@@ -108,6 +118,10 @@ namespace EasyPlaylist.ViewModels
 
             return true;
         }
+
+        #endregion
+
+        #region Private methods
 
         /// <summary>
         /// Génère un Id pour le fichier (avec la date du jour)
@@ -151,5 +165,7 @@ namespace EasyPlaylist.ViewModels
 
             return date;
         }
+
+        #endregion
     }
 }

@@ -13,7 +13,16 @@ namespace EasyPlaylist.ViewModels
 {
     class FolderViewModel : MenuItemViewModel
     {
+        #region Properties 
+
         public override bool IsFolder { get { return true; } }
+
+        /// <summary>
+        /// Sous dossiers/fichiers
+        /// </summary>
+        public ObservableCollection<MenuItemViewModel> Items { get; }
+
+        #endregion
 
         [JsonConstructor]
         public FolderViewModel(IEventAggregator eventAggregator, string path, string title) : base(eventAggregator, path, title)
@@ -22,28 +31,29 @@ namespace EasyPlaylist.ViewModels
             Items.CollectionChanged += Items_CollectionChanged;
         }
 
+        #region Events
+
         private void Items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if(EventAggregator != null)
+            if (EventAggregator != null)
             {
                 EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Publish(this);
             }
         }
 
-        /// <summary>
-        /// Sous dossiers/fichiers
-        /// </summary>
-        public ObservableCollection<MenuItemViewModel> Items { get; }
+        #endregion
+
+        #region Public methods
 
         public override MenuItemViewModel GetItemCopy()
         {
             FolderViewModel folderCopy = new FolderViewModel(EventAggregator, Path, null);
             if (Items.Any())
-            {                
+            {
                 List<MenuItemViewModel> itemsToAdd = Items.Select(x => x.GetItemCopy()).ToList();
                 folderCopy.AddItems(itemsToAdd);
             }
-            
+
             return folderCopy;
         }
 
@@ -148,25 +158,6 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
-        /// Met à jour les dossiers parents des éléments du dossier passé en paramètre
-        /// </summary>
-        /// <param name="folderVM"></param>
-        private void DefineAllSubParentFoldersIn(FolderViewModel folderVM)
-        {
-            // Définit les parents des éléments du dossier
-            foreach (MenuItemViewModel menuItemVM in folderVM.Items)
-            {
-                menuItemVM.ParentFolder = folderVM;
-            }
-
-            // Définit les parents des éléments des sous dossiers du dossier
-            foreach (FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
-            {
-                DefineAllSubParentFoldersIn(subFolder);
-            }
-        }
-
-        /// <summary>
         /// Récupère la liste des fichiers du dossier
         /// </summary>
         /// <param name="recursive">True pour récupérer les fichiers de manière récursive</param>
@@ -231,5 +222,30 @@ namespace EasyPlaylist.ViewModels
 
             return folders;
         }
+
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// Met à jour les dossiers parents des éléments du dossier passé en paramètre
+        /// </summary>
+        /// <param name="folderVM"></param>
+        private void DefineAllSubParentFoldersIn(FolderViewModel folderVM)
+        {
+            // Définit les parents des éléments du dossier
+            foreach (MenuItemViewModel menuItemVM in folderVM.Items)
+            {
+                menuItemVM.ParentFolder = folderVM;
+            }
+
+            // Définit les parents des éléments des sous dossiers du dossier
+            foreach (FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
+            {
+                DefineAllSubParentFoldersIn(subFolder);
+            }
+        }
+
+        #endregion
     }
 }
