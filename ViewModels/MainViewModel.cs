@@ -231,23 +231,6 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand OnClose
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    MessageBoxResult result = System.Windows.MessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNo);
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            SavePlaylists();
-                            break;
-                    }
-                });
-            }
-        }
-
         /// <summary>
         /// Lorsqu'un dossier windows (surveillé) change
         /// </summary>
@@ -397,6 +380,31 @@ namespace EasyPlaylist.ViewModels
             Playlists.Remove(playlistToRemove);
         }
 
+        /// <summary>
+        /// Sauvegarde toutes les playlists
+        /// </summary>
+        /// <returns></returns>
+        public bool SavePlaylists()
+        {
+
+            try
+            {
+                var jsonSerializerSettings = new JsonSerializerSettings()
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                };
+                string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
+                System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
+                return true;
+            }
+            catch
+            {
+                System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                return false;
+            }
+        }
+
         #endregion
 
         #region Private methods
@@ -457,31 +465,6 @@ namespace EasyPlaylist.ViewModels
             }
 
             return existsInPlaylistStatusEnum;
-        }
-
-        /// <summary>
-        /// Sauvegarde toutes les playlists
-        /// </summary>
-        /// <returns></returns>
-        private bool SavePlaylists()
-        {
-            
-            try
-            {
-                var jsonSerializerSettings = new JsonSerializerSettings()
-                {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                };
-                string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
-                System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
-                return true;
-            }
-            catch
-            {
-                System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
-                return false;
-            }
         }
 
         /// <summary>

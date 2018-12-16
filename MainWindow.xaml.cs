@@ -29,5 +29,21 @@ namespace EasyPlaylist.Views
 
             DataContext = new MainViewModel();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MainViewModel mainViewModel = this.DataContext as MainViewModel;
+
+            MessageBoxResult result = System.Windows.MessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNoCancel);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    mainViewModel.SavePlaylists();
+                    break;
+                case MessageBoxResult.Cancel:
+                    e.Cancel = true;
+                    break;
+            }
+        }
     }
 }

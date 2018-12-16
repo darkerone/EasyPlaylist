@@ -9,12 +9,8 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         mc:Ignorable="d"
+        Closing="Window_Closing"
         Title="MainWindow" Height="700" Width="1080">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding OnClose}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
     <Grid IsEnabled="{Binding IsIhmEnabled}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
