@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace EasyPlaylist.ViewModels
             {
                 _searchText = value;
                 RaisePropertyChanged("SearchText");
-                DoSearch();
+                DoTextSearch();
             }
         }
 
@@ -295,11 +296,11 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    DoSearch();
+                    DoTextSearch();
                 });
             }
         }
-
+        
         [JsonIgnore]
         public ICommand DisplayFilesInError
         {
@@ -307,7 +308,19 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    SearchFilesInError();
+                    DoSearch(x => x is FileViewModel && ((FileViewModel)x).IsFileExisting == false);
+                });
+            }
+        }
+
+        [JsonIgnore]
+        public ICommand DisplayRecentFiles
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DoSearch(x => x.IsRecent);
                 });
             }
         }
@@ -429,26 +442,20 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
-        /// Effectue une recherche sur les fichiers en erreur et les met en avant
+        /// Effectue une recherche sur les items et les met en avant
         /// </summary>
-        public void SearchFilesInError()
+        public void DoSearch(Func<MenuItemViewModel, bool> predicate)
         {
-            // Rend tous les dossiers non importants
-            foreach (FolderViewModel folder in RootFolder.GetFolders(true))
+            List<MenuItemViewModel> items = RootFolder.GetItems(true);
+            // Rend tous les fichiers/dossiers non importants
+            foreach (MenuItemViewModel item in items)
             {
-                folder.IsImportant = false;
+                item.IsImportant = false;
             }
-            // Si les fichiers n'existent pas, ils deviennent important
-            foreach (FileViewModel file in RootFolder.GetFiles(true))
+            // Pour tous les items vérifiant le prédicat, ils deviennent important
+            foreach (MenuItemViewModel item in items.Where(predicate))
             {
-                if (!file.IsFileExisting)
-                {
-                    file.IsImportant = true;
-                }
-                else
-                {
-                    file.IsImportant = false;
-                }
+                item.IsImportant = true;
             }
             BringSearchResultToView();
         }
@@ -563,7 +570,7 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Effectue une recherche par nom sur l'ensemble de la playlist
         /// </summary>
-        private void DoSearch()
+        private void DoTextSearch()
         {
             string searchTextString = SearchText == null ? "" : SearchText.ToLower();
             List<MenuItemViewModel> items = RootFolder.GetItems(true);
@@ -579,20 +586,7 @@ namespace EasyPlaylist.ViewModels
             }
             else
             {
-                // Marque les items trouvés et les réduit
-                foreach (MenuItemViewModel item in items)
-                {
-                    item.IsExpanded = false;
-                    if (item.Title.ToLower().Contains(searchTextString))
-                    {
-                        item.IsImportant = true;
-                    }
-                    else
-                    {
-                        item.IsImportant = false;
-                    }
-                }
-                BringSearchResultToView(items);
+                DoSearch(x => x.Title.ToLower().Contains(searchTextString));
             }
         }
 

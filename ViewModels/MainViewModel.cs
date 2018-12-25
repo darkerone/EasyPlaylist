@@ -577,7 +577,7 @@ namespace EasyPlaylist.ViewModels
                         case MessageBoxResult.Yes:
                             foreach (HierarchicalTreeViewModel playlist in Playlists)
                             {
-                                playlist.SearchFilesInError();
+                                playlist.DoSearch(x => x is FileViewModel && ((FileViewModel)x).IsFileExisting == false);
                             }
                             break;
                     }

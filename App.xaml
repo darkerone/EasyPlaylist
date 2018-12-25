@@ -27,8 +27,9 @@
                     <converters:FalseToCollapsedVisibilityConverter x:Key="FalseToCollapsedVisibilityConverter"/> 
                     <converters:NullToFalseConverter x:Key="NullToFalseConverter"/>
                     <converters:AddValueConverter x:Key="AddValueConverter"/>
-                    <converters:MultiAddValueConverter x:Key="MultiAddValueConverter"/>
+                    <converters:MultiAddValueConverter x:Key="MultiAddValueConverter"/> 
                     <converters:InverseValueConverter x:Key="InverseValueConverter"/>
+                    <converters:TrueToCollapsedVisibilityConverter x:Key="TrueToCollapsedVisibilityConverter"/>
                 </ResourceDictionary>
                 <ResourceDictionary>
                     <FontFamily x:Key="FontAwesome">pack://application:,,,/fonts/#fontawesome</FontFamily>
