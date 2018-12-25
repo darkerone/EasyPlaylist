@@ -95,7 +95,6 @@ namespace EasyPlaylist.ViewModels
             get { return _errors; }
         }
 
-
         public bool MoveItemEnabled { get; set; }
         public bool CopyItemInEnabled { get; set; }
         public bool CopyItemOutEnabled { get; set; }
@@ -126,7 +125,7 @@ namespace EasyPlaylist.ViewModels
             SelectedItem = RootFolder;
         }
 
-        #region Commands
+        #region Events
 
         [JsonIgnore]
         public ICommand RemoveSelectedItem
@@ -312,11 +311,49 @@ namespace EasyPlaylist.ViewModels
 
         #region Public methods
 
+        /// <summary>
+        /// Ajoute une copie de l'item à la playlist
+        /// </summary>
+        /// <param name="itemsToAdd"></param>
+        public void AddMenuItemCopy(MenuItemViewModel itemsToAdd)
+        {
+            AddMenuItemsCopy(new List<MenuItemViewModel>() { itemsToAdd });
+        }
+
+        /// <summary>
+        /// Ajoute une copie des items à la playlist
+        /// </summary>
+        /// <param name="itemsToAdd"></param>
+        public void AddMenuItemsCopy(List<MenuItemViewModel> itemsToAdd)
+        {
+            // Si l'item sélectionné est un dossier
+            if (SelectedItem is FolderViewModel)
+            {
+                // On ajoute les éléments au dossier sélectionné
+                FolderViewModel selectedFolder = SelectedItem as FolderViewModel;
+                selectedFolder.AddItemsCopy(itemsToAdd);
+            }
+            else
+            {
+                // On ajoute les éléments au dossier parent de l'élément sélectionné
+                FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
+                folderWhereAdd.AddItemsCopy(itemsToAdd);
+            }
+        }
+
+        /// <summary>
+        /// Ajoute un item à la playlist
+        /// </summary>
+        /// <param name="itemsToAdd"></param>
         public void AddMenuItem(MenuItemViewModel itemsToAdd)
         {
             AddMenuItems(new List<MenuItemViewModel>() { itemsToAdd });
         }
 
+        /// <summary>
+        /// Ajoute des items à la playlist
+        /// </summary>
+        /// <param name="itemsToAdd"></param>
         public void AddMenuItems(List<MenuItemViewModel> itemsToAdd)
         {
             // Si l'item sélectionné est un dossier
@@ -384,6 +421,31 @@ namespace EasyPlaylist.ViewModels
                 }
             }
             return Errors.Any();
+        }
+
+        /// <summary>
+        /// Effectue une recherche sur les fichiers en erreur et les met en avant
+        /// </summary>
+        public void SearchFilesInError()
+        {
+            // Rend tous les dossiers non importants
+            foreach (FolderViewModel folder in RootFolder.GetFolders(true))
+            {
+                folder.IsImportant = false;
+            }
+            // Si les fichiers n'existent pas, ils deviennent important
+            foreach (FileViewModel file in RootFolder.GetFiles(true))
+            {
+                if (!file.IsFileExisting)
+                {
+                    file.IsImportant = true;
+                }
+                else
+                {
+                    file.IsImportant = false;
+                }
+            }
+            BringSearchResultToView();
         }
 
         #endregion
@@ -507,7 +569,7 @@ namespace EasyPlaylist.ViewModels
                 foreach (MenuItemViewModel item in items)
                 {
                     item.IsExpanded = false;
-                    item.IsSearchResult = true;
+                    item.IsImportant = true;
                 }
             }
             else
@@ -518,28 +580,48 @@ namespace EasyPlaylist.ViewModels
                     item.IsExpanded = false;
                     if (item.Title.ToLower().Contains(searchTextString))
                     {
-                        item.IsSearchResult = true;
+                        item.IsImportant = true;
                     }
                     else
                     {
-                        item.IsSearchResult = false;
+                        item.IsImportant = false;
                     }
                 }
-                // Etend les dossiers jusqu'aux fichiers trouvés
-                foreach (MenuItemViewModel item in items)
+                BringSearchResultToView(items);
+            }
+        }
+
+        /// <summary>
+        /// Met en avant les éléments marqués comme résultat de la recherche
+        /// </summary>
+        /// <param name="items">Elément qui seront traités (tout l'arbre si null). 
+        /// Pour éviter de reparcourir l'arbre si cela a déjà été fait</param>
+        private void BringSearchResultToView(List<MenuItemViewModel> items = null)
+        {
+            if (items == null)
+            {
+                items = RootFolder.GetItems(true);
+            }
+
+            // Réduit tous les items
+            foreach (MenuItemViewModel item in items)
+            {
+                item.IsExpanded = false;
+            }
+            // Etend les dossiers jusqu'aux fichiers/dossier trouvés
+            foreach (MenuItemViewModel item in items)
+            {
+                if (item.IsImportant)
                 {
-                    if (item.IsSearchResult)
-                    {
-                        item.ExpandToHere();
-                    }
+                    item.ExpandToHere();
                 }
-                // Considère les dossiers contenant les fichiers trouvés comme des dossiers trouvés
-                foreach (MenuItemViewModel item in items.OfType<FolderViewModel>())
+            }
+            // Considère les dossiers contenant les fichiers trouvés comme des dossiers trouvés
+            foreach (MenuItemViewModel item in items.OfType<FolderViewModel>())
+            {
+                if (item.IsExpanded)
                 {
-                    if (item.IsExpanded)
-                    {
-                        item.IsSearchResult = true;
-                    }
+                    item.IsImportant = true;
                 }
             }
         }

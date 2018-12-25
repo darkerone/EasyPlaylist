@@ -87,7 +87,7 @@ namespace EasyPlaylist.ViewModels
 
         private FileSystemWatcher _watcher;
 
-        private bool _isIhmEnabled = true;
+        private bool _isIhmEnabled = false;
         public bool IsIhmEnabled
         {
             get { return _isIhmEnabled; }
@@ -120,16 +120,20 @@ namespace EasyPlaylist.ViewModels
             // Events
             // ======
             // Lorsque les items d'un dossier change
-            EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) => {
+            EventAggregator.GetEvent<MenuItemCollectionChangedEvent>().Subscribe((e) =>
+            {
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             });
             // Lorsque la sélection d'un item change
-            EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) => {
+            EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) =>
+            {
                 SetCanAddSelectedItemToSelectedPlaylist();
             });
 
             // Effectué après l'initialisation de l'explorer
             SelectedPlaylist = Playlists.FirstOrDefault();
+
+            IsIhmEnabled = true;
         }
 
         #region Events
@@ -309,7 +313,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     FolderViewModel folder = null;
                     // S'il y a un élément sélectionné dans la playlist
-                    if(SelectedPlaylist.SelectedItem != null)
+                    if (SelectedPlaylist.SelectedItem != null)
                     {
                         // Si l'élément sélectionné dans la playlist est un dossier
                         if (SelectedPlaylist.SelectedItem.IsFolder)
@@ -325,7 +329,7 @@ namespace EasyPlaylist.ViewModels
                     {
                         folder = SelectedPlaylist.RootFolder;
                     }
-                    folder.AddItem(Explorer.SelectedItem);
+                    folder.AddItemCopy(Explorer.SelectedItem);
                     folder.IsExpanded = true;
                 });
             }
@@ -388,7 +392,7 @@ namespace EasyPlaylist.ViewModels
         /// <param name="playlistFileTagIDs"></param>
         public void CheckIfItemsExistInSelectedPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
         {
-            if(explorerVM != null && playlistVM != null)
+            if (explorerVM != null && playlistVM != null)
             {
                 List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
 
@@ -493,7 +497,7 @@ namespace EasyPlaylist.ViewModels
             if (!folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.Exists))
             {
                 // Si certains existent 
-                if(folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.PartialExists))
+                if (folderVM.Items.Any(x => x.ExistsInPlaylistStatus == ExistsInPlaylistStatusEnum.PartialExists))
                 {
                     existsInPlaylistStatusEnum = ExistsInPlaylistStatusEnum.PartialExists;
                 }
@@ -543,7 +547,7 @@ namespace EasyPlaylist.ViewModels
                     {
                         // Copie toutes les propriétés utiles de la playlist déserialisée
                         HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
-                        hierarchicalTreeViewModel.AddMenuItems(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+                        hierarchicalTreeViewModel.AddMenuItemsCopy(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
                         hierarchicalTreeViewModel.CopyItemInEnabled = true;
                         hierarchicalTreeViewModel.CopyItemOutEnabled = false;
                         hierarchicalTreeViewModel.MoveItemEnabled = true;
@@ -566,7 +570,17 @@ namespace EasyPlaylist.ViewModels
 
                 if (errors != "")
                 {
-                    MessageBoxResult result = System.Windows.MessageBox.Show(errors, "Errors", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    errors += "Do you want to show those files ?";
+                    MessageBoxResult result = System.Windows.MessageBox.Show(errors, "Errors", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    switch (result)
+                    {
+                        case MessageBoxResult.Yes:
+                            foreach (HierarchicalTreeViewModel playlist in Playlists)
+                            {
+                                playlist.SearchFilesInError();
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -577,10 +591,10 @@ namespace EasyPlaylist.ViewModels
         /// <param name="folderPath"></param>
         private void InitExplorerFolders(string folderPath)
         {
-            if(_watcher == null)
+            if (_watcher == null)
             {
                 _watcher = new FileSystemWatcher();
-                
+
                 /* Watch for changes in LastAccess and LastWrite times, and the renaming of files or directories. */
                 _watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
                 // Only watch mp3 files.
@@ -630,7 +644,7 @@ namespace EasyPlaylist.ViewModels
 
             CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
 
-            if(oldFolders != null)
+            if (oldFolders != null)
             {
                 // Etend les dossiers qui l'étaient
                 List<FolderViewModel> newFolders = Explorer.RootFolder.GetFolders(true);

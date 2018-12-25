@@ -52,7 +52,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         public FolderViewModel ParentFolder { get; set; }
 
-        private bool _isExpanded;
+        private bool _isExpanded = false;
         public bool IsExpanded
         {
             get { return _isExpanded; }
@@ -63,14 +63,18 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private bool _isSearchResult = true;
-        public bool IsSearchResult
+        private bool _isImportant = true;
+
+        /// <summary>
+        /// Définit si l'item est important (pour savoir s'il doit être mis en évidence lors de la recherche par exemple)
+        /// </summary>
+        public bool IsImportant
         {
-            get { return _isSearchResult; }
+            get { return _isImportant; }
             set
             {
-                _isSearchResult = value;
-                RaisePropertyChanged("IsSearchResult");
+                _isImportant = value;
+                RaisePropertyChanged("IsImportant");
             }
         }
 
@@ -120,7 +124,6 @@ namespace EasyPlaylist.ViewModels
             }
            
             EventAggregator = eventAggregator;
-            IsExpanded = false;
         }
 
         #region Events

@@ -41,11 +41,11 @@
                 <DataTrigger Binding="{Binding IsRecent}" Value="False">
                     <Setter Property="Background" Value="Transparent" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding IsSearchResult}" Value="False">
+                <DataTrigger Binding="{Binding IsImportant}" Value="False">
                     <Setter Property="Opacity" Value="0.4" />
                     <Setter Property="FontSize" Value="12" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding IsSearchResult}" Value="True">
+                <DataTrigger Binding="{Binding IsImportant}" Value="True">
                     <Setter Property="Opacity" Value="1" />
                     <Setter Property="FontSize" Value="14" />
                 </DataTrigger>
@@ -56,6 +56,14 @@
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
             <Setter Property="MinHeight" Value="10"></Setter>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding IsImportant}" Value="False">
+                    <Setter Property="Opacity" Value="0.4" />
+                    <Setter Property="FontSize" Value="12" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsImportant}" Value="True">
+                    <Setter Property="Opacity" Value="1" />
+                    <Setter Property="FontSize" Value="14" />
+                </DataTrigger>
                 <DataTrigger Binding="{Binding IsFileExisting}" Value="False">
                     <Setter Property="Foreground" Value="Red" />
                 </DataTrigger>

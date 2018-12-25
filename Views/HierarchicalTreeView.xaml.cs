@@ -139,7 +139,7 @@ namespace EasyPlaylist.Views
                         List<MenuItemViewModel> copiedElements = draggedItemVms.Select(x => x.GetItemCopy()).ToList();
 
                         // Ajoute les éléments copiés au dossier
-                        destinationFolderVM.AddItems(copiedElements);
+                        destinationFolderVM.AddItemsCopy(copiedElements);
                     }
                 }
             }
@@ -162,7 +162,7 @@ namespace EasyPlaylist.Views
                         }
 
                         // Ajoute les éléments déplacés dans leur dossier de destination
-                        destinationFolderVM.AddItems(draggedItemVms);
+                        destinationFolderVM.AddItemsCopy(draggedItemVms);
                     }
                 }
             }

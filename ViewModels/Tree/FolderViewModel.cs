@@ -51,7 +51,7 @@ namespace EasyPlaylist.ViewModels
             if (Items.Any())
             {
                 List<MenuItemViewModel> itemsToAdd = Items.Select(x => x.GetItemCopy()).ToList();
-                folderCopy.AddItems(itemsToAdd);
+                folderCopy.AddItemsCopy(itemsToAdd);
             }
 
             return folderCopy;
@@ -92,20 +92,20 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
-        /// Ajoute un item au dossier.
-        /// Fait appel à AddItems pour éviter les multiples CollectionChanged
+        /// Ajoute une copie de l'item au dossier.
+        /// Fait appel à AddItemsCopy pour éviter les multiples CollectionChanged
         /// </summary>
         /// <param name="menuItemVMToAdd"></param>
-        public void AddItem(MenuItemViewModel menuItemVMToAdd)
+        public void AddItemCopy(MenuItemViewModel menuItemVMToAdd)
         {
-            AddItems(new List<MenuItemViewModel>() { menuItemVMToAdd });
+            AddItemsCopy(new List<MenuItemViewModel>() { menuItemVMToAdd });
         }
 
         /// <summary>
-        /// Ajoute des items au dossier
+        /// Ajoute une copie des items au dossier
         /// </summary>
         /// <param name="menuItemsVMToAdd"></param>
-        public void AddItems(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
+        public void AddItemsCopy(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
         {
             // Copie les items
             List<MenuItemViewModel> copiedMenuItemsVM = menuItemsVMToAdd.Select(x => x.GetItemCopy()).ToList();
@@ -125,6 +125,44 @@ namespace EasyPlaylist.ViewModels
                 menuItemVM.Title = nameTmp;
             }
             Items.AddRange(copiedMenuItemsVM);
+
+            // Un dossier est récent si au moins un de ses item est récent
+            IsRecent = Items.Any(x => x.IsRecent);
+        }
+
+        /// <summary>
+        /// Ajoute un item au dossier.
+        /// Fait appel à AddItems pour éviter les multiples CollectionChanged
+        /// </summary>
+        /// <param name="menuItemVMToAdd"></param>
+        public void AddItem(MenuItemViewModel menuItemVMToAdd)
+        {
+            AddItems(new List<MenuItemViewModel>() { menuItemVMToAdd });
+        }
+
+        /// <summary>
+        /// Ajoute des items au dossier
+        /// </summary>
+        /// <param name="menuItemsVMToAdd"></param>
+        public void AddItems(IEnumerable<MenuItemViewModel> menuItemsVMToAdd)
+        {
+            // Copie les items
+            foreach (MenuItemViewModel menuItemVM in menuItemsVMToAdd)
+            {
+                // Redéfinit l'item parent
+                menuItemVM.ParentFolder = this;
+
+                // Si le nom existe déjà, on incrémente un index entre parenthèse
+                string nameTmp = menuItemVM.Title;
+                int index = 1;
+                while (Items.Any(x => x.Title == nameTmp))
+                {
+                    nameTmp = menuItemVM.Title + $" ({index})";
+                    index++;
+                }
+                menuItemVM.Title = nameTmp;
+            }
+            Items.AddRange(menuItemsVMToAdd);
 
             // Un dossier est récent si au moins un de ses item est récent
             IsRecent = Items.Any(x => x.IsRecent);
