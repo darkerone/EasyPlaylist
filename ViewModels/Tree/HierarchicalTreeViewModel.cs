@@ -103,14 +103,7 @@ namespace EasyPlaylist.ViewModels
 
         #endregion
 
-        /// <summary>
-        /// Contructeur pour désérialization
-        /// </summary>
         [JsonConstructor]
-        public HierarchicalTreeViewModel()
-        {
-        }
-
         public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
         {
             EventAggregator = eventAggregator;
@@ -303,6 +296,18 @@ namespace EasyPlaylist.ViewModels
                 return new DelegateCommand((parameter) =>
                 {
                     DoSearch();
+                });
+            }
+        }
+
+        [JsonIgnore]
+        public ICommand DisplayFilesInError
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    SearchFilesInError();
                 });
             }
         }
