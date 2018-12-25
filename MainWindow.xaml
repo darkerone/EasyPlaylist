@@ -80,6 +80,15 @@
                             Command="{Binding RemoveSelectedPlaylist}"
                             IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}">
                 </Fluent:Button>
+                <Fluent:Button
+                            Header="Copy selected playlist" 
+                            Icon="pack://application:,,,/Icones/SlicerCopy.png" 
+                            LargeIcon="pack://application:,,,/Icones/SlicerCopy.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding CopySelectedPlaylist}"
+                            IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}">
+                </Fluent:Button>
             </StackPanel>
             <telerik:RadTabControl Background="AliceBlue"
                                ItemsSource="{Binding Playlists}" 

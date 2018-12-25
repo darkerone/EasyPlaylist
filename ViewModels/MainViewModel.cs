@@ -231,6 +231,50 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        public ICommand CopySelectedPlaylist
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel
+                    {
+                        ItemName = "Copy of " + SelectedPlaylist.Settings.Name
+                    };
+                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
+                    RadWindow radWindow = new RadWindow
+                    {
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Header = "Copy playlist",
+                        Content = newDefineNamePopupView
+                    };
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                    {
+                        RadWindow popup = sender as RadWindow;
+                        DefineNamePopupView namePopupView = popup.Content as DefineNamePopupView;
+                        DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
+                            {
+                                CopyItemInEnabled = true,
+                                CopyItemOutEnabled = false,
+                                MoveItemEnabled = true,
+                                IsEditable = true,
+                                IsPlaylist = true
+                            };
+                            newPlaylist.Settings.ExportFlatPlaylist = SelectedPlaylist.Settings.ExportFlatPlaylist;
+                            newPlaylist.AddMenuItemsCopy(SelectedPlaylist.RootFolder.Items.ToList());
+                            AddPlaylist(newPlaylist);
+                            SelectedPlaylist = newPlaylist;
+                        }
+                    };
+                    radWindow.Show();
+                });
+            }
+        }
+
         /// <summary>
         /// Lorsqu'un dossier windows (surveillé) change
         /// </summary>
