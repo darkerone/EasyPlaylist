@@ -155,7 +155,12 @@
     <Compile Include="Events\SelectedItemChangedEvent.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
+    <Compile Include="Models\EasyPlaylistStorage.cs" />
+    <Compile Include="ViewModels\EasyPlaylistSettingsViewModel.cs" />
     <Compile Include="ViewModels\HierarchicalTreeSettingsViewModel.cs" />
+    <Compile Include="Views\EasyPlaylistSettingsView.xaml.cs">
+      <DependentUpon>EasyPlaylistSettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\HierarchicalTreeSettingsView.xaml.cs">
       <DependentUpon>HierarchicalTreeSettingsView.xaml</DependentUpon>
     </Compile>
@@ -179,6 +184,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\EasyPlaylistSettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\HierarchicalTreeSettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -274,6 +283,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icones\RecentRow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icones\TableSharePointListsModifyColumnsAndSettings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

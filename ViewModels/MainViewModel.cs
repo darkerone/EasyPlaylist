@@ -1,5 +1,6 @@
 ﻿using EasyPlaylist.Enums;
 using EasyPlaylist.Events;
+using EasyPlaylist.Models;
 using EasyPlaylist.Views;
 using Newtonsoft.Json;
 using Prism.Events;
@@ -296,6 +297,37 @@ namespace EasyPlaylist.ViewModels
                 RefreshExplorer();
                 IsIhmEnabled = true;
             });
+        }
+
+        public ICommand OpenSettings
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    EasyPlaylistSettingsView settingsPopupView = new EasyPlaylistSettingsView();
+                    // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
+                    settingsPopupView.DataContext = EasyPlaylistStorage.EasyPlaylistSettings;
+                    RadWindow radWindow = new RadWindow();
+                    radWindow.Header = "Settings";
+                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+                    radWindow.Content = settingsPopupView;
+
+                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
+                    {
+                        RadWindow popup = sender as RadWindow;
+                        EasyPlaylistSettingsView settingsView = popup.Content as EasyPlaylistSettingsView;
+                        EasyPlaylistSettingsViewModel settingsViewModel = settingsView.DataContext as EasyPlaylistSettingsViewModel;
+                        if (e.DialogResult == true)
+                        {
+                            EasyPlaylistStorage.Save(settingsViewModel);
+                            RefreshExplorer();
+                        }
+                    };
+
+                    radWindow.Show();
+                });
+            }
         }
 
         #endregion

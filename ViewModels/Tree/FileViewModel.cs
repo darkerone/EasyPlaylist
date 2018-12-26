@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Prism.Events;
 using EasyPlaylist.Enums;
 using System.Globalization;
+using EasyPlaylist.Models;
 
 namespace EasyPlaylist.ViewModels
 {
@@ -93,11 +94,14 @@ namespace EasyPlaylist.ViewModels
             {
                 FileTagId = Encoding.Unicode.GetString(readPrivateFrame.PrivateData.Data);
                 FileTagIdCreationDate = GetDateFromEasyPlaylistID(FileTagId);
+
+                // Le fichier est récent si son id a été ajouté récement
                 DateTime currentDate = DateTime.Now;
-                // Le fichier est récent sont id a été ajouté aujourd'hui
-                IsRecent = FileTagIdCreationDate.Year == currentDate.Year
-                            && FileTagIdCreationDate.Month == currentDate.Month
-                            && FileTagIdCreationDate.Day == currentDate.Day;
+                DateTime recentDate = currentDate.AddYears(-EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityYears)
+                                                 .AddMonths(-EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityMonths)
+                                                 .AddDays(-EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityDays)
+                                                 .AddHours(-EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityHours);
+                IsRecent = DateTime.Compare(recentDate, FileTagIdCreationDate) <= 0;
             }
             else
             {

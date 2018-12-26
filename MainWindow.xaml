@@ -29,6 +29,14 @@
                             SizeDefinition="Middle"
                             Command="{Binding Browse}">
                 </Fluent:Button>
+                <Fluent:Button
+                            Header="Settings" 
+                            Icon="pack://application:,,,/Icones/TableSharePointListsModifyColumnsAndSettings.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableSharePointListsModifyColumnsAndSettings.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding OpenSettings}">
+                </Fluent:Button>
             </StackPanel>
             <telerik:RadTabControl>
                 <telerik:RadTabItem Header="Explorer">
