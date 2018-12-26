@@ -30,6 +30,11 @@ namespace EasyPlaylist.Views
             InitializeComponent();
         }
 
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            Validate_Button.Focus();
+        }
+
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             RadWindow window = this.ParentOfType<RadWindow>();

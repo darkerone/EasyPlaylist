@@ -9,7 +9,9 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         mc:Ignorable="d"
+        x:Name="MainWindow_Window"
         Closing="Window_Closing"
+        DataContext="{Binding}"
         Title="EasyPlaylist" Height="700" Width="1080">
     <Grid IsEnabled="{Binding IsIhmEnabled}">
         <Grid.ColumnDefinitions>

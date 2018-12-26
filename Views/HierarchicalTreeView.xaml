@@ -19,7 +19,7 @@
              x:Name="HierarchicalTreeView_UserControl">
     <UserControl.Resources>
         <!--Style des items de l'explorer-->
-        <Style x:Key="ExplorerItem" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
+        <Style x:Key="ExplorerItemStyle" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
             <Setter Property="MinHeight" Value="10"></Setter>
             <Style.Triggers>
@@ -52,7 +52,7 @@
             </Style.Triggers>
         </Style>
         <!--Style des items des playlists-->
-        <Style x:Key="PlaylistItem" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
+        <Style x:Key="PlaylistItemStyle" TargetType="{x:Type telerik:RadTreeViewItem}" BasedOn="{StaticResource RadTreeViewItemStyle}">
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
             <Setter Property="MinHeight" Value="10"></Setter>
             <Style.Triggers>
@@ -73,8 +73,52 @@
             </Style.Triggers>
         </Style>
         <customControls:HierarchicalStyleSelector x:Key="HierarchicalStyleSelector"
-                                                  ExplorerItem="{StaticResource ExplorerItem}"
-                                                  PlaylistItem="{StaticResource PlaylistItem}" />
+                                                  ExplorerItem="{StaticResource ExplorerItemStyle}"
+                                                  PlaylistItem="{StaticResource PlaylistItemStyle}" />
+
+        <!--Template des items de l'explorer-->
+        <HierarchicalDataTemplate x:Key="ExplorerItemTemplate" ItemsSource="{Binding Items}">
+            <TextBlock Text="{Binding Title}">
+                <telerik:RadContextMenu.ContextMenu>
+                    <telerik:RadContextMenu>
+                        <telerik:RadMenuItem 
+                            Header="Add" 
+                            Command="{Binding AddItemToSelectedPlaylist}" >
+                            <telerik:RadMenuItem.Icon>
+                                <Image Source="pack://application:,,,/Icones/TableRowsInsertWord2.png" />
+                            </telerik:RadMenuItem.Icon>
+                        </telerik:RadMenuItem>
+                    </telerik:RadContextMenu>
+                </telerik:RadContextMenu.ContextMenu>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+        <!--Template des items des playlists-->
+        <HierarchicalDataTemplate x:Key="PlaylistItemTemplate" ItemsSource="{Binding Items}">
+            <TextBlock Text="{Binding Title}">
+                <telerik:RadContextMenu.ContextMenu>
+                    <telerik:RadContextMenu>
+                        <telerik:RadMenuItem 
+                            Header="Rename" 
+                            Command="{Binding RenameItem}">
+                            <telerik:RadMenuItem.Icon>
+                                <Image Source="pack://application:,,,/Icones/Rename.png" />
+                            </telerik:RadMenuItem.Icon>
+                        </telerik:RadMenuItem>
+                        <telerik:RadMenuItem 
+                            Header="Remove" 
+                            Command="{Binding RemoveItemFromParent}">
+                            <telerik:RadMenuItem.Icon>
+                                <Image Source="pack://application:,,,/Icones/RecordsDeleteRecord.png" />
+                            </telerik:RadMenuItem.Icon>
+                        </telerik:RadMenuItem>
+                    </telerik:RadContextMenu>
+                </telerik:RadContextMenu.ContextMenu>
+            </TextBlock>
+        </HierarchicalDataTemplate>
+
+        <customControls:HierarchicalTemplateSelector x:Key="HierarchicalTemplateSelector"
+                                                  ExplorerItem="{StaticResource ExplorerItemTemplate}"
+                                                  PlaylistItem="{StaticResource PlaylistItemTemplate}" />
     </UserControl.Resources>
     <DockPanel>
         <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top">
@@ -179,6 +223,7 @@
                 IsExpandOnDblClickEnabled="True"
                 telerik:TextSearch.TextPath="Title"
                 ItemContainerStyleSelector="{StaticResource HierarchicalStyleSelector}"
+                ItemTemplateSelector="{StaticResource HierarchicalTemplateSelector}"
                 DataContextChanged="HierarchicalTree_DataContextChanged"
                 PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14">
             <!--On définit la hauteur du composant en la calculant car elle ne s'adapte pas correctement avec le RadTabControl et les DockPanel-->
@@ -196,22 +241,6 @@
                     <Binding ElementName="HierarchicalTree_Buttons" Path="ActualHeight" Converter="{StaticResource InverseValueConverter}" />
                 </MultiBinding>
             </telerik:RadTreeView.Height>
-            <telerik:RadTreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding Title}">
-                            <!--<telerik:RadContextMenu.ContextMenu>
-                                <telerik:RadContextMenu>
-                                    <telerik:RadMenuItem 
-                                        Header="Rename" 
-                                        Command="{Binding Rename}" />
-                                    <telerik:RadMenuItem 
-                                        Header="Delete" 
-                                        Command="{Binding RemoveSelectedItem}"/>
-                                </telerik:RadContextMenu>
-                            </telerik:RadContextMenu.ContextMenu>-->
-                    </TextBlock>
-                </HierarchicalDataTemplate>
-            </telerik:RadTreeView.ItemTemplate>
         </telerik:RadTreeView>
     </DockPanel>
 

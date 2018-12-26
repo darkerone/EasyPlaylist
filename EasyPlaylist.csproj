@@ -150,6 +150,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\HierarchicalTemplateSelector.cs" />
     <Compile Include="Controls\HierarchicalStyleSelector.cs" />
     <Compile Include="Converters\TrueToCollapsedVisibilityConverter.cs" />
     <Compile Include="Converters\InverseValueConverter.cs" />
@@ -165,6 +166,7 @@
     <Compile Include="Models\EasyPlaylistStorage.cs" />
     <Compile Include="ViewModels\EasyPlaylistSettingsViewModel.cs" />
     <Compile Include="ViewModels\HierarchicalTreeSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Tree\RootFolderViewModel.cs" />
     <Compile Include="Views\EasyPlaylistSettingsView.xaml.cs">
       <DependentUpon>EasyPlaylistSettingsView.xaml</DependentUpon>
     </Compile>

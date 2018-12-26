@@ -129,30 +129,51 @@ namespace EasyPlaylist.ViewModels
         #region Events
 
         [JsonIgnore]
-        public ICommand Rename
+        public ICommand RenameItem
         {
             get
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
-                    newDefineNamePopupViewModel.ItemName = Title;
-                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
-                    RadWindow radWindow = new RadWindow();
-                    radWindow.Header = "Rename item";
-                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = newDefineNamePopupView;
-                    radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
-                        RadWindow popup = sender as RadWindow;
-                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-                        DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-                        if (e.DialogResult == true)
-                        {
-                            Title = defineNamePopupViewModel.ItemName;
-                        }
-                    };
-                    radWindow.Show();
+                    Rename();
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retire l'item de la playlist
+        /// </summary>
+        [JsonIgnore]
+        public ICommand RemoveItemFromParent
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    RemoveFromParent();
+                });
+            }
+        }
+
+        /// <summary>
+        /// Retire l'item de la playlist
+        /// </summary>
+        [JsonIgnore]
+        public ICommand AddItemToSelectedPlaylist
+        {
+            get
+            {
+                // Faire passer la playlist sélectionnée en paramètre via le Binding n'a pas été possible.
+                // L'utilisation du DataContext d'un parent quand on se trouve dans un ContextMenu n'est pas du tout évidente.
+                // TODO : Utiliser directement une command du MainViewModel en lui passant l'item en paramètre
+                //        Il faut aussi griser le bouton quand aucune playlist n'est sélectionnée
+                return new DelegateCommand((parameter) =>
+                {
+                    HierarchicalTreeViewModel parentPlaylist = GetParentHierarchicalTree();
+                    if(parentPlaylist != null && parentPlaylist.ParentMainViewModel != null)
+                    {
+                        parentPlaylist.ParentMainViewModel.AddItemToSelectedPlaylist(this);
+                    }
                 });
             }
         }
@@ -185,6 +206,61 @@ namespace EasyPlaylist.ViewModels
             {
                 ParentFolder.IsExpanded = true;
                 ParentFolder.ExpandToHere();
+            }
+        }
+
+        /// <summary>
+        /// Ouvre la popup de définition du nom pour renommer l'élément
+        /// </summary>
+        public void Rename()
+        {
+            DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
+            DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
+            newDefineNamePopupViewModel.ItemName = Title;
+            newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
+            RadWindow radWindow = new RadWindow();
+            radWindow.Header = "Rename item";
+            radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
+            radWindow.Content = newDefineNamePopupView;
+            radWindow.Closed += (object sender, WindowClosedEventArgs e) => {
+                RadWindow popup = sender as RadWindow;
+                DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
+                DefineNamePopupViewModel defineNamePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
+                if (e.DialogResult == true)
+                {
+                    Title = defineNamePopupViewModel.ItemName;
+                }
+            };
+            radWindow.Show();
+        }
+
+        public void RemoveFromParent()
+        {
+            FolderViewModel parentFolder = GetParentFolder();
+            parentFolder.RemoveItem(this);
+        }
+
+        /// <summary>
+        /// Recherche l'arbre parent
+        /// </summary>
+        /// <returns></returns>
+        public HierarchicalTreeViewModel GetParentHierarchicalTree()
+        {
+            FolderViewModel folderTmp = ParentFolder;
+            while (folderTmp.ParentFolder != null)
+            {
+                folderTmp = folderTmp.ParentFolder;
+            }
+
+            RootFolderViewModel rootFolder = folderTmp as RootFolderViewModel;
+
+            if(rootFolder != null)
+            {
+                return rootFolder.ParentHierarchicalTree;
+            }
+            else
+            {
+                return null;
             }
         }
 

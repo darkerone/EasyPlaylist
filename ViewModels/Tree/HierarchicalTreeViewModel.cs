@@ -24,14 +24,22 @@ namespace EasyPlaylist.ViewModels
     {
         #region Properties
 
+        private MainViewModel _parentMainViewModel;
+        /// <summary>
+        /// Modèle de vue parent. 
+        /// Utilisé par la command d'ajout d'un item à la playlist sélectionnée depuis un item (Menu contextuel)
+        /// </summary>
+        [JsonIgnore]
+        public MainViewModel ParentMainViewModel { get { return _parentMainViewModel; } }
+
         /// <summary>
         /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
         /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
         /// </summary>
         public ObservableCollection<MenuItemViewModel> RootFolders { get; }
 
-        private FolderViewModel _rootFolder;
-        public FolderViewModel RootFolder
+        private RootFolderViewModel _rootFolder;
+        public RootFolderViewModel RootFolder
         {
             get { return _rootFolder; }
             set
@@ -105,8 +113,9 @@ namespace EasyPlaylist.ViewModels
         #endregion
 
         [JsonConstructor]
-        public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
+        public HierarchicalTreeViewModel(MainViewModel mainViewModel, IEventAggregator eventAggregator, string name = "Unnamed")
         {
+            _parentMainViewModel = mainViewModel;
             EventAggregator = eventAggregator;
             Settings = new HierarchicalTreeSettingsViewModel()
             {
@@ -114,7 +123,7 @@ namespace EasyPlaylist.ViewModels
                 ExportFlatPlaylist = false
             };
             RootFolders = new ObservableCollection<MenuItemViewModel>();
-            RootFolder = new FolderViewModel(eventAggregator, name, null);
+            RootFolder = new RootFolderViewModel(eventAggregator, name, null, this);
             RootFolders.Add(RootFolder);
             SelectedItem = RootFolder;
         }
@@ -130,9 +139,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (SelectedItem != null)
                     {
-                        FolderViewModel parentFolder = SelectedItem.GetParentFolder();
-                        RemoveMenuItem(SelectedItem);
-                        SelectedItem = parentFolder;
+                        SelectedItem.RemoveFromParent();
                     }
                 });
             }
@@ -147,25 +154,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (SelectedItem != null)
                     {
-                        DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
-                        DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
-                        newDefineNamePopupViewModel.ItemName = SelectedItem.Title;
-                        newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
-                        RadWindow radWindow = new RadWindow();
-                        radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                        radWindow.Header = "Rename";
-                        radWindow.Content = newDefineNamePopupView;
-                        radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
-                        {
-                            RadWindow popup = sender as RadWindow;
-                            DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-                            DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-                            if (e.DialogResult == true)
-                            {
-                                SelectedItem.Title = definePopupViewModel.ItemName;
-                            }
-                        };
-                        radWindow.Show();
+                        SelectedItem.Rename();
                     }
                 });
             }
@@ -398,21 +387,6 @@ namespace EasyPlaylist.ViewModels
                 // On ajoute les éléments au dossier parent de l'élément sélectionné
                 FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
                 folderWhereAdd.AddItems(itemsToAdd);
-            }
-        }
-
-        public void RemoveMenuItem(MenuItemViewModel itemToRemove)
-        {
-            RemoveMenuItems(new List<MenuItemViewModel>() { itemToRemove });
-        }
-
-        public void RemoveMenuItems(List<MenuItemViewModel> itemsToRemove)
-        {
-            foreach (MenuItemViewModel itemToRemove in itemsToRemove)
-            {
-                // On retire les éléments au dossier parent de l'élément sélectionné
-                FolderViewModel folderWhereAdd = GetFirstParentFolder(itemToRemove);
-                folderWhereAdd.RemoveItem(itemToRemove);
             }
         }
 

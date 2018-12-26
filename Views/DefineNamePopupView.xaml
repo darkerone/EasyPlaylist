@@ -10,6 +10,7 @@
              xmlns:prism="http://prismlibrary.com/"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
+             Loaded="UserControl_Loaded"
              MinWidth="300">
     <Grid Margin="10">
         <StackPanel>
@@ -17,8 +18,8 @@
             <TextBox Text="{Binding ItemName}"></TextBox>
             <TextBlock Text="{Binding ErrorMessage}" Foreground="Red"></TextBlock>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Validate" Click="ValidateButton_Click" Margin="5"></Button>
-                <Button Content="Cancel" Click="CancelButton_Click" Margin="5"></Button>
+                <Button x:Name="Validate_Button" Content="Validate" Click="ValidateButton_Click" Margin="5"></Button>
+                <Button x:Name="Cancel_Button" Content="Cancel" Click="CancelButton_Click" Margin="5"></Button>
             </StackPanel>
         </StackPanel>
     </Grid>

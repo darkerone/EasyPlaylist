@@ -21,6 +21,8 @@ namespace EasyPlaylist.ViewModels
 {
     class MainViewModel : BaseViewModel
     {
+        const string PlaylistFilePath = @"Playlists.acep";
+
         #region Properties
 
         private string _currentFolderPath;
@@ -219,7 +221,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(this, EventAggregator, namePopupViewModel.ItemName)
                             {
                                 CopyItemInEnabled = true,
                                 CopyItemOutEnabled = false,
@@ -261,7 +263,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(this, EventAggregator, namePopupViewModel.ItemName)
                             {
                                 CopyItemInEnabled = true,
                                 CopyItemOutEnabled = false,
@@ -340,39 +342,16 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        #endregion
-
-        #region Public methods
-
         /// <summary>
         /// Ajoute l'élément sélectionné dans l'explorer dans l'élément sélectionné de la playlist sélectionnée
         /// </summary>
-        public DelegateCommand AddSelectedItemToSelectedPlaylist
+        public ICommand AddSelectedItemToSelectedPlaylist
         {
             get
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    FolderViewModel folder = null;
-                    // S'il y a un élément sélectionné dans la playlist
-                    if (SelectedPlaylist.SelectedItem != null)
-                    {
-                        // Si l'élément sélectionné dans la playlist est un dossier
-                        if (SelectedPlaylist.SelectedItem.IsFolder)
-                        {
-                            folder = SelectedPlaylist.SelectedItem as FolderViewModel;
-                        }
-                        else
-                        {
-                            folder = SelectedPlaylist.SelectedItem.GetParentFolder();
-                        }
-                    }
-                    else
-                    {
-                        folder = SelectedPlaylist.RootFolder;
-                    }
-                    folder.AddItemCopy(Explorer.SelectedItem);
-                    folder.IsExpanded = true;
+                    AddItemToSelectedPlaylist(Explorer.SelectedItem);
                 });
             }
         }
@@ -390,6 +369,10 @@ namespace EasyPlaylist.ViewModels
                 });
             }
         }
+
+        #endregion
+
+        #region Public methods
 
         /// <summary>
         /// Récupère le modèle de vue du dossier ainsi que de tous ses sous dossiers et fichiers
@@ -485,7 +468,7 @@ namespace EasyPlaylist.ViewModels
                     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 };
                 string jsonPlaylist = JsonConvert.SerializeObject(Playlists, jsonSerializerSettings);
-                System.IO.File.WriteAllText(@"Playlists.txt", jsonPlaylist);
+                System.IO.File.WriteAllText(PlaylistFilePath, jsonPlaylist);
                 return true;
             }
             catch
@@ -493,6 +476,49 @@ namespace EasyPlaylist.ViewModels
                 CustomMessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, System.Windows.MessageBoxImage.Stop);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Ajoute l'item au dossier sélectionné de la playlist sélectionnée
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddItemToSelectedPlaylist(MenuItemViewModel item)
+        {
+            AddItemToPlaylist(item , SelectedPlaylist);
+        }
+
+        /// <summary>
+        /// Ajoute l'item au dossier sélectionné de la playlist
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="playlist"></param>
+        public void AddItemToPlaylist(MenuItemViewModel item, HierarchicalTreeViewModel playlist)
+        {
+            if(playlist == null)
+            {
+                return;
+            }
+
+            FolderViewModel folder = null;
+            // S'il y a un élément sélectionné dans la playlist
+            if (playlist.SelectedItem != null)
+            {
+                // Si l'élément sélectionné dans la playlist est un dossier
+                if (playlist.SelectedItem.IsFolder)
+                {
+                    folder = playlist.SelectedItem as FolderViewModel;
+                }
+                else
+                {
+                    folder = playlist.SelectedItem.GetParentFolder();
+                }
+            }
+            else
+            {
+                folder = playlist.RootFolder;
+            }
+            folder.AddItemCopy(item);
+            folder.IsExpanded = true;
         }
 
         #endregion
@@ -571,9 +597,9 @@ namespace EasyPlaylist.ViewModels
         private void RestorePlaylists()
         {
             // Récupère les playlists sauvegardées
-            if (System.IO.File.Exists(@"Playlists.txt"))
+            if (System.IO.File.Exists(PlaylistFilePath))
             {
-                string json = System.IO.File.ReadAllText(@"Playlists.txt");
+                string json = System.IO.File.ReadAllText(PlaylistFilePath);
                 var jsonSerializerSettings = new JsonSerializerSettings()
                 {
                     TypeNameHandling = TypeNameHandling.All,
@@ -588,7 +614,7 @@ namespace EasyPlaylist.ViewModels
                     foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
                     {
                         // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(this, EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
                         hierarchicalTreeViewModel.AddMenuItemsCopy(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
                         hierarchicalTreeViewModel.CopyItemInEnabled = true;
                         hierarchicalTreeViewModel.CopyItemOutEnabled = false;
@@ -674,7 +700,7 @@ namespace EasyPlaylist.ViewModels
 
             // Récupère le dossier et ses sous dossiers et fichiers
             FolderViewModel musicFolder = GetFolderViewModel(CurrentFolderPath, "Musiques");
-            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
+            Explorer = new HierarchicalTreeViewModel(this, EventAggregator, musicFolder.Title)
             {
                 CopyItemInEnabled = false,
                 CopyItemOutEnabled = true,
