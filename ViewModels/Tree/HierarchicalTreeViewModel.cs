@@ -24,14 +24,6 @@ namespace EasyPlaylist.ViewModels
     {
         #region Properties
 
-        private MainViewModel _parentMainViewModel;
-        /// <summary>
-        /// Modèle de vue parent. 
-        /// Utilisé par la command d'ajout d'un item à la playlist sélectionnée depuis un item (Menu contextuel)
-        /// </summary>
-        [JsonIgnore]
-        public MainViewModel ParentMainViewModel { get { return _parentMainViewModel; } }
-
         /// <summary>
         /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
         /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
@@ -113,9 +105,8 @@ namespace EasyPlaylist.ViewModels
         #endregion
 
         [JsonConstructor]
-        public HierarchicalTreeViewModel(MainViewModel mainViewModel, IEventAggregator eventAggregator, string name = "Unnamed")
+        public HierarchicalTreeViewModel(IEventAggregator eventAggregator, string name = "Unnamed")
         {
-            _parentMainViewModel = mainViewModel;
             EventAggregator = eventAggregator;
             Settings = new HierarchicalTreeSettingsViewModel()
             {

@@ -155,29 +155,6 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        /// <summary>
-        /// Retire l'item de la playlist
-        /// </summary>
-        [JsonIgnore]
-        public ICommand AddItemToSelectedPlaylist
-        {
-            get
-            {
-                // Faire passer la playlist sélectionnée en paramètre via le Binding n'a pas été possible.
-                // L'utilisation du DataContext d'un parent quand on se trouve dans un ContextMenu n'est pas du tout évidente.
-                // TODO : Utiliser directement une command du MainViewModel en lui passant l'item en paramètre
-                //        Il faut aussi griser le bouton quand aucune playlist n'est sélectionnée
-                return new DelegateCommand((parameter) =>
-                {
-                    HierarchicalTreeViewModel parentPlaylist = GetParentHierarchicalTree();
-                    if(parentPlaylist != null && parentPlaylist.ParentMainViewModel != null)
-                    {
-                        parentPlaylist.ParentMainViewModel.AddItemToSelectedPlaylist(this);
-                    }
-                });
-            }
-        }
-
         #endregion
 
         #region Public methods

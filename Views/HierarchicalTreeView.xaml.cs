@@ -251,5 +251,29 @@ namespace EasyPlaylist.Views
                 viewModel.RootFolder.Items.CollectionChanged += RootFolders_CollectionChanged;
             }
         }
+
+        /// <summary>
+        /// Au clic sur le bouton Add du menu contextuel d'un item.
+        /// On passe par le clic car passer par le DataContext ne semble pas fonctionner.
+        /// En effet, nous avons besoin d'une command qui se trouve dans MainViewModel :
+        /// DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Popup}}}"
+        /// De plus, même si celà était possible, il faudrait passer l'item en paramètre de la commande. 
+        /// On se retrouverait avec 2 DataContext différents, ce qui n'est pas possible.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RadMenuItem_Add_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            RadMenuItem radMenuItem = sender as RadMenuItem;
+            // Récupère le modèle de vue de l'item
+            MenuItemViewModel itemViewModel = radMenuItem.DataContext as MenuItemViewModel;
+            // Récupère le modèle de vue pricinpal
+            RadContextMenu radContextMenu = radMenuItem.Parent as RadContextMenu;
+            System.Windows.Controls.Primitives.Popup popup = radContextMenu.Parent as System.Windows.Controls.Primitives.Popup;
+            Grid grid = popup.PlacementTarget as Grid;
+            MainViewModel mainViewModel = grid.Tag as MainViewModel;
+
+            mainViewModel.AddItemToSelectedPlaylist(itemViewModel);
+        }
     }
 }

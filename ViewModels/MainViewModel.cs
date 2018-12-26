@@ -221,7 +221,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(this, EventAggregator, namePopupViewModel.ItemName)
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
                             {
                                 CopyItemInEnabled = true,
                                 CopyItemOutEnabled = false,
@@ -263,7 +263,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(this, EventAggregator, namePopupViewModel.ItemName)
+                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
                             {
                                 CopyItemInEnabled = true,
                                 CopyItemOutEnabled = false,
@@ -614,7 +614,7 @@ namespace EasyPlaylist.ViewModels
                     foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
                     {
                         // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(this, EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
+                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
                         hierarchicalTreeViewModel.AddMenuItemsCopy(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
                         hierarchicalTreeViewModel.CopyItemInEnabled = true;
                         hierarchicalTreeViewModel.CopyItemOutEnabled = false;
@@ -700,7 +700,7 @@ namespace EasyPlaylist.ViewModels
 
             // Récupère le dossier et ses sous dossiers et fichiers
             FolderViewModel musicFolder = GetFolderViewModel(CurrentFolderPath, "Musiques");
-            Explorer = new HierarchicalTreeViewModel(this, EventAggregator, musicFolder.Title)
+            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
             {
                 CopyItemInEnabled = false,
                 CopyItemOutEnabled = true,

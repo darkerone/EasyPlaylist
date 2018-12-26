@@ -78,19 +78,22 @@
 
         <!--Template des items de l'explorer-->
         <HierarchicalDataTemplate x:Key="ExplorerItemTemplate" ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding Title}">
+            <Grid HorizontalAlignment="Stretch" Tag="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                <TextBlock Text="{Binding Title}" />
                 <telerik:RadContextMenu.ContextMenu>
                     <telerik:RadContextMenu>
+                        <!--TODO : Il faut griser le bouton quand aucune playlist n'est sélectionnée
+                        Au clic droit, évaluer si une playlist sélectionné existe et définir Enabled-->
                         <telerik:RadMenuItem 
                             Header="Add" 
-                            Command="{Binding AddItemToSelectedPlaylist}" >
+                            Click="RadMenuItem_Add_Click">
                             <telerik:RadMenuItem.Icon>
                                 <Image Source="pack://application:,,,/Icones/TableRowsInsertWord2.png" />
                             </telerik:RadMenuItem.Icon>
                         </telerik:RadMenuItem>
                     </telerik:RadContextMenu>
                 </telerik:RadContextMenu.ContextMenu>
-            </TextBlock>
+            </Grid>
         </HierarchicalDataTemplate>
         <!--Template des items des playlists-->
         <HierarchicalDataTemplate x:Key="PlaylistItemTemplate" ItemsSource="{Binding Items}">
