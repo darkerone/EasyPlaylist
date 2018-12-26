@@ -10,7 +10,7 @@
         xmlns:Fluent="clr-namespace:Fluent;assembly=Fluent"
         mc:Ignorable="d"
         Closing="Window_Closing"
-        Title="MainWindow" Height="700" Width="1080">
+        Title="EasyPlaylist" Height="700" Width="1080">
     <Grid IsEnabled="{Binding IsIhmEnabled}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -20,7 +20,7 @@
 
 
         <DockPanel Grid.Column="0">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="-4.8,0,5.2,0">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <Fluent:Button
                             Header="Browse" 
                             Icon="pack://application:,,,/Icones/ReopenFromServer.png" 
@@ -62,7 +62,7 @@
         </StackPanel>
 
         <DockPanel Grid.Column="2">
-            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="-4.8,0,5.2,0">
+            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <Fluent:Button
                             Header="Add playlist" 
                             Icon="pack://application:,,,/Icones/TableOfContentsAddTextGallery.png" 

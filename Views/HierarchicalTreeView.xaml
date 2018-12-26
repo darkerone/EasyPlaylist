@@ -151,7 +151,9 @@
                             Visibility="{Binding IsPlaylist, Converter={StaticResource TrueToCollapsedVisibilityConverter}}">
                 </Fluent:Button>
                 <TextBox x:Name="TextBox_Search" 
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="150">
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="150" 
+                         BorderBrush="LightBlue"
+                         Background="White" >
                     <TextBox.InputBindings>
                         <KeyBinding Command="{Binding Search}" Key="Enter" />
                     </TextBox.InputBindings>

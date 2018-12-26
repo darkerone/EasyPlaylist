@@ -1,4 +1,5 @@
 ﻿using EasyPlaylist.ViewModels;
+using EasyPlaylist.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -72,7 +73,7 @@ namespace EasyPlaylist.Models
             }
             catch
             {
-                System.Windows.MessageBox.Show("An error occured while saving settings", "Save settings", MessageBoxButton.OK, MessageBoxImage.Stop);
+                CustomMessageBox.Show("An error occured while saving settings", "Save settings", MessageBoxButton.OK, MessageBoxImage.Stop);
                 return false;
             }
         }

@@ -222,7 +222,7 @@ namespace EasyPlaylist.ViewModels
                             // Si la playlist existe déjà dans le dossier sélectionné
                             if (Directory.Exists(fbd.SelectedPath + "\\" + RootFolder.Title))
                             {
-                                MessageBoxResult alreadyExistsMessageBoxResult = System.Windows.MessageBox.Show($"The folder \"{RootFolder.Title}\" already exists in \"{fbd.SelectedPath}\", do you want to replace it ?", "Already exists", MessageBoxButton.YesNo);
+                                MessageBoxResult alreadyExistsMessageBoxResult = CustomMessageBox.Show($"The folder \"{RootFolder.Title}\" already exists in \"{fbd.SelectedPath}\", do you want to replace it ?", "Already exists", MessageBoxButton.YesNo);
                                 switch (alreadyExistsMessageBoxResult)
                                 {
                                     case MessageBoxResult.Yes:
@@ -235,7 +235,7 @@ namespace EasyPlaylist.ViewModels
                             {
                                 ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
                             }
-                            MessageBoxResult exportedPlaylistMessageBoxResult = System.Windows.MessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
+                            MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
                             switch (exportedPlaylistMessageBoxResult)
                             {
                                 case MessageBoxResult.Yes:
@@ -246,7 +246,7 @@ namespace EasyPlaylist.ViewModels
                     }
                     catch (Exception ex)
                     {
-                        System.Windows.MessageBox.Show($"An exception occured while writting file :\n- {ex.Message}", "Exception", MessageBoxButton.OK);
+                        CustomMessageBox.Show($"An exception occured while writting file :\n- {ex.Message}", "Exception", MessageBoxButton.OK);
                     }
                 });
             }

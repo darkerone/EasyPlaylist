@@ -167,7 +167,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (SavePlaylists())
                     {
-                        System.Windows.MessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, MessageBoxImage.None);
+                        CustomMessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, System.Windows.MessageBoxImage.None);
                     }
                 });
             }
@@ -181,7 +181,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     if (SavePlaylists())
                     {
-                        MessageBoxResult result = System.Windows.MessageBox.Show($"Are you sure you want to delete playlist {SelectedPlaylist.Settings.Name} ?", "Remove playlist", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        MessageBoxResult result = CustomMessageBox.Show($"Are you sure you want to delete playlist {SelectedPlaylist.Settings.Name} ?", "Remove playlist", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                         switch (result)
                         {
                             case MessageBoxResult.Yes:
@@ -305,13 +305,23 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    EasyPlaylistSettingsView settingsPopupView = new EasyPlaylistSettingsView();
-                    // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
-                    settingsPopupView.DataContext = EasyPlaylistStorage.EasyPlaylistSettings;
-                    RadWindow radWindow = new RadWindow();
-                    radWindow.Header = "Settings";
-                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = settingsPopupView;
+                    EasyPlaylistSettingsView settingsPopupView = new EasyPlaylistSettingsView()
+                    {
+                        // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
+                        DataContext = new EasyPlaylistSettingsViewModel() {
+                            AnteriorityYears = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityYears,
+                            AnteriorityMonths = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityMonths,
+                            AnteriorityDays = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityDays,
+                            AnteriorityHours = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityHours
+                        } 
+                    };
+                   
+                    RadWindow radWindow = new RadWindow()
+                    {
+                        Header = "Settings",
+                        WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                        Content = settingsPopupView
+                    };
 
                     radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
                     {
@@ -480,7 +490,7 @@ namespace EasyPlaylist.ViewModels
             }
             catch
             {
-                System.Windows.MessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, MessageBoxImage.Stop);
+                CustomMessageBox.Show("An error occured while saving the playlists", "Save playlists", MessageBoxButton.OK, System.Windows.MessageBoxImage.Stop);
                 return false;
             }
         }
@@ -603,7 +613,7 @@ namespace EasyPlaylist.ViewModels
                 if (errors != "")
                 {
                     errors += "Do you want to show those files ?";
-                    MessageBoxResult result = System.Windows.MessageBox.Show(errors, "Errors", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    MessageBoxResult result = CustomMessageBox.Show(errors, "Errors", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                     switch (result)
                     {
                         case MessageBoxResult.Yes:

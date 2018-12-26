@@ -15,8 +15,8 @@
         <StackPanel DockPanel.Dock="Bottom">
             <TextBlock Text="{Binding ErrorMessage}" Foreground="Red"></TextBlock>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Cancel" Click="CancelButton_Click"></Button>
-                <Button Content="Validate" Click="ValidateButton_Click"></Button>
+                <Button Content="Validate" Click="ValidateButton_Click" Margin="5"></Button>
+                <Button Content="Cancel" Click="CancelButton_Click" Margin="5"></Button>
             </StackPanel>
         </StackPanel>
         <Grid Margin="10">

@@ -34,7 +34,7 @@ namespace EasyPlaylist.Views
         {
             MainViewModel mainViewModel = this.DataContext as MainViewModel;
 
-            MessageBoxResult result = System.Windows.MessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNoCancel);
+            MessageBoxResult result = CustomMessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNoCancel);
             switch (result)
             {
                 case MessageBoxResult.Yes:
