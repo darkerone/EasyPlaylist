@@ -312,7 +312,7 @@ namespace EasyPlaylist.ViewModels
                 });
             }
         }
-
+        
         [JsonIgnore]
         public ICommand DisplayRecentFiles
         {
@@ -321,6 +321,18 @@ namespace EasyPlaylist.ViewModels
                 return new DelegateCommand((parameter) =>
                 {
                     DoSearch(x => x.IsRecent);
+                });
+            }
+        }
+
+        [JsonIgnore]
+        public ICommand CollapseAll
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DoSearch(null);
                 });
             }
         }
@@ -444,6 +456,7 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Effectue une recherche sur les items et les met en avant
         /// </summary>
+        /// <param name="predicate">Prédicat pour la recherche. Si null, aucun item ne sera mis en valeur</param>
         public void DoSearch(Func<MenuItemViewModel, bool> predicate)
         {
             List<MenuItemViewModel> items = RootFolder.GetItems(true);
@@ -452,12 +465,25 @@ namespace EasyPlaylist.ViewModels
             {
                 item.IsImportant = false;
             }
-            // Pour tous les items vérifiant le prédicat, ils deviennent important
-            foreach (MenuItemViewModel item in items.Where(predicate))
+
+            if(predicate != null)
             {
-                item.IsImportant = true;
+                // Pour tous les items vérifiant le prédicat, ils deviennent important
+                foreach (MenuItemViewModel item in items.Where(predicate))
+                {
+                    item.IsImportant = true;
+                }
+                BringSearchResultToView();
             }
-            BringSearchResultToView();
+            else
+            {
+                // Marque tous les items comme trouvés
+                foreach (MenuItemViewModel item in items)
+                {
+                    item.IsExpanded = false;
+                    item.IsImportant = true;
+                }
+            }
         }
 
         #endregion
@@ -577,12 +603,7 @@ namespace EasyPlaylist.ViewModels
             // Si aucun recherche n'est effectuée
             if (searchTextString == "")
             {
-                // Marque tous les items comme trouvés
-                foreach (MenuItemViewModel item in items)
-                {
-                    item.IsExpanded = false;
-                    item.IsImportant = true;
-                }
+                DoSearch(null);
             }
             else
             {

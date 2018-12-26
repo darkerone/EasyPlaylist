@@ -78,15 +78,9 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel x:Name="HierarchicalTree_Buttons" DockPanel.Dock="Top">
-            <DockPanel>
-                <TextBox DockPanel.Dock="Right" x:Name="TextBox_Search" 
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="150">
-                    <TextBox.InputBindings>
-                        <KeyBinding Command="{Binding Search}" Key="Enter" />
-                    </TextBox.InputBindings>
-                </TextBox>
-                <StackPanel Orientation="Horizontal">
-                    <Fluent:Button
+            <!--Ligne 1-->
+            <StackPanel Orientation="Horizontal">
+                <Fluent:Button
                             Header="Playlist settings" 
                             Icon="pack://application:,,,/Icones/RenamePagePublisher.png" 
                             LargeIcon="pack://application:,,,/Icones/RenamePagePublisher.png"
@@ -94,8 +88,8 @@
                             SizeDefinition="Middle"
                             Command="{Binding OpenPlaylistSettings}"
                             Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
-                    </Fluent:Button>
-                    <Fluent:Button
+                </Fluent:Button>
+                <Fluent:Button
                             Header="Export playlist" 
                             Icon="pack://application:,,,/Icones/TableExportMenu.png" 
                             LargeIcon="pack://application:,,,/Icones/TableExportMenu.png"
@@ -103,27 +97,9 @@
                             SizeDefinition="Middle"
                             Command="{Binding Export}"
                             Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
-                    </Fluent:Button>
-                    <Fluent:Button
-                            Header="Display errors" 
-                            Icon="pack://application:,,,/Icones/TraceError.png" 
-                            LargeIcon="pack://application:,,,/Icones/TraceError.png"
-                            Width="Auto" HorizontalAlignment="Left"
-                            SizeDefinition="Middle"
-                            Command="{Binding DisplayFilesInError}"
-                            Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
-                    </Fluent:Button>
-                    <Fluent:Button
-                            Header="Display recent" 
-                            Icon="pack://application:,,,/Icones/RecentRow.png" 
-                            LargeIcon="pack://application:,,,/Icones/RecentRow.png"
-                            Width="Auto" HorizontalAlignment="Left"
-                            SizeDefinition="Middle"
-                            Command="{Binding DisplayRecentFiles}"
-                            Visibility="{Binding IsPlaylist, Converter={StaticResource TrueToCollapsedVisibilityConverter}}">
-                    </Fluent:Button>
-                </StackPanel>
-            </DockPanel>
+                </Fluent:Button>
+            </StackPanel>
+            <!--Ligne 2-->
             <StackPanel Orientation="Horizontal" 
                         Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 <Fluent:Button
@@ -151,6 +127,42 @@
                             SizeDefinition="Middle"
                             Command="{Binding RemoveSelectedItem}"
                             IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
+                </Fluent:Button>
+            </StackPanel>
+            <!--Ligne 3-->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Fluent:Button
+                            Header="Display errors" 
+                            Icon="pack://application:,,,/Icones/TraceError.png" 
+                            LargeIcon="pack://application:,,,/Icones/TraceError.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding DisplayFilesInError}"
+                            Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Display recent" 
+                            Icon="pack://application:,,,/Icones/TimeInsert.png" 
+                            LargeIcon="pack://application:,,,/Icones/TimeInsert.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding DisplayRecentFiles}"
+                            Visibility="{Binding IsPlaylist, Converter={StaticResource TrueToCollapsedVisibilityConverter}}">
+                </Fluent:Button>
+                <TextBox x:Name="TextBox_Search" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=500}" Width="150">
+                    <TextBox.InputBindings>
+                        <KeyBinding Command="{Binding Search}" Key="Enter" />
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Fluent:Button
+                            Header="Collapse all" 
+                            Icon="pack://application:,,,/Icones/RecordsCollapseAllSubdatasheets.png" 
+                            LargeIcon="pack://application:,,,/Icones/RecordsCollapseAllSubdatasheets.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding CollapseAll}">
                 </Fluent:Button>
             </StackPanel>
         </StackPanel>
