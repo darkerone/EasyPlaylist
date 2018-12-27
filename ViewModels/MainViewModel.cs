@@ -417,11 +417,18 @@ namespace EasyPlaylist.ViewModels
         /// <param name="playlistFileTagIDs"></param>
         public void CheckIfItemsExistInSelectedPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
         {
-            if (explorerVM != null && playlistVM != null)
+            if (explorerVM != null)
             {
-                List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
+                if(playlistVM != null)
+                {
+                    List<string> playlistFileTagIDs = playlistVM.GetAllFileTagIDs();
 
-                CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, playlistFileTagIDs);
+                    CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, playlistFileTagIDs);
+                }
+                else
+                {
+                    CheckIfItemsExistInPlaylistRecursively(Explorer.RootFolder, new List<string>());
+                }
             }
         }
 
