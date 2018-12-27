@@ -233,8 +233,15 @@ namespace EasyPlaylist.Views
             HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
             if (viewModel != null)
             {
-                // On étend l'item racine
-                HierarchicalTree.ExpandItemByPath(viewModel.RootFolder.Title);
+                try
+                {
+                    // On étend l'item racine
+                    HierarchicalTree.ExpandItemByPath(viewModel.RootFolder.Title);
+                }
+                catch
+                {
+
+                }
             }
         }
 

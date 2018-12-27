@@ -25,7 +25,7 @@ namespace EasyPlaylist.ViewModels
         #endregion
 
         [JsonConstructor]
-        public RootFolderViewModel(IEventAggregator eventAggregator, string path, string title, HierarchicalTreeViewModel parentHierarchicalTree) : base(eventAggregator, path, title)
+        public RootFolderViewModel(IEventAggregator eventAggregator, string title, HierarchicalTreeViewModel parentHierarchicalTree) : base(eventAggregator, "", title)
         {
             _parentHierarchicalTree = parentHierarchicalTree;
         }

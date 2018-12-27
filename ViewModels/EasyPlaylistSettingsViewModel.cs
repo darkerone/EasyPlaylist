@@ -17,6 +17,7 @@ namespace EasyPlaylist.ViewModels
             AnteriorityMonths = 0;
             AnteriorityDays = 1;
             AnteriorityHours = 0;
+            ExplorerPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         }
 
         private int _anteriorityYears;
@@ -80,6 +81,20 @@ namespace EasyPlaylist.ViewModels
             {
                 _anteriorityHours = value;
                 RaisePropertyChanged("AnteriorityHours");
+            }
+        }
+
+        private string _explorerPath;
+        /// <summary>
+        /// Définit le chemin de l'explorer
+        /// </summary>
+        public string ExplorerPath
+        {
+            get { return _explorerPath; }
+            set
+            {
+                _explorerPath = value;
+                RaisePropertyChanged("ExplorerPath");
             }
         }
     }

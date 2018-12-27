@@ -25,17 +25,6 @@ namespace EasyPlaylist.ViewModels
 
         #region Properties
 
-        private string _currentFolderPath;
-        public string CurrentFolderPath
-        {
-            get { return _currentFolderPath; }
-            set
-            {
-                _currentFolderPath = value;
-                RaisePropertyChanged("CurrentFolderPath");
-            }
-        }
-
         private HierarchicalTreeViewModel _explorer;
         public HierarchicalTreeViewModel Explorer
         {
@@ -116,8 +105,7 @@ namespace EasyPlaylist.ViewModels
             // ========
             // Explorer
             // ========
-            CurrentFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            InitExplorerFolders(CurrentFolderPath);
+            InitExplorerFolders();
 
             // ======
             // Events
@@ -148,14 +136,16 @@ namespace EasyPlaylist.ViewModels
                 return new DelegateCommand((parameter) =>
                 {
                     FolderBrowserDialog fbd = new FolderBrowserDialog();
+                    fbd.SelectedPath = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath;
 
                     DialogResult result = fbd.ShowDialog();
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        InitExplorerFolders(fbd.SelectedPath);
-                        //Explorer.RootFolder.RemoveAllItems();
-                        //Explorer.RootFolder.AddItem(GetFolderViewModel(fbd.SelectedPath, Path.GetFileName(fbd.SelectedPath)));
+                        EasyPlaylistSettingsViewModel settings = EasyPlaylistStorage.EasyPlaylistSettings;
+                        settings.ExplorerPath = fbd.SelectedPath;
+                        EasyPlaylistStorage.Save(settings);
+                        InitExplorerFolders();
                     }
                 });
             }
@@ -314,7 +304,8 @@ namespace EasyPlaylist.ViewModels
                             AnteriorityYears = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityYears,
                             AnteriorityMonths = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityMonths,
                             AnteriorityDays = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityDays,
-                            AnteriorityHours = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityHours
+                            AnteriorityHours = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityHours,
+                            ExplorerPath = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath
                         } 
                     };
                    
@@ -378,9 +369,8 @@ namespace EasyPlaylist.ViewModels
         /// Récupère le modèle de vue du dossier ainsi que de tous ses sous dossiers et fichiers
         /// </summary>
         /// <param name="directoryPath"></param>
-        /// <param name="directoryName"></param>
         /// <returns></returns>
-        public FolderViewModel GetFolderViewModel(string directoryPath, string directoryName)
+        public FolderViewModel GetFolderViewModel(string directoryPath)
         {
             FolderViewModel folderViewModel = new FolderViewModel(EventAggregator, directoryPath, null);
 
@@ -390,7 +380,7 @@ namespace EasyPlaylist.ViewModels
             {
                 foreach (string subDirectoryPath in subDirectoriesPaths)
                 {
-                    folderViewModel.AddItem(GetFolderViewModel(subDirectoryPath, Path.GetFileName(subDirectoryPath)));
+                    folderViewModel.AddItem(GetFolderViewModel(subDirectoryPath));
                 }
             }
 
@@ -682,7 +672,7 @@ namespace EasyPlaylist.ViewModels
         /// Initialise l'explorer
         /// </summary>
         /// <param name="folderPath"></param>
-        private void InitExplorerFolders(string folderPath)
+        private void InitExplorerFolders()
         {
             if (_watcher == null)
             {
@@ -694,19 +684,22 @@ namespace EasyPlaylist.ViewModels
                 _watcher.Filter = "*.mp3";
                 _watcher.IncludeSubdirectories = true;
                 // Path to watch
-                _watcher.Path = folderPath;
+                _watcher.Path = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath;
 
                 // Add event handlers.
                 _watcher.Changed += new FileSystemEventHandler(OnExplorerFolderChanged);
                 _watcher.Created += new FileSystemEventHandler(OnExplorerFolderChanged);
                 _watcher.Deleted += new FileSystemEventHandler(OnExplorerFolderChanged);
                 _watcher.Renamed += new RenamedEventHandler(OnExplorerFolderChanged);
-
-                // Begin watching.
-                _watcher.EnableRaisingEvents = true;
             }
+            
+            // Stop watching.
+            _watcher.EnableRaisingEvents = false;
 
-            _watcher.Path = folderPath;
+            _watcher.Path = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath;
+
+            // Begin watching.
+            _watcher.EnableRaisingEvents = true;
 
             RefreshExplorer();
         }
@@ -724,7 +717,7 @@ namespace EasyPlaylist.ViewModels
             }
 
             // Récupère le dossier et ses sous dossiers et fichiers
-            FolderViewModel musicFolder = GetFolderViewModel(CurrentFolderPath, "Musiques");
+            FolderViewModel musicFolder = GetFolderViewModel(EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath);
             Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
             {
                 CopyItemInEnabled = false,

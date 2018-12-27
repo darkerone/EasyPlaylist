@@ -31,9 +31,6 @@
                     <converters:InverseValueConverter x:Key="InverseValueConverter"/>
                     <converters:TrueToCollapsedVisibilityConverter x:Key="TrueToCollapsedVisibilityConverter"/>
                 </ResourceDictionary>
-                <ResourceDictionary>
-                    <FontFamily x:Key="FontAwesome">pack://application:,,,/fonts/#fontawesome</FontFamily>
-                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

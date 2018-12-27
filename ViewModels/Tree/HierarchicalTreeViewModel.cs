@@ -114,7 +114,7 @@ namespace EasyPlaylist.ViewModels
                 ExportFlatPlaylist = false
             };
             RootFolders = new ObservableCollection<MenuItemViewModel>();
-            RootFolder = new RootFolderViewModel(eventAggregator, name, null, this);
+            RootFolder = new RootFolderViewModel(eventAggregator, name, this);
             RootFolders.Add(RootFolder);
             SelectedItem = RootFolder;
         }
