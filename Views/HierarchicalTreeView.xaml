@@ -192,7 +192,14 @@
             </StackPanel>
             <!--Ligne 3-->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-
+                <Fluent:Button
+                            Header="Display doubles" 
+                            Icon="pack://application:,,,/Icones/TableStyleBandedRows.png" 
+                            LargeIcon="pack://application:,,,/Icones/TableStyleBandedRows.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding SearchDoubles}">
+                </Fluent:Button>
                 <Fluent:Button
                             Header="Display errors" 
                             Icon="pack://application:,,,/Icones/TraceError.png" 

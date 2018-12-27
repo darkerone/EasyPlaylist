@@ -280,7 +280,19 @@ namespace EasyPlaylist.ViewModels
                 });
             }
         }
-        
+
+        [JsonIgnore]
+        public ICommand SearchDoubles
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DoSearchDoubles();
+                });
+            }
+        }
+
         [JsonIgnore]
         public ICommand DisplayFilesInError
         {
@@ -431,7 +443,7 @@ namespace EasyPlaylist.ViewModels
                 item.IsImportant = false;
             }
 
-            if(predicate != null)
+            if(predicate != null && items.Any(predicate))
             {
                 // Pour tous les items vérifiant le prédicat, ils deviennent important
                 foreach (MenuItemViewModel item in items.Where(predicate))
@@ -449,6 +461,33 @@ namespace EasyPlaylist.ViewModels
                     item.IsImportant = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Recherche les fichiers en double
+        /// </summary>
+        public void DoSearchDoubles()
+        {
+            List<MenuItemViewModel> items = RootFolder.GetItems(true);
+            List<string> itemsPaths = new List<string>();
+            List<string> itemsPathsInDoubles = new List<string>();
+
+            foreach (MenuItemViewModel item in items)
+            {
+                // Si le chemin de l'item appartient à la liste des chemins
+                if (itemsPaths.Contains(item.Path))
+                {
+                    // Il est considéré comme en double
+                    itemsPathsInDoubles.Add(item.Path);
+                }
+                else
+                {
+                    itemsPaths.Add(item.Path);
+                }
+            }
+
+            // Recherche les items dont le chemin est en double
+            DoSearch(x => itemsPathsInDoubles.Contains(x.Path));
         }
 
         #endregion
