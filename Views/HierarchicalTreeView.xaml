@@ -89,13 +89,21 @@
                                 <Image Source="pack://application:,,,/Icones/TableRowsInsertWord2.png" />
                             </telerik:RadMenuItem.Icon>
                         </telerik:RadMenuItem>
+                        <telerik:RadMenuItem 
+                            Header="Find in playlist" 
+                            Click="RadMenuItem_Find_In_Playlist_Click">
+                            <telerik:RadMenuItem.Icon>
+                                <Image Source="pack://application:,,,/Icones/SearchUI.png" />
+                            </telerik:RadMenuItem.Icon>
+                        </telerik:RadMenuItem>
                     </telerik:RadContextMenu>
                 </telerik:RadContextMenu.ContextMenu>
             </Grid>
         </HierarchicalDataTemplate>
         <!--Template des items des playlists-->
         <HierarchicalDataTemplate x:Key="PlaylistItemTemplate" ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding Title}">
+            <Grid HorizontalAlignment="Stretch" Tag="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                <TextBlock Text="{Binding Title}"/>
                 <telerik:RadContextMenu.ContextMenu>
                     <telerik:RadContextMenu>
                         <telerik:RadMenuItem 
@@ -106,6 +114,14 @@
                             </telerik:RadMenuItem.Icon>
                         </telerik:RadMenuItem>
                         <telerik:RadMenuItem 
+                            Header="Find in explorer" 
+                            Click="RadMenuItem_Find_In_Explorer_Click">
+                            <telerik:RadMenuItem.Icon>
+                                <Image Source="pack://application:,,,/Icones/SearchUI.png" />
+                            </telerik:RadMenuItem.Icon>
+                        </telerik:RadMenuItem>
+                        <telerik:RadMenuSeparatorItem />
+                        <telerik:RadMenuItem 
                             Header="Remove" 
                             Command="{Binding RemoveItemFromParent}">
                             <telerik:RadMenuItem.Icon>
@@ -114,7 +130,7 @@
                         </telerik:RadMenuItem>
                     </telerik:RadContextMenu>
                 </telerik:RadContextMenu.ContextMenu>
-            </TextBlock>
+            </Grid>
         </HierarchicalDataTemplate>
 
         <customControls:HierarchicalTemplateSelector x:Key="HierarchicalTemplateSelector"

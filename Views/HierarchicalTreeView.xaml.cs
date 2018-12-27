@@ -252,8 +252,10 @@ namespace EasyPlaylist.Views
             }
         }
 
+        #region Explorer
+
         /// <summary>
-        /// Au clic sur le bouton Add du menu contextuel d'un item.
+        /// Au clic sur le bouton "Add" du menu contextuel d'un item.
         /// On passe par le clic car passer par le DataContext ne semble pas fonctionner.
         /// En effet, nous avons besoin d'une command qui se trouve dans MainViewModel :
         /// DataContext="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Popup}}}"
@@ -282,6 +284,24 @@ namespace EasyPlaylist.Views
         }
 
         /// <summary>
+        /// Au clic sur le bouton "Find in playlist" du menu contextuel d'un item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RadMenuItem_Find_In_Playlist_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            RadMenuItem radMenuItem = sender as RadMenuItem;
+            // Récupère le modèle de vue de l'item
+            MenuItemViewModel itemViewModel = radMenuItem.DataContext as MenuItemViewModel;
+
+            // Récupère le modèle de vue pricinpal
+            Window mainWindow = this.ParentOfType<Window>();
+            MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
+
+            mainViewModel.SearchInSelectedPlaylist(x => x.Path == itemViewModel.Path);
+        }
+
+        /// <summary>
         /// Pendant l'ouverture du menu contextuel
         /// </summary>
         /// <param name="sender"></param>
@@ -291,11 +311,36 @@ namespace EasyPlaylist.Views
             // Récupère le modèle de vue pricinpal
             RadContextMenu radContextMenu = sender as RadContextMenu;
 
+            // Récupère le modèle de vue pricinpal
             Window mainWindow = this.ParentOfType<Window>();
             MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
 
             // Désactive le menu contextuel si aucune playlist n'est sélectionnée
             radContextMenu.IsEnabled = mainViewModel.SelectedPlaylist != null;
         }
+
+        #endregion
+
+        #region Playlist
+
+        /// <summary>
+        /// Au clic sur le bouton "Find in explorer" du menu contextuel d'un item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RadMenuItem_Find_In_Explorer_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            RadMenuItem radMenuItem = sender as RadMenuItem;
+            // Récupère le modèle de vue de l'item
+            MenuItemViewModel itemViewModel = radMenuItem.DataContext as MenuItemViewModel;
+
+            // Récupère le modèle de vue pricinpal
+            Window mainWindow = this.ParentOfType<Window>();
+            MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
+
+            mainViewModel.SearchInExplorer(x => x.Path == itemViewModel.Path);
+        }
+
+        #endregion
     }
 }

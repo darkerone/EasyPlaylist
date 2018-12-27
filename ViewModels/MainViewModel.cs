@@ -528,6 +528,24 @@ namespace EasyPlaylist.ViewModels
             folder.IsExpanded = true;
         }
 
+        /// <summary>
+        /// Recherche des items dans la playlist sélectionnée
+        /// </summary>
+        /// <param name="predicate"></param>
+        public void SearchInSelectedPlaylist(Func<MenuItemViewModel, bool> predicate)
+        {
+            SelectedPlaylist.DoSearch(predicate);
+        }
+
+        /// <summary>
+        /// Recherche des items dans l'explorer
+        /// </summary>
+        /// <param name="predicate"></param>
+        public void SearchInExplorer(Func<MenuItemViewModel, bool> predicate)
+        {
+            Explorer.DoSearch(predicate);
+        }
+
         #endregion
 
         #region Private methods
