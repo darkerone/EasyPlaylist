@@ -698,10 +698,10 @@ namespace EasyPlaylist.ViewModels
 
             _watcher.Path = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath;
 
+            RefreshExplorer();
+
             // Begin watching.
             _watcher.EnableRaisingEvents = true;
-
-            RefreshExplorer();
         }
 
         /// <summary>
