@@ -101,6 +101,7 @@ namespace EasyPlaylist.ViewModels
         public bool CopyItemOutEnabled { get; set; }
         public bool IsEditable { get; set; }
         public bool IsPlaylist { get; set; }
+        public bool HasBeenModified { get; set; }
 
         #endregion
 

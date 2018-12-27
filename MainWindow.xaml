@@ -12,7 +12,7 @@
         x:Name="MainWindow_Window"
         Closing="Window_Closing"
         DataContext="{Binding}"
-        Title="EasyPlaylist" Height="700" Width="1080">
+        Title="EasyPlaylist" Height="700" MinWidth="1080">
     <Grid IsEnabled="{Binding IsIhmEnabled}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -25,6 +25,7 @@
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <Fluent:Button
                             Header="Browse" 
+                            ToolTip="Browse"
                             Icon="pack://application:,,,/Icones/ReopenFromServer.png" 
                             LargeIcon="pack://application:,,,/Icones/ReopenFromServer.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -33,6 +34,7 @@
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Settings" 
+                            ToolTip="Application settings"
                             Icon="pack://application:,,,/Icones/TableSharePointListsModifyColumnsAndSettings.png" 
                             LargeIcon="pack://application:,,,/Icones/TableSharePointListsModifyColumnsAndSettings.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -54,6 +56,7 @@
             VerticalAlignment="Center" 
             HorizontalAlignment="Center">
             <Fluent:Button
+                            ToolTip="Add item to playlist"
                             Icon="pack://application:,,,/Icones/TableRowsInsertWord2.png" 
                             LargeIcon="pack://application:,,,/Icones/TableRowsInsertWord2.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -66,7 +69,8 @@
         <DockPanel Grid.Column="2">
             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
                 <Fluent:Button
-                            Header="Add playlist" 
+                            Header="New" 
+                            ToolTip="Add new playlist"
                             Icon="pack://application:,,,/Icones/TableOfContentsAddTextGallery.png" 
                             LargeIcon="pack://application:,,,/Icones/TableOfContentsAddTextGallery.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -74,7 +78,8 @@
                             Command="{Binding AddNewPlaylist}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Save playlists" 
+                            Header="Save"
+                            ToolTip="Save all playlists"
                             Icon="pack://application:,,,/Icones/SaveAll.png" 
                             LargeIcon="pack://application:,,,/Icones/SaveAll.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -82,7 +87,8 @@
                             Command="{Binding SavePlaylist}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Remove selected playlist" 
+                            Header="Remove" 
+                            ToolTip="Remove selected playlist"
                             Icon="pack://application:,,,/Icones/TableOfContentsRemove.png" 
                             LargeIcon="pack://application:,,,/Icones/TableOfContentsRemove.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -91,7 +97,8 @@
                             IsEnabled="{Binding SelectedPlaylist, Converter={StaticResource NullToFalseConverter}}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Copy selected playlist" 
+                            Header="Copy" 
+                            ToolTip="Copy selected playlist"
                             Icon="pack://application:,,,/Icones/SlicerCopy.png" 
                             LargeIcon="pack://application:,,,/Icones/SlicerCopy.png"
                             Width="Auto" HorizontalAlignment="Left"

@@ -11,13 +11,26 @@ namespace EasyPlaylist.ViewModels
 {
     class EasyPlaylistSettingsViewModel : BaseViewModel
     {
-        public EasyPlaylistSettingsViewModel()
+        public EasyPlaylistSettingsViewModel(EasyPlaylistSettingsViewModel easyPlaylistSettings = null)
         {
-            AnteriorityYears = 0;
-            AnteriorityMonths = 0;
-            AnteriorityDays = 1;
-            AnteriorityHours = 0;
-            ExplorerPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            if(easyPlaylistSettings == null)
+            {
+                AnteriorityYears = 0;
+                AnteriorityMonths = 0;
+                AnteriorityDays = 1;
+                AnteriorityHours = 0;
+                ExplorerPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+                IsFileWatcherOptionEnabled = true;
+            }
+            else
+            {
+                AnteriorityYears = easyPlaylistSettings.AnteriorityYears;
+                AnteriorityMonths = easyPlaylistSettings.AnteriorityMonths;
+                AnteriorityDays = easyPlaylistSettings.AnteriorityDays;
+                AnteriorityHours = easyPlaylistSettings.AnteriorityHours;
+                ExplorerPath = easyPlaylistSettings.ExplorerPath;
+                IsFileWatcherOptionEnabled = easyPlaylistSettings.IsFileWatcherOptionEnabled;
+            }
         }
 
         private int _anteriorityYears;
@@ -95,6 +108,20 @@ namespace EasyPlaylist.ViewModels
             {
                 _explorerPath = value;
                 RaisePropertyChanged("ExplorerPath");
+            }
+        }
+
+        public bool _isFileWatcherOptionEnabled;
+        /// <summary>
+        /// Définit si l'application va surveiller les modification des fichiers/dossiers Windows
+        /// </summary>
+        public bool IsFileWatcherOptionEnabled
+        {
+            get { return _isFileWatcherOptionEnabled; }
+            set
+            {
+                _isFileWatcherOptionEnabled = value;
+                RaisePropertyChanged("IsFileWatcherOptionEnabled");
             }
         }
     }

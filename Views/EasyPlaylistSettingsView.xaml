@@ -49,6 +49,9 @@
                 </StackPanel>
             </StackPanel>
 
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Is explorer auto refresh enabled" VerticalAlignment="Center"></TextBlock>
+            <CheckBox Grid.Row="1" Grid.Column="1" Content="" IsChecked="{Binding IsFileWatcherOptionEnabled}" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
+
         </Grid>
     </DockPanel>
 </UserControl>

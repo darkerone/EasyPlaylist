@@ -142,7 +142,8 @@
             <!--Ligne 1-->
             <StackPanel Orientation="Horizontal">
                 <Fluent:Button
-                            Header="Playlist settings" 
+                            Header="Settings" 
+                            ToolTip="Playlist settings"
                             Icon="pack://application:,,,/Icones/RenamePagePublisher.png" 
                             LargeIcon="pack://application:,,,/Icones/RenamePagePublisher.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -151,7 +152,8 @@
                             Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Export playlist" 
+                            Header="Export" 
+                            ToolTip="Export playlist"
                             Icon="pack://application:,,,/Icones/TableExportMenu.png" 
                             LargeIcon="pack://application:,,,/Icones/TableExportMenu.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -165,6 +167,7 @@
                         Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 <Fluent:Button
                             Header="Add folder" 
+                            ToolTip="Add folder"
                             Icon="pack://application:,,,/Icones/AddFolder.png" 
                             LargeIcon="pack://application:,,,/Icones/AddFolder.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -172,7 +175,8 @@
                             Command="{Binding OpenAddFolderPopup}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Rename selected" 
+                            Header="Rename" 
+                            ToolTip="Rename selected item"
                             Icon="pack://application:,,,/Icones/Rename.png" 
                             LargeIcon="pack://application:,,,/Icones/Rename.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -181,7 +185,8 @@
                             IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Remove selected" 
+                            Header="Remove" 
+                            ToolTip="Remove selected item"
                             Icon="pack://application:,,,/Icones/RecordsDeleteRecord.png" 
                             LargeIcon="pack://application:,,,/Icones/RecordsDeleteRecord.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -193,7 +198,18 @@
             <!--Ligne 3-->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Fluent:Button
-                            Header="Display doubles" 
+                            Header="Refresh"
+                            ToolTip="Refresh explorer"
+                            Icon="pack://application:,,,/Icones/RefreshWebView.png" 
+                            LargeIcon="pack://application:,,,/Icones/RefreshWebView.png"
+                            Width="Auto" HorizontalAlignment="Left"
+                            SizeDefinition="Middle"
+                            Command="{Binding Path=DataContext.RefreshExplorer, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                            Visibility="{Binding IsPlaylist, Converter={StaticResource TrueToCollapsedVisibilityConverter}}">
+                </Fluent:Button>
+                <Fluent:Button
+                            Header="Doubles" 
+                            ToolTip="Show doubles"
                             Icon="pack://application:,,,/Icones/TableStyleBandedRows.png" 
                             LargeIcon="pack://application:,,,/Icones/TableStyleBandedRows.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -201,7 +217,8 @@
                             Command="{Binding SearchDoubles}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Display errors" 
+                            Header="Errors" 
+                            ToolTip="Show files in error"
                             Icon="pack://application:,,,/Icones/TraceError.png" 
                             LargeIcon="pack://application:,,,/Icones/TraceError.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -210,7 +227,8 @@
                             Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 </Fluent:Button>
                 <Fluent:Button
-                            Header="Display recent" 
+                            Header="Recent" 
+                            ToolTip="Show recent files"
                             Icon="pack://application:,,,/Icones/TimeInsert.png" 
                             LargeIcon="pack://application:,,,/Icones/TimeInsert.png"
                             Width="Auto" HorizontalAlignment="Left"
@@ -228,6 +246,7 @@
                 </TextBox>
                 <Fluent:Button
                             Header="Collapse all" 
+                            ToolTip="Collapse all"
                             Icon="pack://application:,,,/Icones/RecordsCollapseAllSubdatasheets.png" 
                             LargeIcon="pack://application:,,,/Icones/RecordsCollapseAllSubdatasheets.png"
                             Width="Auto" HorizontalAlignment="Left"

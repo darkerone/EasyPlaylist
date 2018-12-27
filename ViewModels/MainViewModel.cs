@@ -286,7 +286,7 @@ namespace EasyPlaylist.ViewModels
                 IsIhmEnabled = false;
                 // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
                 System.Windows.Forms.Application.DoEvents();
-                RefreshExplorer();
+                DoRefreshExplorer();
                 IsIhmEnabled = true;
             });
         }
@@ -300,13 +300,7 @@ namespace EasyPlaylist.ViewModels
                     EasyPlaylistSettingsView settingsPopupView = new EasyPlaylistSettingsView()
                     {
                         // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
-                        DataContext = new EasyPlaylistSettingsViewModel() {
-                            AnteriorityYears = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityYears,
-                            AnteriorityMonths = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityMonths,
-                            AnteriorityDays = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityDays,
-                            AnteriorityHours = EasyPlaylistStorage.EasyPlaylistSettings.AnteriorityHours,
-                            ExplorerPath = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath
-                        } 
+                        DataContext = new EasyPlaylistSettingsViewModel(EasyPlaylistStorage.EasyPlaylistSettings)
                     };
                    
                     RadWindow radWindow = new RadWindow()
@@ -324,7 +318,7 @@ namespace EasyPlaylist.ViewModels
                         if (e.DialogResult == true)
                         {
                             EasyPlaylistStorage.Save(settingsViewModel);
-                            RefreshExplorer();
+                            DoRefreshExplorer();
                         }
                     };
 
@@ -357,6 +351,17 @@ namespace EasyPlaylist.ViewModels
                 return new DelegateCommand((parameter) =>
                 {
                     SelectedPlaylist.SelectedItem.GetParentFolder().RemoveItem(SelectedPlaylist.SelectedItem);
+                });
+            }
+        }
+
+        public ICommand RefreshExplorer
+        {
+            get
+            {
+                return new DelegateCommand((parameter) =>
+                {
+                    DoRefreshExplorer();
                 });
             }
         }
@@ -692,23 +697,23 @@ namespace EasyPlaylist.ViewModels
                 _watcher.Deleted += new FileSystemEventHandler(OnExplorerFolderChanged);
                 _watcher.Renamed += new RenamedEventHandler(OnExplorerFolderChanged);
             }
-            
-            // Stop watching.
-            _watcher.EnableRaisingEvents = false;
 
             _watcher.Path = EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath;
 
-            RefreshExplorer();
+            DoRefreshExplorer();
 
             // Begin watching.
-            _watcher.EnableRaisingEvents = true;
+            EnableFileWatcher(true);
         }
 
         /// <summary>
         /// Raffraichi l'explorer
         /// </summary>
-        private void RefreshExplorer()
+        private void DoRefreshExplorer()
         {
+            // Stop watching.
+            EnableFileWatcher(false);
+
             // Mémorise l'état des dossiers de l'explorer pour le rétablir après la mise à jour
             List<FolderViewModel> oldFolders = null;
             if (Explorer != null)
@@ -739,6 +744,18 @@ namespace EasyPlaylist.ViewModels
                     folder.IsExpanded = oldFolders.Any(x => x.Path == folder.Path && x.IsExpanded);
                 }
             }
+
+            // Begin watching.
+            EnableFileWatcher(true);
+        }
+
+        /// <summary>
+        /// Active ou désactive le file watcher (attention, si l'utilisateur a désactivé l'option, il ne s'activera jamais)
+        /// </summary>
+        /// <param name="enable"></param>
+        private void EnableFileWatcher(bool enable)
+        {
+            _watcher.EnableRaisingEvents = enable && EasyPlaylistStorage.EasyPlaylistSettings.IsFileWatcherOptionEnabled;
         }
 
         #endregion
