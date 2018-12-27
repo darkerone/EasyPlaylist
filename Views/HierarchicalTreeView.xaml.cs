@@ -267,13 +267,35 @@ namespace EasyPlaylist.Views
             RadMenuItem radMenuItem = sender as RadMenuItem;
             // Récupère le modèle de vue de l'item
             MenuItemViewModel itemViewModel = radMenuItem.DataContext as MenuItemViewModel;
+
             // Récupère le modèle de vue pricinpal
-            RadContextMenu radContextMenu = radMenuItem.Parent as RadContextMenu;
-            System.Windows.Controls.Primitives.Popup popup = radContextMenu.Parent as System.Windows.Controls.Primitives.Popup;
-            Grid grid = popup.PlacementTarget as Grid;
-            MainViewModel mainViewModel = grid.Tag as MainViewModel;
+            // Méthode intéressante, à conserver
+            //RadContextMenu radContextMenu = radMenuItem.Parent as RadContextMenu;
+            //System.Windows.Controls.Primitives.Popup popup = radContextMenu.Parent as System.Windows.Controls.Primitives.Popup;
+            //Grid grid = popup.PlacementTarget as Grid;
+            //MainViewModel mainViewModel = grid.Tag as MainViewModel;
+
+            Window mainWindow = this.ParentOfType<Window>();
+            MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
 
             mainViewModel.AddItemToSelectedPlaylist(itemViewModel);
+        }
+
+        /// <summary>
+        /// Pendant l'ouverture du menu contextuel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void RadContextMenu_Opening(object sender, Telerik.Windows.RadRoutedEventArgs e)
+        {
+            // Récupère le modèle de vue pricinpal
+            RadContextMenu radContextMenu = sender as RadContextMenu;
+
+            Window mainWindow = this.ParentOfType<Window>();
+            MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
+
+            // Désactive le menu contextuel si aucune playlist n'est sélectionnée
+            radContextMenu.IsEnabled = mainViewModel.SelectedPlaylist != null;
         }
     }
 }

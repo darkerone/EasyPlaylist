@@ -81,9 +81,7 @@
             <Grid HorizontalAlignment="Stretch" Tag="{Binding Path=DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
                 <TextBlock Text="{Binding Title}" />
                 <telerik:RadContextMenu.ContextMenu>
-                    <telerik:RadContextMenu>
-                        <!--TODO : Il faut griser le bouton quand aucune playlist n'est sélectionnée
-                        Au clic droit, évaluer si une playlist sélectionné existe et définir Enabled-->
+                    <telerik:RadContextMenu Opening="RadContextMenu_Opening">
                         <telerik:RadMenuItem 
                             Header="Add" 
                             Click="RadMenuItem_Add_Click">
