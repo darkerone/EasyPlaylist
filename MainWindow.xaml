@@ -61,7 +61,7 @@
                             LargeIcon="pack://application:,,,/Icones/TableRowsInsertWord2.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Large"
-                            Command="{Binding AddSelectedItemToSelectedPlaylist}"
+                            Command="{Binding AddSelectedItemsToSelectedPlaylist}"
                             IsEnabled="{Binding CanAddSelectedItemToSelectedPlaylist}">
             </Fluent:Button>
         </StackPanel>

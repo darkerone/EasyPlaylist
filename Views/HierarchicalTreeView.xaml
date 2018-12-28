@@ -108,6 +108,7 @@
                     <telerik:RadContextMenu>
                         <telerik:RadMenuItem 
                             Header="Rename" 
+                            ToolTip="Rename item"
                             Command="{Binding RenameItem}">
                             <telerik:RadMenuItem.Icon>
                                 <Image Source="pack://application:,,,/Icones/Rename.png" />
@@ -115,6 +116,7 @@
                         </telerik:RadMenuItem>
                         <telerik:RadMenuItem 
                             Header="Find in explorer" 
+                            ToolTip="Find item in explorer"
                             Click="RadMenuItem_Find_In_Explorer_Click">
                             <telerik:RadMenuItem.Icon>
                                 <Image Source="pack://application:,,,/Icones/SearchUI.png" />
@@ -123,6 +125,7 @@
                         <telerik:RadMenuSeparatorItem />
                         <telerik:RadMenuItem 
                             Header="Remove" 
+                            ToolTip="Remove item"
                             Command="{Binding RemoveItemFromParent}">
                             <telerik:RadMenuItem.Icon>
                                 <Image Source="pack://application:,,,/Icones/RecordsDeleteRecord.png" />
@@ -172,7 +175,8 @@
                             LargeIcon="pack://application:,,,/Icones/AddFolder.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding OpenAddFolderPopup}">
+                            Command="{Binding OpenAddFolderPopup}"
+                            IsEnabled="{Binding SelectedItems.Count, Converter={StaticResource IntParameterValueToTrueConverter}, ConverterParameter=1}">
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Rename" 
@@ -182,17 +186,17 @@
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
                             Command="{Binding RenameSelectedItem}"
-                            IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
+                            IsEnabled="{Binding SelectedItems.Count, Converter={StaticResource IntParameterValueToTrueConverter}, ConverterParameter=1}">
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Remove" 
-                            ToolTip="Remove selected item"
+                            ToolTip="Remove selected item(s)"
                             Icon="pack://application:,,,/Icones/RecordsDeleteRecord.png" 
                             LargeIcon="pack://application:,,,/Icones/RecordsDeleteRecord.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding RemoveSelectedItem}"
-                            IsEnabled="{Binding SelectedItem, Converter={StaticResource NullToFalseConverter}}">
+                            Command="{Binding RemoveSelectedItems}"
+                            IsEnabled="{Binding SelectedItems.Count, Converter={StaticResource ZeroToFalseConverter}}">
                 </Fluent:Button>
             </StackPanel>
             <!--Ligne 3-->
@@ -258,8 +262,9 @@
         <telerik:RadTreeView
                 x:Name="HierarchicalTree"
                 ItemsSource="{Binding RootFolders}" 
-                SelectionMode="Single" 
+                SelectionMode="Extended" 
                 SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                SelectionChanged="HierarchicalTree_SelectionChanged"
                 IsDragDropEnabled="True"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 telerik:AnimationManager.IsAnimationEnabled="False"

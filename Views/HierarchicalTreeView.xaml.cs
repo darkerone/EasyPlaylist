@@ -25,6 +25,8 @@ namespace EasyPlaylist.Views
     /// </summary>
     public partial class HierarchicalTreeView : UserControl
     {
+        private bool _isSelectedCollectionChanging = false;
+
         public HierarchicalTreeView()
         {
             InitializeComponent();
@@ -256,6 +258,72 @@ namespace EasyPlaylist.Views
             if (viewModel != null)
             {
                 viewModel.RootFolder.Items.CollectionChanged += RootFolders_CollectionChanged;
+                viewModel.SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
+            }
+        }
+
+        /// <summary>
+        /// A la mise à jour de la collection des items sélectionnés
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SelectedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            // Si ce n'est pas la vue qui est en train de faire la modifcation
+            if (!_isSelectedCollectionChanging)
+            {
+                _isSelectedCollectionChanging = true;
+                // On met à jour la liste des items sélectionnés du HierarchicalTree
+                HierarchicalTree.SelectedItems.Clear();
+                if(e.OldItems != null)
+                {
+                    foreach (MenuItemViewModel item in e.OldItems)
+                    {
+                        if (HierarchicalTree.SelectedItems.Contains(item))
+                        {
+                            HierarchicalTree.SelectedItems.Add(item);
+                        }
+                    }
+                }
+                if(e.NewItems != null)
+                {
+                    foreach (MenuItemViewModel item in e.NewItems)
+                    {
+                        if (HierarchicalTree.SelectedItems.Contains(item))
+                        {
+                            HierarchicalTree.SelectedItems.Add(item);
+                        }
+                    }
+                }
+                _isSelectedCollectionChanging = false;
+            }
+        }
+
+        /// <summary>
+        /// Lors du changement de sélection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HierarchicalTree_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_isSelectedCollectionChanging)
+            {
+                _isSelectedCollectionChanging = true;
+                HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+                // On retire les éléments désélectionné du model de vue
+                foreach (MenuItemViewModel item in e.RemovedItems)
+                {
+                    viewModel.SelectedItems.Remove(item);
+                }
+                // On ajoute les éléments sélectionné au model de vue
+                foreach (MenuItemViewModel item in e.AddedItems)
+                {
+                    if (!viewModel.SelectedItems.Contains(item))
+                    {
+                        viewModel.SelectedItems.Add(item);
+                    }
+                }
+                _isSelectedCollectionChanging = false;
             }
         }
 
@@ -287,7 +355,7 @@ namespace EasyPlaylist.Views
             Window mainWindow = this.ParentOfType<Window>();
             MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
 
-            mainViewModel.AddItemToSelectedPlaylist(itemViewModel);
+            mainViewModel.AddItemsToSelectedPlaylist(new List<MenuItemViewModel>(){ itemViewModel});
         }
 
         /// <summary>

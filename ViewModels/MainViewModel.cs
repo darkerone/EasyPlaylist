@@ -116,7 +116,8 @@ namespace EasyPlaylist.ViewModels
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             });
             // Lorsque la sélection d'un item change
-            EventAggregator.GetEvent<SelectedItemChangedEvent>().Subscribe((e) =>
+            // TODO : recabler la publication de l'evenement qui se faisait lors du changement de selectedItem
+            EventAggregator.GetEvent<SelectedItemsChangedEvent>().Subscribe((e) =>
             {
                 SetCanAddSelectedItemToSelectedPlaylist();
             });
@@ -283,11 +284,7 @@ namespace EasyPlaylist.ViewModels
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
                 // TODO : effectuer les changement dans l'explorer en fonction de l'évennement
-                IsIhmEnabled = false;
-                // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
-                System.Windows.Forms.Application.DoEvents();
                 DoRefreshExplorer();
-                IsIhmEnabled = true;
             });
         }
 
@@ -330,27 +327,13 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Ajoute l'élément sélectionné dans l'explorer dans l'élément sélectionné de la playlist sélectionnée
         /// </summary>
-        public ICommand AddSelectedItemToSelectedPlaylist
+        public ICommand AddSelectedItemsToSelectedPlaylist
         {
             get
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    AddItemToSelectedPlaylist(Explorer.SelectedItem);
-                });
-            }
-        }
-
-        /// <summary>
-        /// Retire l'élément sélectionné dans la playlist sélectionnée de la playlist sélectionnée
-        /// </summary>
-        public ICommand RemoveSelectedItemFromSelectedPlaylist
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    SelectedPlaylist.SelectedItem.GetParentFolder().RemoveItem(SelectedPlaylist.SelectedItem);
+                    AddItemsToSelectedPlaylist(Explorer.SelectedItems.ToList());
                 });
             }
         }
@@ -483,44 +466,23 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Ajoute l'item au dossier sélectionné de la playlist sélectionnée
         /// </summary>
-        /// <param name="item"></param>
-        public void AddItemToSelectedPlaylist(MenuItemViewModel item)
+        /// <param name="items"></param>
+        public void AddItemsToSelectedPlaylist(List<MenuItemViewModel> items)
         {
-            AddItemToPlaylist(item , SelectedPlaylist);
+            AddItemToPlaylist(items , SelectedPlaylist);
         }
 
         /// <summary>
         /// Ajoute l'item au dossier sélectionné de la playlist
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="items"></param>
         /// <param name="playlist"></param>
-        public void AddItemToPlaylist(MenuItemViewModel item, HierarchicalTreeViewModel playlist)
+        public void AddItemToPlaylist(List<MenuItemViewModel> items, HierarchicalTreeViewModel playlist)
         {
-            if(playlist == null)
+            if(playlist != null)
             {
-                return;
+                playlist.AddMenuItemsCopy(items);
             }
-
-            FolderViewModel folder = null;
-            // S'il y a un élément sélectionné dans la playlist
-            if (playlist.SelectedItem != null)
-            {
-                // Si l'élément sélectionné dans la playlist est un dossier
-                if (playlist.SelectedItem.IsFolder)
-                {
-                    folder = playlist.SelectedItem as FolderViewModel;
-                }
-                else
-                {
-                    folder = playlist.SelectedItem.GetParentFolder();
-                }
-            }
-            else
-            {
-                folder = playlist.RootFolder;
-            }
-            folder.AddItemCopy(item);
-            folder.IsExpanded = true;
         }
 
         /// <summary>
@@ -608,7 +570,9 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         private void SetCanAddSelectedItemToSelectedPlaylist()
         {
-            CanAddSelectedItemToSelectedPlaylist = Explorer.SelectedItem != null && SelectedPlaylist != null;
+            CanAddSelectedItemToSelectedPlaylist = Explorer.SelectedItems.Any() 
+                                                    && SelectedPlaylist != null 
+                                                    && SelectedPlaylist.SelectedItems.Count <= 1;
         }
 
         /// <summary>
@@ -713,6 +677,7 @@ namespace EasyPlaylist.ViewModels
         {
             // Stop watching.
             EnableFileWatcher(false);
+            EnableIhm(false);
 
             // Mémorise l'état des dossiers de l'explorer pour le rétablir après la mise à jour
             List<FolderViewModel> oldFolders = null;
@@ -747,6 +712,7 @@ namespace EasyPlaylist.ViewModels
 
             // Begin watching.
             EnableFileWatcher(true);
+            EnableIhm(true);
         }
 
         /// <summary>
@@ -756,6 +722,17 @@ namespace EasyPlaylist.ViewModels
         private void EnableFileWatcher(bool enable)
         {
             _watcher.EnableRaisingEvents = enable && EasyPlaylistStorage.EasyPlaylistSettings.IsFileWatcherOptionEnabled;
+        }
+
+        /// <summary>
+        /// Active ou désactive l'IHM
+        /// </summary>
+        /// <param name="enable"></param>
+        private void EnableIhm(bool enable)
+        {
+            IsIhmEnabled = enable;
+            // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
+            System.Windows.Forms.Application.DoEvents();
         }
 
         #endregion

@@ -56,17 +56,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private MenuItemViewModel _selectedItem;
-        public MenuItemViewModel SelectedItem
-        {
-            get { return _selectedItem; }
-            set
-            {
-                _selectedItem = value;
-                RaisePropertyChanged("SelectedItem");
-                EventAggregator?.GetEvent<SelectedItemChangedEvent>().Publish(_selectedItem);
-            }
-        }
+        public ObservableCollection<MenuItemViewModel> SelectedItems { get; }
 
         private IEventAggregator _eventAggregator;
         public IEventAggregator EventAggregator
@@ -117,21 +107,32 @@ namespace EasyPlaylist.ViewModels
             RootFolders = new ObservableCollection<MenuItemViewModel>();
             RootFolder = new RootFolderViewModel(eventAggregator, name, this);
             RootFolders.Add(RootFolder);
-            SelectedItem = RootFolder;
+            SelectedItems = new ObservableCollection<MenuItemViewModel>();
+            //SelectedItems.Add(RootFolder);
+            SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
 
         #region Events
 
+        private void SelectedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            EventAggregator.GetEvent<SelectedItemsChangedEvent>().Publish(SelectedItems);
+        }
+
         [JsonIgnore]
-        public ICommand RemoveSelectedItem
+        public ICommand RemoveSelectedItems
         {
             get
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    if (SelectedItem != null)
+                    if (SelectedItems.Any())
                     {
-                        SelectedItem.RemoveFromParent();
+                        List<MenuItemViewModel> selectedItemsTmp = SelectedItems.ToList();
+                        foreach (MenuItemViewModel item in selectedItemsTmp)
+                        {
+                            item.RemoveFromParent();
+                        }
                     }
                 });
             }
@@ -144,9 +145,9 @@ namespace EasyPlaylist.ViewModels
             {
                 return new DelegateCommand((parameter) =>
                 {
-                    if (SelectedItem != null)
+                    if (SelectedItems.Count == 1)
                     {
-                        SelectedItem.Rename();
+                        SelectedItems.First().Rename();
                     }
                 });
             }
@@ -176,7 +177,8 @@ namespace EasyPlaylist.ViewModels
                         {
                             FolderViewModel newFolder = new FolderViewModel(EventAggregator, definePopupViewModel.ItemName, null);
                             AddMenuItem(newFolder);
-                            SelectedItem = newFolder;
+                            SelectedItems.Clear();
+                            SelectedItems.Add(newFolder);
                         }
                     };
                     radWindow.Show();
@@ -349,19 +351,8 @@ namespace EasyPlaylist.ViewModels
         /// <param name="itemsToAdd"></param>
         public void AddMenuItemsCopy(List<MenuItemViewModel> itemsToAdd)
         {
-            // Si l'item sélectionné est un dossier
-            if (SelectedItem is FolderViewModel)
-            {
-                // On ajoute les éléments au dossier sélectionné
-                FolderViewModel selectedFolder = SelectedItem as FolderViewModel;
-                selectedFolder.AddItemsCopy(itemsToAdd);
-            }
-            else
-            {
-                // On ajoute les éléments au dossier parent de l'élément sélectionné
-                FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
-                folderWhereAdd.AddItemsCopy(itemsToAdd);
-            }
+            List<MenuItemViewModel> itemsToAddCopies = itemsToAdd.Select(x => x.GetItemCopy()).ToList();
+            AddMenuItems(itemsToAddCopies);
         }
 
         /// <summary>
@@ -379,18 +370,29 @@ namespace EasyPlaylist.ViewModels
         /// <param name="itemsToAdd"></param>
         public void AddMenuItems(List<MenuItemViewModel> itemsToAdd)
         {
-            // Si l'item sélectionné est un dossier
-            if (SelectedItem is FolderViewModel)
+            if(SelectedItems.Count == 0)
             {
-                // On ajoute les éléments au dossier sélectionné
-                FolderViewModel selectedFolder = SelectedItem as FolderViewModel;
-                selectedFolder.AddItems(itemsToAdd);
+                RootFolder.AddItems(itemsToAdd);
+            }
+            else if (SelectedItems.Count == 1)
+            {
+                // Si l'item sélectionné est un dossier
+                if (SelectedItems.First() is FolderViewModel)
+                {
+                    // On ajoute les éléments au dossier sélectionné
+                    FolderViewModel selectedFolder = SelectedItems.First() as FolderViewModel;
+                    selectedFolder.AddItems(itemsToAdd);
+                }
+                else
+                {
+                    // On ajoute les éléments au dossier parent de l'élément sélectionné
+                    FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItems.First());
+                    folderWhereAdd.AddItems(itemsToAdd);
+                }
             }
             else
             {
-                // On ajoute les éléments au dossier parent de l'élément sélectionné
-                FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItem);
-                folderWhereAdd.AddItems(itemsToAdd);
+                // TODO : gérer le cas où plusieurs items sont sélectionnés
             }
         }
 

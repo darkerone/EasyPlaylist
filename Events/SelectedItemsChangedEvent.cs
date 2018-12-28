@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EasyPlaylist.Events
 {
-    class SelectedItemChangedEvent : PubSubEvent<MenuItemViewModel>
+    class SelectedItemsChangedEvent : PubSubEvent<IEnumerable<MenuItemViewModel>>
     {
     }
 }

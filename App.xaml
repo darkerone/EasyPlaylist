@@ -30,6 +30,8 @@
                     <converters:MultiAddValueConverter x:Key="MultiAddValueConverter"/> 
                     <converters:InverseValueConverter x:Key="InverseValueConverter"/>
                     <converters:TrueToCollapsedVisibilityConverter x:Key="TrueToCollapsedVisibilityConverter"/>
+                    <converters:IntParameterValueToTrueConverter x:Key="IntParameterValueToTrueConverter"/>
+                    <converters:ZeroToFalseConverter x:Key="ZeroToFalseConverter"/> 
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
