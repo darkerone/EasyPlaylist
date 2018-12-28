@@ -416,6 +416,36 @@ namespace EasyPlaylist.Views
             mainViewModel.SearchInExplorer(x => x.Path == itemViewModel.Path);
         }
 
+        /// <summary>
+        /// Au relachement d'une touche
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HierarchicalTree_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Space)
+            {
+                // Récupère le modèle de vue pricinpal
+                Window mainWindow = this.ParentOfType<Window>();
+                MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
+                HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+                if (!viewModel.IsPlaylist)
+                {
+                    mainViewModel.AddSelectedItemsToSelectedPlaylist.Execute(null);
+                }
+                e.Handled = true;
+            }
+            if(e.Key == Key.Delete)
+            {
+                HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
+                if (viewModel.IsPlaylist)
+                {
+                    viewModel.RemoveSelectedItems.Execute(null);
+                }
+                e.Handled = true;
+            }
+        }
+
         #endregion
     }
 }

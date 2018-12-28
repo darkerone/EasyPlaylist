@@ -273,7 +273,8 @@
                 ItemContainerStyleSelector="{StaticResource HierarchicalStyleSelector}"
                 ItemTemplateSelector="{StaticResource HierarchicalTemplateSelector}"
                 DataContextChanged="HierarchicalTree_DataContextChanged"
-                PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14">
+                PreviewCollapsed="HierarchicalTree_PreviewCollapsed" FontSize="14"
+                KeyUp="HierarchicalTree_KeyUp">
             <!--On définit la hauteur du composant en la calculant car elle ne s'adapte pas correctement avec le RadTabControl et les DockPanel-->
             <telerik:RadTreeView.Height>
                 <MultiBinding Converter="{StaticResource MultiAddValueConverter}">
