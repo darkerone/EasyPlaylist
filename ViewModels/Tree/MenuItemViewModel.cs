@@ -31,28 +31,32 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private IEventAggregator _eventAggregator;
-        public IEventAggregator EventAggregator
-        {
-            get { return _eventAggregator; }
-            set
-            {
-                _eventAggregator = value;
-                RaisePropertyChanged("EventAggregator");
-            }
-        }
+        [JsonIgnore]
+        public IEventAggregator EventAggregator { get; set; }
 
         /// <summary>
         /// Chemin du dossier/fichier
         /// </summary>
         public string Path { get; set; }
 
+        private FolderViewModel _parentFolder;
         /// <summary>
         /// Dossier parent
         /// </summary>
-        public FolderViewModel ParentFolder { get; set; }
+        [JsonIgnore]
+        public FolderViewModel ParentFolder
+        {
+            get { return _parentFolder; }
+            set
+            {
+                _parentFolder = value;
+                //RaisePropertyChanged("ParentFolder"); // Inutil de faire cette notification
+                MarkParentPlaylistAsChanged();
+            }
+        }
 
         private bool _isExpanded = false;
+        [JsonIgnore]
         public bool IsExpanded
         {
             get { return _isExpanded; }
@@ -64,10 +68,10 @@ namespace EasyPlaylist.ViewModels
         }
 
         private bool _isImportant = true;
-
         /// <summary>
         /// Définit si l'item est important (pour savoir s'il doit être mis en évidence lors de la recherche par exemple)
         /// </summary>
+        [JsonIgnore]
         public bool IsImportant
         {
             get { return _isImportant; }
@@ -78,12 +82,14 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
         public abstract bool IsFolder { get; }
 
         private ExistsInPlaylistStatusEnum _existsInPlaylistStatus;
         /// <summary>
         /// True si le FileTagID du fichier est aussi dans la playlist (booleen utilisé dans l'explorer)
         /// </summary>
+        [JsonIgnore]
         public ExistsInPlaylistStatusEnum ExistsInPlaylistStatus
         {
             get { return _existsInPlaylistStatus; }
@@ -99,6 +105,7 @@ namespace EasyPlaylist.ViewModels
         /// Définit si l'item est considéré comme récent ou non.
         /// Un dossier est récent s'il contient au moins un fichier récent
         /// </summary>
+        [JsonIgnore]
         public bool IsRecent
         {
             get { return _isRecent; }
@@ -206,11 +213,15 @@ namespace EasyPlaylist.ViewModels
                 if (e.DialogResult == true)
                 {
                     Title = defineNamePopupViewModel.ItemName;
+                    MarkParentPlaylistAsChanged();
                 }
             };
             radWindow.Show();
         }
 
+        /// <summary>
+        /// Supprime l'item de la liste des items de son parent
+        /// </summary>
         public void RemoveFromParent()
         {
             FolderViewModel parentFolder = GetParentFolder();
@@ -224,16 +235,30 @@ namespace EasyPlaylist.ViewModels
         public HierarchicalTreeViewModel GetParentHierarchicalTree()
         {
             FolderViewModel folderTmp = ParentFolder;
-            while (folderTmp.ParentFolder != null)
+            // Si l'item a un parent
+            if (folderTmp != null)
             {
-                folderTmp = folderTmp.ParentFolder;
+                // On recherche le premier ancètre n'ayant pas de parent
+                while (folderTmp.ParentFolder != null)
+                {
+                    folderTmp = folderTmp.ParentFolder;
+                }
+            }
+            else
+            {
+                // Si l'item est l'item racine
+                RootFolderViewModel rootFolder = this as RootFolderViewModel;
+                if (rootFolder != null)
+                {
+                    return rootFolder.ParentHierarchicalTree;
+                }
             }
 
-            RootFolderViewModel rootFolder = folderTmp as RootFolderViewModel;
-
-            if(rootFolder != null)
+            // Si le premier ancetre n'ayant pas de parent est le dossier racine
+            RootFolderViewModel rootFolderTmp = folderTmp as RootFolderViewModel;
+            if(rootFolderTmp != null)
             {
-                return rootFolder.ParentHierarchicalTree;
+                return rootFolderTmp.ParentHierarchicalTree;
             }
             else
             {
@@ -243,7 +268,19 @@ namespace EasyPlaylist.ViewModels
 
         #endregion
 
-        #region Private methods
+        #region Protected methods
+
+        /// <summary>
+        /// Marque la playlist parente comme modifiée
+        /// </summary>
+        protected void MarkParentPlaylistAsChanged()
+        {
+            HierarchicalTreeViewModel hierarchicalTreeParent = GetParentHierarchicalTree();
+            if(hierarchicalTreeParent != null && hierarchicalTreeParent.IsPlaylist)
+            {
+                ((PlaylistViewModel)hierarchicalTreeParent).HasBeenModified = true;
+            }
+        }
 
         #endregion
     }

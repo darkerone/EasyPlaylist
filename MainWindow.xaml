@@ -84,7 +84,7 @@
                             LargeIcon="pack://application:,,,/Icones/SaveAll.png"
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
-                            Command="{Binding SavePlaylist}">
+                            Command="{Binding SaveAllPlaylist}">
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Remove" 

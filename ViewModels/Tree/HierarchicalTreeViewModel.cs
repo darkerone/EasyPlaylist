@@ -28,6 +28,7 @@ namespace EasyPlaylist.ViewModels
         /// Liste contenant un seul dossier (le dossier racine). C'est cette liste qui est passée au ItemsSource
         /// du RadTreeView dans la vue. De cette manière, on peut afficher le dossier racine.
         /// </summary>
+        [JsonIgnore]
         public ObservableCollection<MenuItemViewModel> RootFolders { get; }
 
         private RootFolderViewModel _rootFolder;
@@ -45,6 +46,7 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Texte utilisé pour effectuer une recherche
         /// </summary>
+        [JsonIgnore]
         public string SearchText
         {
             get { return _searchText; }
@@ -56,18 +58,11 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
         public ObservableCollection<MenuItemViewModel> SelectedItems { get; }
 
-        private IEventAggregator _eventAggregator;
-        public IEventAggregator EventAggregator
-        {
-            get { return _eventAggregator; }
-            set
-            {
-                _eventAggregator = value;
-                RaisePropertyChanged("EventAggregator");
-            }
-        }
+        [JsonIgnore]
+        public IEventAggregator EventAggregator { get; set; }
 
         private HierarchicalTreeSettingsViewModel _settings;
         public HierarchicalTreeSettingsViewModel Settings
@@ -79,7 +74,8 @@ namespace EasyPlaylist.ViewModels
                 RaisePropertyChanged("Settings");
             }
         }
-        
+
+        [JsonIgnore]
         public abstract bool IsPlaylist { get; }
 
         #endregion

@@ -33,6 +33,12 @@ namespace EasyPlaylist.Views
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             MainViewModel mainViewModel = this.DataContext as MainViewModel;
+            
+            // Si aucune playlist n'a été modifiée
+            if (!mainViewModel.Playlists.Any(x => x.HasBeenModified))
+            {
+                return;
+            }
 
             MessageBoxResult result = CustomMessageBox.Show($"Save playlists ?", "Save playlists", MessageBoxButton.YesNoCancel);
             switch (result)

@@ -14,6 +14,7 @@ namespace EasyPlaylist.ViewModels
 
         #region Properties
 
+        [JsonIgnore]
         public override bool IsPlaylist { get { return false; } }
 
         #endregion

@@ -19,13 +19,25 @@ namespace EasyPlaylist.ViewModels
     {
         #region Properties
 
+        [JsonIgnore]
         public override bool IsPlaylist { get { return true; } }
 
-        public bool HasBeenModified { get; set; }
+        private bool _hasBeenModified;
+        [JsonIgnore]
+        public bool HasBeenModified
+        {
+            get { return _hasBeenModified; }
+            set
+            {
+                _hasBeenModified = value;
+                RaisePropertyChanged("HasBeenModified");
+            }
+        }
 
         #endregion
 
         private List<string> _errors = new List<string>();
+        [JsonIgnore]
         public List<string> Errors
         {
             get { return _errors; }
@@ -191,6 +203,7 @@ namespace EasyPlaylist.ViewModels
                             Settings.Name = hierarchicalTreeSettingsViewModel.Name;
                             RootFolder.Title = hierarchicalTreeSettingsViewModel.Name;
                             Settings.ExportFlatPlaylist = hierarchicalTreeSettingsViewModel.ExportFlatPlaylist;
+                            HasBeenModified = true;
                         }
                     };
 

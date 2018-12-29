@@ -152,7 +152,7 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        public ICommand SavePlaylist
+        public ICommand SaveAllPlaylist
         {
             get
             {
@@ -161,6 +161,10 @@ namespace EasyPlaylist.ViewModels
                     if (SavePlaylists())
                     {
                         CustomMessageBox.Show("Playlists saved successfully", "Saved playlists", MessageBoxButton.OK, System.Windows.MessageBoxImage.None);
+                        foreach (PlaylistViewModel playlist in Playlists)
+                        {
+                            playlist.HasBeenModified = false;
+                        }
                     }
                 });
             }
@@ -427,10 +431,10 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Sauvegarde toutes les playlists
         /// </summary>
+        /// <param name="onlyIfModified">Définit si la sauvegarde sera effectuée même si aucune playlist n'a été modifiée</param>
         /// <returns></returns>
         public bool SavePlaylists()
         {
-
             try
             {
                 var jsonSerializerSettings = new JsonSerializerSettings()
@@ -600,6 +604,7 @@ namespace EasyPlaylist.ViewModels
                                 }
                                 errors += "\n";
                             }
+                            playlistViewModel.HasBeenModified = false;
                         }
                     }
 

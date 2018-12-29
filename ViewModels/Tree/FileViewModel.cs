@@ -37,6 +37,7 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Date à laquelle l'identifiant du fichier a été créé
         /// </summary>
+        [JsonIgnore]
         public DateTime FileTagIdCreationDate
         {
             get { return _fileTagIdCreationDate; }
@@ -47,12 +48,14 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        [JsonIgnore]
         public override bool IsFolder { get { return false; } }
 
         private bool _isFileExisting;
         /// <summary>
         /// Définit si le fichier existe sur le disque dur
         /// </summary>
+        [JsonIgnore]
         public bool IsFileExisting
         {
             get { return _isFileExisting; }

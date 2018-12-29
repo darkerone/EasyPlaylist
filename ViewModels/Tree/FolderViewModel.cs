@@ -15,6 +15,7 @@ namespace EasyPlaylist.ViewModels
     {
         #region Properties 
 
+        [JsonIgnore]
         public override bool IsFolder { get { return true; } }
 
         /// <summary>
@@ -80,6 +81,8 @@ namespace EasyPlaylist.ViewModels
 
             // Un dossier est récent si au moins un de ses item est récent
             IsRecent = Items.Any(x => x.IsRecent);
+
+            MarkParentPlaylistAsChanged();
         }
 
         /// <summary>
@@ -89,6 +92,7 @@ namespace EasyPlaylist.ViewModels
         {
             Items.Clear();
             IsRecent = false;
+            MarkParentPlaylistAsChanged();
         }
 
         /// <summary>
@@ -109,25 +113,7 @@ namespace EasyPlaylist.ViewModels
         {
             // Copie les items
             List<MenuItemViewModel> copiedMenuItemsVM = menuItemsVMToAdd.Select(x => x.GetItemCopy()).ToList();
-            foreach (MenuItemViewModel menuItemVM in copiedMenuItemsVM)
-            {
-                // Redéfinit l'item parent
-                menuItemVM.ParentFolder = this;
-
-                // Si le nom existe déjà, on incrémente un index entre parenthèse
-                string nameTmp = menuItemVM.Title;
-                int index = 1;
-                while (Items.Any(x => x.Title == nameTmp))
-                {
-                    nameTmp = menuItemVM.Title + $" ({index})";
-                    index++;
-                }
-                menuItemVM.Title = nameTmp;
-            }
-            Items.AddRange(copiedMenuItemsVM);
-
-            // Un dossier est récent si au moins un de ses item est récent
-            IsRecent = Items.Any(x => x.IsRecent);
+            AddItems(copiedMenuItemsVM);
         }
 
         /// <summary>
