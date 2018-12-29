@@ -20,7 +20,7 @@ using Telerik.Windows.Controls;
 
 namespace EasyPlaylist.ViewModels
 {
-    class HierarchicalTreeViewModel : BaseViewModel
+    abstract class HierarchicalTreeViewModel : BaseViewModel
     {
         #region Properties
 
@@ -79,19 +79,8 @@ namespace EasyPlaylist.ViewModels
                 RaisePropertyChanged("Settings");
             }
         }
-
-        private List<string> _errors = new List<string>();
-        public List<string> Errors
-        {
-            get { return _errors; }
-        }
-
-        public bool MoveItemEnabled { get; set; }
-        public bool CopyItemInEnabled { get; set; }
-        public bool CopyItemOutEnabled { get; set; }
-        public bool IsEditable { get; set; }
-        public bool IsPlaylist { get; set; }
-        public bool HasBeenModified { get; set; }
+        
+        public abstract bool IsPlaylist { get; }
 
         #endregion
 
@@ -120,159 +109,6 @@ namespace EasyPlaylist.ViewModels
         }
 
         [JsonIgnore]
-        public ICommand RemoveSelectedItems
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    if (SelectedItems.Any())
-                    {
-                        List<MenuItemViewModel> selectedItemsTmp = SelectedItems.ToList();
-                        foreach (MenuItemViewModel item in selectedItemsTmp)
-                        {
-                            item.RemoveFromParent();
-                        }
-                    }
-                });
-            }
-        }
-
-        [JsonIgnore]
-        public ICommand RenameSelectedItem
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    if (SelectedItems.Count == 1)
-                    {
-                        SelectedItems.First().Rename();
-                    }
-                });
-            }
-        }
-
-        [JsonIgnore]
-        public ICommand OpenAddFolderPopup
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    DefineNamePopupView newDefineNamePopupView = new DefineNamePopupView();
-                    DefineNamePopupViewModel newDefineNamePopupViewModel = new DefineNamePopupViewModel();
-                    newDefineNamePopupViewModel.ItemName = "New folder";
-                    newDefineNamePopupView.DataContext = newDefineNamePopupViewModel;
-                    RadWindow radWindow = new RadWindow();
-                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Header = "New folder";
-                    radWindow.Content = newDefineNamePopupView;
-                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
-                    {
-                        RadWindow popup = sender as RadWindow;
-                        DefineNamePopupView defineNamePopupView = popup.Content as DefineNamePopupView;
-                        DefineNamePopupViewModel definePopupViewModel = defineNamePopupView.DataContext as DefineNamePopupViewModel;
-                        if (e.DialogResult == true)
-                        {
-                            FolderViewModel newFolder = new FolderViewModel(EventAggregator, definePopupViewModel.ItemName, null);
-                            AddMenuItem(newFolder);
-                            SelectedItems.Clear();
-                            SelectedItems.Add(newFolder);
-                        }
-                    };
-                    radWindow.Show();
-                }, (parameter) => { return true; });
-            }
-        }
-
-        [JsonIgnore]
-        public ICommand Export
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    try
-                    {
-                        FolderBrowserDialog fbd = new FolderBrowserDialog();
-                        fbd.Description = "Destination folder (a folder with playlist name will be created)";
-
-                        // Demande à l'utilisateur de choisir le dossier de destination
-                        DialogResult result = fbd.ShowDialog();
-                        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-                        {
-                            // Si la playlist existe déjà dans le dossier sélectionné
-                            if (Directory.Exists(fbd.SelectedPath + "\\" + RootFolder.Title))
-                            {
-                                MessageBoxResult alreadyExistsMessageBoxResult = CustomMessageBox.Show($"The folder \"{RootFolder.Title}\" already exists in \"{fbd.SelectedPath}\", do you want to replace it ?", "Already exists", MessageBoxButton.YesNo);
-                                switch (alreadyExistsMessageBoxResult)
-                                {
-                                    case MessageBoxResult.Yes:
-                                        Directory.Delete(fbd.SelectedPath + "\\" + RootFolder.Title, true);
-                                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
-                            }
-                            MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
-                            switch (exportedPlaylistMessageBoxResult)
-                            {
-                                case MessageBoxResult.Yes:
-                                    Process.Start(fbd.SelectedPath + "\\" + RootFolder.Title);
-                                    break;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        CustomMessageBox.Show($"An exception occured while writting file :\n- {ex.Message}", "Exception", MessageBoxButton.OK);
-                    }
-                });
-            }
-        }
-
-        [JsonIgnore]
-        public ICommand OpenPlaylistSettings
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    HierarchicalTreeSettingsView playlistSettingsPopupView = new HierarchicalTreeSettingsView();
-                    // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
-                    playlistSettingsPopupView.DataContext = new HierarchicalTreeSettingsViewModel()
-                    {
-                        Name = Settings.Name,
-                        ExportFlatPlaylist = Settings.ExportFlatPlaylist
-                    };
-                    RadWindow radWindow = new RadWindow();
-                    radWindow.Header = "Playlist settings";
-                    radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
-                    radWindow.Content = playlistSettingsPopupView;
-
-                    radWindow.Closed += (object sender, WindowClosedEventArgs e) =>
-                    {
-                        RadWindow popup = sender as RadWindow;
-                        HierarchicalTreeSettingsView hierarchicalTreeSettingsView = popup.Content as HierarchicalTreeSettingsView;
-                        HierarchicalTreeSettingsViewModel hierarchicalTreeSettingsViewModel = hierarchicalTreeSettingsView.DataContext as HierarchicalTreeSettingsViewModel;
-                        if (e.DialogResult == true)
-                        {
-                            Settings.Name = hierarchicalTreeSettingsViewModel.Name;
-                            RootFolder.Title = hierarchicalTreeSettingsViewModel.Name;
-                            Settings.ExportFlatPlaylist = hierarchicalTreeSettingsViewModel.ExportFlatPlaylist;
-                        }
-                    };
-
-                    radWindow.Show();
-                });
-            }
-        }
-
-        [JsonIgnore]
         public ICommand Search
         {
             get
@@ -292,30 +128,6 @@ namespace EasyPlaylist.ViewModels
                 return new DelegateCommand((parameter) =>
                 {
                     DoSearchDoubles();
-                });
-            }
-        }
-
-        [JsonIgnore]
-        public ICommand DisplayFilesInError
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    DoSearch(x => x is FileViewModel && ((FileViewModel)x).IsFileExisting == false);
-                });
-            }
-        }
-        
-        [JsonIgnore]
-        public ICommand DisplayRecentFiles
-        {
-            get
-            {
-                return new DelegateCommand((parameter) =>
-                {
-                    DoSearch(x => x.IsRecent);
                 });
             }
         }
@@ -386,7 +198,7 @@ namespace EasyPlaylist.ViewModels
                 else
                 {
                     // On ajoute les éléments au dossier parent de l'élément sélectionné
-                    FolderViewModel folderWhereAdd = GetFirstParentFolder(SelectedItems.First());
+                    FolderViewModel folderWhereAdd = SelectedItems.First().ParentFolder;
                     folderWhereAdd.AddItems(itemsToAdd);
                 }
             }
@@ -413,24 +225,6 @@ namespace EasyPlaylist.ViewModels
         public List<string> GetAllFileTagIDs()
         {
             return GetAllFileTagIDsRecursively(RootFolder);
-        }
-
-        /// <summary>
-        /// Vérifie si la playlist contient des erreurs
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckErrors()
-        {
-            Errors.Clear();
-            foreach (FileViewModel file in RootFolder.GetFiles(true))
-            {
-                // Vérifie si le fichier existe sur le disque dur
-                if (!file.IsFileExisting)
-                {
-                    Errors.Add($"\"{file.Path}\" does not exists.");
-                }
-            }
-            return Errors.Any();
         }
 
         /// <summary>
@@ -498,93 +292,11 @@ namespace EasyPlaylist.ViewModels
         #region Private methods
 
         /// <summary>
-        /// Renvoie le dossier contenant l'élément passé en paramètre
-        /// </summary>
-        /// <param name="menuItemVM"></param>
-        /// <returns></returns>
-        private FolderViewModel GetFirstParentFolder(MenuItemViewModel menuItemVM)
-        {
-            List<FolderViewModel> allContainerFolders = SearchAllFoldersContainingMenuItem(menuItemVM, RootFolder);
-
-            if (allContainerFolders.Any())
-            {
-                return allContainerFolders.First();
-            }
-
-            return RootFolder;
-        }
-
-        /// <summary>
-        /// Renvoie tous les dossiers contenant l'élément passé en paramètre
-        /// </summary>
-        /// <param name="menuItemVM">Eléméent à rechercher</param>
-        /// <param name="folderVM">Dossier où l'on fait la recherche</param>
-        /// <returns></returns>
-        private List<FolderViewModel> SearchAllFoldersContainingMenuItem(MenuItemViewModel menuItemVM, FolderViewModel folderVM)
-        {
-            List<FolderViewModel> containerFolders = new List<FolderViewModel>();
-            if (folderVM.Items.Contains(menuItemVM))
-            {
-                containerFolders.Add(folderVM);
-            }
-
-            foreach (FolderViewModel subFolder in folderVM.Items.OfType<FolderViewModel>())
-            {
-                containerFolders.AddRange(SearchAllFoldersContainingMenuItem(menuItemVM, subFolder));
-            }
-
-            return containerFolders;
-        }
-
-        /// <summary>
-        /// Exporte tout le contenu du dossier passé en paramètre dans le dossier de destination
-        /// </summary>
-        /// <param name="destinationFolder"></param>
-        /// <param name="folderVM"></param>
-        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM, bool flatedPlaylist = false)
-        {
-            // Créé le dossier
-            bool success = folderVM.WriteFolder(destinationFolder);
-
-            string folderPath = destinationFolder + "\\" + folderVM.Title;
-
-            if (success)
-            {
-                // Dans le cas où l'on veut que tous les fichiers de la playlist soient exportés dans le dossier racine
-                if (flatedPlaylist)
-                {
-                    // Récupère tous les fichiers
-                    List<FileViewModel> filesToExport = folderVM.GetFiles(true);
-
-                    // Ecris les fichiers
-                    foreach (FileViewModel file in filesToExport)
-                    {
-                        file.WriteFile(folderPath);
-                    }
-                }
-                else
-                {
-                    // Créé les sous dossiers du dossier
-                    foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
-                    {
-                        ExportFoldersAndFiles(folderPath, subFolderVM);
-                    }
-
-                    // Créé les fichiers du dossier
-                    foreach (FileViewModel fileVM in folderVM.Items.OfType<FileViewModel>())
-                    {
-                        fileVM.WriteFile(folderPath);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Récupère de manière récursive tous les ID des fichiers du dossier passé en paramètre
         /// </summary>
         /// <param name="folderViewModel"></param>
         /// <returns></returns>
-        private List<string> GetAllFileTagIDsRecursively(FolderViewModel folderViewModel)
+        protected List<string> GetAllFileTagIDsRecursively(FolderViewModel folderViewModel)
         {
             List<string> fileTagIDs = new List<string>();
             foreach (FolderViewModel subFolderVM in folderViewModel.Items.OfType<FolderViewModel>())
@@ -603,7 +315,7 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Effectue une recherche par nom sur l'ensemble de la playlist
         /// </summary>
-        private void DoTextSearch()
+        protected void DoTextSearch()
         {
             string searchTextString = SearchText == null ? "" : SearchText.ToLower();
             List<MenuItemViewModel> items = RootFolder.GetItems(true);
@@ -623,7 +335,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="items">Elément qui seront traités (tout l'arbre si null). 
         /// Pour éviter de reparcourir l'arbre si cela a déjà été fait</param>
-        private void BringSearchResultToView(List<MenuItemViewModel> items = null)
+        protected void BringSearchResultToView(List<MenuItemViewModel> items = null)
         {
             if (items == null)
             {

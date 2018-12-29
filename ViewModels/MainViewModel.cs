@@ -25,8 +25,8 @@ namespace EasyPlaylist.ViewModels
 
         #region Properties
 
-        private HierarchicalTreeViewModel _explorer;
-        public HierarchicalTreeViewModel Explorer
+        private ExplorerViewModel _explorer;
+        public ExplorerViewModel Explorer
         {
             get { return _explorer; }
             set
@@ -36,14 +36,14 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
-        private ObservableCollection<HierarchicalTreeViewModel> _playlists;
-        public ObservableCollection<HierarchicalTreeViewModel> Playlists
+        private ObservableCollection<PlaylistViewModel> _playlists;
+        public ObservableCollection<PlaylistViewModel> Playlists
         {
             get { return _playlists; }
         }
 
-        private HierarchicalTreeViewModel _selectedPlaylist;
-        public HierarchicalTreeViewModel SelectedPlaylist
+        private PlaylistViewModel _selectedPlaylist;
+        public PlaylistViewModel SelectedPlaylist
         {
             get { return _selectedPlaylist; }
             set
@@ -95,7 +95,7 @@ namespace EasyPlaylist.ViewModels
         public MainViewModel()
         {
             EventAggregator = new EventAggregator();
-            _playlists = new ObservableCollection<HierarchicalTreeViewModel>();
+            _playlists = new ObservableCollection<PlaylistViewModel>();
 
             // =========
             // Playlists
@@ -212,14 +212,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
-                            {
-                                CopyItemInEnabled = true,
-                                CopyItemOutEnabled = false,
-                                MoveItemEnabled = true,
-                                IsEditable = true,
-                                IsPlaylist = true
-                            };
+                            PlaylistViewModel newPlaylist = new PlaylistViewModel(EventAggregator, namePopupViewModel.ItemName);
                             AddPlaylist(newPlaylist);
                             SelectedPlaylist = newPlaylist;
                         }
@@ -254,14 +247,7 @@ namespace EasyPlaylist.ViewModels
                         DefineNamePopupViewModel namePopupViewModel = namePopupView.DataContext as DefineNamePopupViewModel;
                         if (e.DialogResult == true)
                         {
-                            HierarchicalTreeViewModel newPlaylist = new HierarchicalTreeViewModel(EventAggregator, namePopupViewModel.ItemName)
-                            {
-                                CopyItemInEnabled = true,
-                                CopyItemOutEnabled = false,
-                                MoveItemEnabled = true,
-                                IsEditable = true,
-                                IsPlaylist = true
-                            };
+                            PlaylistViewModel newPlaylist = new PlaylistViewModel(EventAggregator, namePopupViewModel.ItemName);
                             newPlaylist.Settings.ExportFlatPlaylist = SelectedPlaylist.Settings.ExportFlatPlaylist;
                             newPlaylist.AddMenuItemsCopy(SelectedPlaylist.RootFolder.Items.ToList());
                             AddPlaylist(newPlaylist);
@@ -393,7 +379,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="folderVM"></param>
         /// <param name="playlistFileTagIDs"></param>
-        public void CheckIfItemsExistInSelectedPlaylist(HierarchicalTreeViewModel explorerVM, HierarchicalTreeViewModel playlistVM)
+        public void CheckIfItemsExistInSelectedPlaylist(ExplorerViewModel explorerVM, PlaylistViewModel playlistVM)
         {
             if (explorerVM != null)
             {
@@ -414,7 +400,7 @@ namespace EasyPlaylist.ViewModels
         /// Ajoute une playlist à la liste des playlists (ajoute un index au nom si le nom existe déjà)
         /// </summary>
         /// <param name="newPlaylist"></param>
-        public void AddPlaylist(HierarchicalTreeViewModel newPlaylist)
+        public void AddPlaylist(PlaylistViewModel newPlaylist)
         {
             // Si le nom existe déjà, on incrémente un index entre parenthèse
             string nameTmp = newPlaylist.Settings.Name;
@@ -433,7 +419,7 @@ namespace EasyPlaylist.ViewModels
         /// Retire une playlist de la liste des playlists
         /// </summary>
         /// <param name="playlistToRemove"></param>
-        public void RemovePlaylist(HierarchicalTreeViewModel playlistToRemove)
+        public void RemovePlaylist(PlaylistViewModel playlistToRemove)
         {
             Playlists.Remove(playlistToRemove);
         }
@@ -477,7 +463,7 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         /// <param name="items"></param>
         /// <param name="playlist"></param>
-        public void AddItemToPlaylist(List<MenuItemViewModel> items, HierarchicalTreeViewModel playlist)
+        public void AddItemToPlaylist(List<MenuItemViewModel> items, PlaylistViewModel playlist)
         {
             if(playlist != null)
             {
@@ -583,56 +569,58 @@ namespace EasyPlaylist.ViewModels
             // Récupère les playlists sauvegardées
             if (System.IO.File.Exists(PlaylistFilePath))
             {
-                string json = System.IO.File.ReadAllText(PlaylistFilePath);
-                var jsonSerializerSettings = new JsonSerializerSettings()
+                try
                 {
-                    TypeNameHandling = TypeNameHandling.All,
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                };
-                ObservableCollection<HierarchicalTreeViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<HierarchicalTreeViewModel>>(json, jsonSerializerSettings);
-
-                string errors = "";
-                if (deserializedPlaylist != null)
-                {
-                    // Pour chaque playlist
-                    foreach (HierarchicalTreeViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
+                    string json = System.IO.File.ReadAllText(PlaylistFilePath);
+                    var jsonSerializerSettings = new JsonSerializerSettings()
                     {
-                        // Copie toutes les propriétés utiles de la playlist déserialisée
-                        HierarchicalTreeViewModel hierarchicalTreeViewModel = new HierarchicalTreeViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
-                        hierarchicalTreeViewModel.AddMenuItemsCopy(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
-                        hierarchicalTreeViewModel.CopyItemInEnabled = true;
-                        hierarchicalTreeViewModel.CopyItemOutEnabled = false;
-                        hierarchicalTreeViewModel.MoveItemEnabled = true;
-                        hierarchicalTreeViewModel.IsEditable = true;
-                        hierarchicalTreeViewModel.IsPlaylist = true;
-                        hierarchicalTreeViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
-                        AddPlaylist(hierarchicalTreeViewModel);
+                        TypeNameHandling = TypeNameHandling.All,
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    };
+                    ObservableCollection<PlaylistViewModel> deserializedPlaylist = JsonConvert.DeserializeObject<ObservableCollection<PlaylistViewModel>>(json, jsonSerializerSettings);
 
-                        if (hierarchicalTreeViewModel.CheckErrors())
+                    string errors = "";
+                    if (deserializedPlaylist != null)
+                    {
+                        // Pour chaque playlist
+                        foreach (PlaylistViewModel deserializedHierarchicalTreeVM in deserializedPlaylist)
                         {
-                            errors += $"- Playlist \"{hierarchicalTreeViewModel.Settings.Name}\" contains errors :\n";
-                            foreach (string error in hierarchicalTreeViewModel.Errors)
+                            // Copie toutes les propriétés utiles de la playlist déserialisée
+                            PlaylistViewModel playlistViewModel = new PlaylistViewModel(EventAggregator, deserializedHierarchicalTreeVM.Settings.Name);
+                            playlistViewModel.AddMenuItemsCopy(deserializedHierarchicalTreeVM.RootFolder.Items.ToList());
+                            playlistViewModel.Settings = deserializedHierarchicalTreeVM.Settings;
+                            AddPlaylist(playlistViewModel);
+
+                            if (playlistViewModel.CheckErrors())
                             {
-                                errors += error + "\n";
+                                errors += $"- Playlist \"{playlistViewModel.Settings.Name}\" contains errors :\n";
+                                foreach (string error in playlistViewModel.Errors)
+                                {
+                                    errors += error + "\n";
+                                }
+                                errors += "\n";
                             }
-                            errors += "\n";
+                        }
+                    }
+
+                    if (errors != "")
+                    {
+                        errors += "Do you want to show those files ?";
+                        MessageBoxResult result = CustomMessageBox.Show(errors, "Errors", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        switch (result)
+                        {
+                            case MessageBoxResult.Yes:
+                                foreach (PlaylistViewModel playlist in Playlists)
+                                {
+                                    playlist.DoSearch(x => x is FileViewModel && ((FileViewModel)x).IsFileExisting == false);
+                                }
+                                break;
                         }
                     }
                 }
-
-                if (errors != "")
+                catch
                 {
-                    errors += "Do you want to show those files ?";
-                    MessageBoxResult result = CustomMessageBox.Show(errors, "Errors", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-                    switch (result)
-                    {
-                        case MessageBoxResult.Yes:
-                            foreach (HierarchicalTreeViewModel playlist in Playlists)
-                            {
-                                playlist.DoSearch(x => x is FileViewModel && ((FileViewModel)x).IsFileExisting == false);
-                            }
-                            break;
-                    }
+                    MessageBoxResult result = CustomMessageBox.Show("An error occured when trying to restore playlits", "Errors", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -688,14 +676,7 @@ namespace EasyPlaylist.ViewModels
 
             // Récupère le dossier et ses sous dossiers et fichiers
             FolderViewModel musicFolder = GetFolderViewModel(EasyPlaylistStorage.EasyPlaylistSettings.ExplorerPath);
-            Explorer = new HierarchicalTreeViewModel(EventAggregator, musicFolder.Title)
-            {
-                CopyItemInEnabled = false,
-                CopyItemOutEnabled = true,
-                MoveItemEnabled = false,
-                IsEditable = false,
-                IsPlaylist = false
-            };
+            Explorer = new ExplorerViewModel(EventAggregator, musicFolder.Title);
             Explorer.AddMenuItems(musicFolder.Items.ToList());
 
             CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);

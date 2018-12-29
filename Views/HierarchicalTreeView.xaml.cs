@@ -49,125 +49,125 @@ namespace EasyPlaylist.Views
 
         private static void OnDropCompleted(object sender, Telerik.Windows.DragDrop.DragEventArgs e)
         {
-            var options = DragDropPayloadManager.GetDataFromObject(e.Data, TreeViewDragDropOptions.Key) as TreeViewDragDropOptions;
-            if (options == null)
-            {
-                return;
-            }
+            //var options = DragDropPayloadManager.GetDataFromObject(e.Data, TreeViewDragDropOptions.Key) as TreeViewDragDropOptions;
+            //if (options == null)
+            //{
+            //    return;
+            //}
 
-            //// Tell RadTreeView to do nothing with the data.
-            options.DropAction = DropAction.None;
+            ////// Tell RadTreeView to do nothing with the data.
+            //options.DropAction = DropAction.None;
         }
 
         // https://www.telerik.com/forums/drag-and-drop----how-to-handle-the-move-copy-myself
         private static void OnDragDropCompleted(object sender, DragDropCompletedEventArgs e)
         {
-            var options = DragDropPayloadManager.GetDataFromObject(e.Data, TreeViewDragDropOptions.Key) as TreeViewDragDropOptions;
-            if (options == null)
-            {
-                return;
-            }
+            //var options = DragDropPayloadManager.GetDataFromObject(e.Data, TreeViewDragDropOptions.Key) as TreeViewDragDropOptions;
+            //if (options == null)
+            //{
+            //    return;
+            //}
 
-            // ==============================
-            // Récupère le treeview d'origine
-            // ==============================
-            RadTreeView originRadTreeView = sender as RadTreeView;
-            HierarchicalTreeViewModel originHierarchicalTreeVM = originRadTreeView.DataContext as HierarchicalTreeViewModel;
+            //// ==============================
+            //// Récupère le treeview d'origine
+            //// ==============================
+            //RadTreeView originRadTreeView = sender as RadTreeView;
+            //HierarchicalTreeViewModel originHierarchicalTreeVM = originRadTreeView.DataContext as HierarchicalTreeViewModel;
 
-            if (originRadTreeView == null || originHierarchicalTreeVM == null)
-            {
-                return;
-            }
+            //if (originRadTreeView == null || originHierarchicalTreeVM == null)
+            //{
+            //    return;
+            //}
 
-            // ===================================
-            // Récupère le treeview de destination
-            // ===================================
-            RadTreeView destinationRadTreeView = options.DropTargetTree;
-            // Si le treeview de destination n'est pas renseigné
-            if (destinationRadTreeView == null)
-            {
-                // Si l'item de destination est renseigné
-                if (options.DropTargetItem != null)
-                {
-                    // On récupère le treeview de destination grâce à l'item de destination
-                    destinationRadTreeView = (options.DropTargetItem as FrameworkElement).ParentOfType<RadTreeView>();
-                }
-                else
-                {
-                    return;
-                }
-            }
+            //// ===================================
+            //// Récupère le treeview de destination
+            //// ===================================
+            //RadTreeView destinationRadTreeView = options.DropTargetTree;
+            //// Si le treeview de destination n'est pas renseigné
+            //if (destinationRadTreeView == null)
+            //{
+            //    // Si l'item de destination est renseigné
+            //    if (options.DropTargetItem != null)
+            //    {
+            //        // On récupère le treeview de destination grâce à l'item de destination
+            //        destinationRadTreeView = (options.DropTargetItem as FrameworkElement).ParentOfType<RadTreeView>();
+            //    }
+            //    else
+            //    {
+            //        return;
+            //    }
+            //}
 
-            HierarchicalTreeViewModel destinationHierarchicalTreeVM = destinationRadTreeView.DataContext as HierarchicalTreeViewModel;
+            //PlaylistViewModel destinationPlaylistVM = destinationRadTreeView.DataContext as PlaylistViewModel;
 
-            if (destinationRadTreeView == null || destinationHierarchicalTreeVM == null)
-            {
-                return;
-            }
+            //if (destinationRadTreeView == null || destinationPlaylistVM == null)
+            //{
+            //    return;
+            //}
 
-            // ==============================
-            // Récupère l'item de destination
-            // ==============================
-            MenuItemViewModel destinationItemVM;
-            if (options.DropTargetItem != null)
-            {
-                destinationItemVM = options.DropTargetItem.DataContext as MenuItemViewModel;
-            }
-            else
-            {
-                destinationItemVM = destinationHierarchicalTreeVM.RootFolder;
-            }
+            //// ==============================
+            //// Récupère l'item de destination
+            //// ==============================
+            //MenuItemViewModel destinationItemVM;
+            //if (options.DropTargetItem != null)
+            //{
+            //    destinationItemVM = options.DropTargetItem.DataContext as MenuItemViewModel;
+            //}
+            //else
+            //{
+            //    destinationItemVM = destinationPlaylistVM.RootFolder;
+            //}
 
-            // ===============
-            // Eléments dropés
-            // ===============
-            List<object> draggedItems = options.DraggedItems as List<object>;
-            List<MenuItemViewModel> draggedItemVms = draggedItems.OfType<MenuItemViewModel>().ToList();
+            //// ===============
+            //// Eléments dropés
+            //// ===============
+            //List<object> draggedItems = options.DraggedItems as List<object>;
+            //List<MenuItemViewModel> draggedItemVms = draggedItems.OfType<MenuItemViewModel>().ToList();
 
-            // =============================================
-            // Dans le cas de 2 arbres différents : on copie
-            // =============================================
-            if (originRadTreeView != destinationRadTreeView)
-            {
-                if (destinationHierarchicalTreeVM != null && destinationHierarchicalTreeVM.CopyItemInEnabled && originHierarchicalTreeVM.CopyItemOutEnabled)
-                {
-                    // Dossier de destination
-                    FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
+            //// =============================================
+            //// Dans le cas de 2 arbres différents : on copie
+            //// =============================================
+            //if (originRadTreeView != destinationRadTreeView)
+            //{
+            //    if (destinationPlaylistVM != null && destinationPlaylistVM.CopyItemInEnabled && originHierarchicalTreeVM.CopyItemOutEnabled)
+            //    {
+            //        // Dossier de destination
+            //        FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
 
-                    // Copie des éléments dropés
-                    if (destinationFolderVM != null)
-                    {
-                        // Copie les éléments dropés 
-                        List<MenuItemViewModel> copiedElements = draggedItemVms.Select(x => x.GetItemCopy()).ToList();
+            //        // Copie des éléments dropés
+            //        if (destinationFolderVM != null)
+            //        {
+            //            // Copie les éléments dropés 
+            //            List<MenuItemViewModel> copiedElements = draggedItemVms.Select(x => x.GetItemCopy()).ToList();
 
-                        // Ajoute les éléments copiés au dossier
-                        destinationFolderVM.AddItemsCopy(copiedElements);
-                    }
-                }
-            }
-            // ======================================
-            // Dans le cas du même arbre : on déplace
-            // ======================================
-            else
-            {
-                if (originHierarchicalTreeVM.MoveItemEnabled)
-                {
-                    FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
+            //            // Ajoute les éléments copiés au dossier
+            //            destinationFolderVM.AddItemsCopy(copiedElements);
+            //        }
+            //    }
+            //}
+            //// ======================================
+            //// Dans le cas du même arbre : on déplace
+            //// ======================================
+            //else
+            //{
+            //    if (originHierarchicalTreeVM.MoveItemEnabled)
+            //    {
+            //        FolderViewModel destinationFolderVM = GetDestinationFolder(destinationItemVM);
 
-                    // Déplacement des éléments dropés
-                    if (destinationFolderVM != null)
-                    {
-                        // Retire les éléments déplacés de leur dossier d'origine
-                        foreach (MenuItemViewModel draggedMenuItemVM in options.DraggedItems)
-                        {
-                            draggedMenuItemVM.ParentFolder.RemoveItem(draggedMenuItemVM);
-                        }
+            //        // Déplacement des éléments dropés
+            //        if (destinationFolderVM != null)
+            //        {
+            //            // Retire les éléments déplacés de leur dossier d'origine
+            //            foreach (MenuItemViewModel draggedMenuItemVM in options.DraggedItems)
+            //            {
+            //                draggedMenuItemVM.ParentFolder.RemoveItem(draggedMenuItemVM);
+            //            }
 
-                        // Ajoute les éléments déplacés dans leur dossier de destination
-                        destinationFolderVM.AddItemsCopy(draggedItemVms);
-                    }
-                }
-            }
+            //            // Ajoute les éléments déplacés dans leur dossier de destination
+            //            destinationFolderVM.AddItemsCopy(draggedItemVms);
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
@@ -327,6 +327,36 @@ namespace EasyPlaylist.Views
             }
         }
 
+        /// <summary>
+        /// Au relachement d'une touche
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void HierarchicalTree_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                // Récupère le modèle de vue pricinpal
+                Window mainWindow = this.ParentOfType<Window>();
+                MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
+                ExplorerViewModel viewModel = this.DataContext as ExplorerViewModel;
+                if (viewModel != null)
+                {
+                    mainViewModel.AddSelectedItemsToSelectedPlaylist.Execute(null);
+                }
+                e.Handled = true;
+            }
+            if (e.Key == Key.Delete)
+            {
+                PlaylistViewModel viewModel = this.DataContext as PlaylistViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.RemoveSelectedItems.Execute(null);
+                }
+                e.Handled = true;
+            }
+        }
+
         #region Explorer
 
         /// <summary>
@@ -414,36 +444,6 @@ namespace EasyPlaylist.Views
             MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
 
             mainViewModel.SearchInExplorer(x => x.Path == itemViewModel.Path);
-        }
-
-        /// <summary>
-        /// Au relachement d'une touche
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void HierarchicalTree_KeyUp(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Space)
-            {
-                // Récupère le modèle de vue pricinpal
-                Window mainWindow = this.ParentOfType<Window>();
-                MainViewModel mainViewModel = mainWindow.DataContext as MainViewModel;
-                HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
-                if (!viewModel.IsPlaylist)
-                {
-                    mainViewModel.AddSelectedItemsToSelectedPlaylist.Execute(null);
-                }
-                e.Handled = true;
-            }
-            if(e.Key == Key.Delete)
-            {
-                HierarchicalTreeViewModel viewModel = this.DataContext as HierarchicalTreeViewModel;
-                if (viewModel.IsPlaylist)
-                {
-                    viewModel.RemoveSelectedItems.Execute(null);
-                }
-                e.Handled = true;
-            }
         }
 
         #endregion

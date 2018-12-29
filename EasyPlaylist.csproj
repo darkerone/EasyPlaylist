@@ -195,7 +195,9 @@
     <Compile Include="KeysJsonConverter.cs" />
     <Compile Include="Models\EasyPlaylistStorage.cs" />
     <Compile Include="ViewModels\EasyPlaylistSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Tree\ExplorerViewModel.cs" />
     <Compile Include="ViewModels\HierarchicalTreeSettingsViewModel.cs" />
+    <Compile Include="ViewModels\Tree\PlaylistViewModel.cs" />
     <Compile Include="ViewModels\Tree\RootFolderViewModel.cs" />
     <Compile Include="Views\EasyPlaylistSettingsView.xaml.cs">
       <DependentUpon>EasyPlaylistSettingsView.xaml</DependentUpon>

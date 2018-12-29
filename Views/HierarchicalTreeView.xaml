@@ -152,7 +152,7 @@
                             Width="Auto" HorizontalAlignment="Left"
                             SizeDefinition="Middle"
                             Command="{Binding OpenPlaylistSettings}"
-                            Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+                            Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 </Fluent:Button>
                 <Fluent:Button
                             Header="Export" 
@@ -167,7 +167,7 @@
             </StackPanel>
             <!--Ligne 2-->
             <StackPanel Orientation="Horizontal" 
-                        Visibility="{Binding IsEditable, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
+                        Visibility="{Binding IsPlaylist, Converter={StaticResource FalseToCollapsedVisibilityConverter}}">
                 <Fluent:Button
                             Header="Add folder" 
                             ToolTip="Add folder"
