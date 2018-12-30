@@ -23,12 +23,20 @@ namespace EasyPlaylist.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Control _beforeDisableFocusedObject;
+
         public MainWindow()
         {
             InitializeComponent();
 
             DataContext = new MainViewModel();
         }
+
+        //private void gif_MediaEnded(object sender, RoutedEventArgs e)
+        //{
+        //    gif.Position = new TimeSpan(0, 0, 1);
+        //    gif.Play();
+        //}
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {

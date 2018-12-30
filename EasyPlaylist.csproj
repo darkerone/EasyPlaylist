@@ -172,6 +172,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WpfAnimatedGif, Version=1.4.17.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\WpfAnimatedGif.1.4.17\lib\net\WpfAnimatedGif.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -190,6 +193,8 @@
     <Compile Include="Converters\NullToFalseConverter.cs" />
     <Compile Include="Converters\FalseToHiddenVisibilityConverter.cs" />
     <Compile Include="Enums\ExistsInPlaylistStatusEnum.cs" />
+    <Compile Include="Events\EnableLoaderPayload.cs" />
+    <Compile Include="Events\RequestEnableLoaderEvent.cs" />
     <Compile Include="Events\SelectedItemsChangedEvent.cs" />
     <Compile Include="Events\MenuItemCollectionChangedEvent.cs" />
     <Compile Include="KeysJsonConverter.cs" />
@@ -363,6 +368,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icones\RefreshWebView.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Loader.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

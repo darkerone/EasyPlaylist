@@ -229,6 +229,8 @@ namespace EasyPlaylist.ViewModels
         /// <param name="predicate">Prédicat pour la recherche. Si null, aucun item ne sera mis en valeur</param>
         public void DoSearch(Func<MenuItemViewModel, bool> predicate)
         {
+            EventAggregator.GetEvent<RequestEnableLoaderEvent>().Publish(new EnableLoaderPayload(this, true));
+
             List<MenuItemViewModel> items = RootFolder.GetItems(true);
             // Rend tous les fichiers/dossiers non importants
             foreach (MenuItemViewModel item in items)
@@ -254,6 +256,8 @@ namespace EasyPlaylist.ViewModels
                     item.IsImportant = true;
                 }
             }
+
+            EventAggregator.GetEvent<RequestEnableLoaderEvent>().Publish(new EnableLoaderPayload(this, false));
         }
 
         /// <summary>

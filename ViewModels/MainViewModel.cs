@@ -79,16 +79,21 @@ namespace EasyPlaylist.ViewModels
 
         private FileSystemWatcher _watcher;
 
-        private bool _isIhmEnabled = false;
-        public bool IsIhmEnabled
+        private bool _isLoaderEnabled = false;
+        public bool IsLoaderEnabled
         {
-            get { return _isIhmEnabled; }
+            get { return _isLoaderEnabled; }
             set
             {
-                _isIhmEnabled = value;
-                RaisePropertyChanged("IsIhmEnabled");
+                _isLoaderEnabled = value;
+                RaisePropertyChanged("IsLoaderEnabled");
             }
         }
+
+        /// <summary>
+        /// Dictionnaire associant les sender de demande de désactivation de l'IHM au nombre de demande (du même sender)
+        /// </summary>
+        private Dictionary<object, int> _enableLoaderRequests;
 
         #endregion
 
@@ -96,6 +101,7 @@ namespace EasyPlaylist.ViewModels
         {
             EventAggregator = new EventAggregator();
             _playlists = new ObservableCollection<PlaylistViewModel>();
+            _enableLoaderRequests = new Dictionary<object, int>();
 
             // =========
             // Playlists
@@ -116,16 +122,20 @@ namespace EasyPlaylist.ViewModels
                 CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
             });
             // Lorsque la sélection d'un item change
-            // TODO : recabler la publication de l'evenement qui se faisait lors du changement de selectedItem
             EventAggregator.GetEvent<SelectedItemsChangedEvent>().Subscribe((e) =>
             {
                 SetCanAddSelectedItemToSelectedPlaylist();
+            });
+            // Lorsqu'une demande d'activation/désactivation de l'IHM est reçu
+            EventAggregator.GetEvent<RequestEnableLoaderEvent>().Subscribe((e) =>
+            {
+                ManageLoader(e.Sender, e.EnableLoader, e.Force);
             });
 
             // Effectué après l'initialisation de l'explorer
             SelectedPlaylist = Playlists.FirstOrDefault();
 
-            IsIhmEnabled = true;
+            IsLoaderEnabled = false;
         }
 
         #region Events
@@ -670,7 +680,7 @@ namespace EasyPlaylist.ViewModels
         {
             // Stop watching.
             EnableFileWatcher(false);
-            EnableIhm(false);
+            ManageLoader(this, true);
 
             // Mémorise l'état des dossiers de l'explorer pour le rétablir après la mise à jour
             List<FolderViewModel> oldFolders = null;
@@ -698,7 +708,7 @@ namespace EasyPlaylist.ViewModels
 
             // Begin watching.
             EnableFileWatcher(true);
-            EnableIhm(true);
+            ManageLoader(this, false);
         }
 
         /// <summary>
@@ -711,12 +721,66 @@ namespace EasyPlaylist.ViewModels
         }
 
         /// <summary>
-        /// Active ou désactive l'IHM
+        /// Gère l'activation et la désactivation du loader en fonction des demandes.
+        /// Gère une liste de demande. Tant que des demandes d'activation existent, le loader s'affiche.
         /// </summary>
-        /// <param name="enable"></param>
-        private void EnableIhm(bool enable)
+        /// <param name="sender">Celui qui demande l'activation du lolader</param>
+        /// <param name="enableLoader">True pour activer, False pour désactiver</param>
+        /// <param name="force">Supprime les demandes précédentes et ne tient compte que de celle ci</param>
+        private void ManageLoader(object sender, bool enableLoader, bool force = false)
         {
-            IsIhmEnabled = enable;
+            if (force)
+            {
+                IsLoaderEnabled = enableLoader;
+                _enableLoaderRequests.Clear();
+            }
+            else
+            {
+                // Demande activation
+                if (enableLoader)
+                {
+                    // Si une demande d'activation existe
+                    if (_enableLoaderRequests.ContainsKey(sender))
+                    {
+                        // On incrémente son compteur
+                        _enableLoaderRequests[sender]++;
+                    }
+                    else
+                    {
+                        // On créé une demande d'activation
+                        _enableLoaderRequests.Add(sender, 1);
+                    }
+                }
+                // Demande désactivation
+                else
+                {
+                    // Si une demande d'activation existe
+                    if (_enableLoaderRequests.ContainsKey(sender))
+                    {
+                        // Retire une demande d'activation
+                        _enableLoaderRequests[sender]--;
+                    }
+                    // Si le compteur du sender est nul
+                    if (_enableLoaderRequests[sender] == 0)
+                    {
+                        // On le retire
+                        _enableLoaderRequests.Remove(sender);
+                    }
+                }
+            }
+
+            // S'il reste des demandes d'activation
+            if (_enableLoaderRequests.Any())
+            {
+                // On affiche le loader
+                IsLoaderEnabled = true;
+            }
+            else
+            {
+                // On masque le loader
+                IsLoaderEnabled = false;
+            }
+
             // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
             System.Windows.Forms.Application.DoEvents();
         }
