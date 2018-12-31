@@ -70,3 +70,4 @@ Il suffit d'ajouter les dossiers de gauche à droite puis d'exporter la playlist
 ## Fonctionnalités à implémenter
 - Undu/Redo
 - Sauvegarder les playlists individuellement
+- Export en mélangeant les fichiers (utiliser MixerAC)
