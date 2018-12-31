@@ -95,6 +95,11 @@ namespace EasyPlaylist.ViewModels
         /// </summary>
         private Dictionary<object, int> _enableLoaderRequests;
 
+        /// <summary>
+        /// Définit si l'explorer est en train dêtre raffraichi
+        /// </summary>
+        private bool _isExplorerRefreshing = false;
+
         #endregion
 
         public MainViewModel()
@@ -395,7 +400,7 @@ namespace EasyPlaylist.ViewModels
         /// <param name="playlistFileTagIDs"></param>
         public void CheckIfItemsExistInSelectedPlaylist(ExplorerViewModel explorerVM, PlaylistViewModel playlistVM)
         {
-            if (explorerVM != null)
+            if (explorerVM != null && !_isExplorerRefreshing)
             {
                 if(playlistVM != null)
                 {
@@ -681,6 +686,7 @@ namespace EasyPlaylist.ViewModels
             // Stop watching.
             EnableFileWatcher(false);
             ManageLoader(this, true);
+            _isExplorerRefreshing = true;
 
             // Mémorise l'état des dossiers de l'explorer pour le rétablir après la mise à jour
             List<FolderViewModel> oldFolders = null;
@@ -694,6 +700,9 @@ namespace EasyPlaylist.ViewModels
             Explorer = new ExplorerViewModel(EventAggregator, musicFolder.Title);
             Explorer.AddMenuItems(musicFolder.Items.ToList());
 
+            _isExplorerRefreshing = false;
+
+            // Doit être placé après _isExplorerRefreshing
             CheckIfItemsExistInSelectedPlaylist(Explorer, SelectedPlaylist);
 
             if (oldFolders != null)
