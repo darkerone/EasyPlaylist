@@ -67,6 +67,6 @@ Il suffit d'ajouter les dossiers de gauche à droite puis d'exporter la playlist
     - Bouton de suppression de l'élément de la playlist
   - Sélection multiple
   
-  ## Fonctionnalités à implémenter
-  - Undu/Redo
-  - Sauvegarder les playlists individuellement
+## Fonctionnalités à implémenter
+- Undu/Redo
+- Sauvegarder les playlists individuellement
