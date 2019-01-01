@@ -24,10 +24,12 @@
         <Grid Grid.ColumnSpan="100" Grid.RowSpan="100" Background="#33000000" 
               Visibility="{Binding IsLoaderEnabled, Converter={StaticResource FalseToCollapsedVisibilityConverter}}" 
               Panel.ZIndex="100">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Loading...</TextBlock>
-            <!--https://www.thomaslevesque.com/2011/03/27/wpf-display-an-animated-gif-image/-->
-            <!--https://github.com/XamlAnimatedGif/WpfAnimatedGif/-->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <!--https://www.thomaslevesque.com/2011/03/27/wpf-display-an-animated-gif-image/-->
+                <!--https://github.com/XamlAnimatedGif/WpfAnimatedGif/-->
                 <Image gif:ImageBehavior.AnimatedSource="pack://application:,,,/Resources/Loader.gif" Height="100" />
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding LoaderMessage}"></TextBlock>
+            </StackPanel>
         </Grid>
 
         <DockPanel Grid.Column="0" Panel.ZIndex="50">

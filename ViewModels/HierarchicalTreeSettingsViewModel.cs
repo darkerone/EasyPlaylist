@@ -11,6 +11,8 @@ namespace EasyPlaylist.ViewModels
 {
     class HierarchicalTreeSettingsViewModel : BaseViewModel
     {
+        #region Properties
+
         private string _name;
         public string Name
         {
@@ -36,6 +38,20 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private bool _exportRandomOrderPlaylist;
+        /// <summary>
+        /// Définit si la playlist doit être mélangée lors de l'export
+        /// </summary>
+        public bool ExportRandomOrderPlaylist
+        {
+            get { return _exportRandomOrderPlaylist; }
+            set
+            {
+                _exportRandomOrderPlaylist = value;
+                RaisePropertyChanged("ExportRandomOrderPlaylist");
+            }
+        }
+
         private string _errorMessage;
         [JsonIgnore]
         public string ErrorMessage
@@ -45,6 +61,24 @@ namespace EasyPlaylist.ViewModels
             {
                 _errorMessage = value;
                 RaisePropertyChanged("ErrorMessage");
+            }
+        }
+
+        #endregion
+
+        public HierarchicalTreeSettingsViewModel(HierarchicalTreeSettingsViewModel hierarchicalTreeSettings = null)
+        {
+            if(hierarchicalTreeSettings == null)
+            {
+                Name = "Unnamed";
+                ExportFlatPlaylist = false;
+                ExportRandomOrderPlaylist = false;
+            }
+            else
+            {
+                Name = hierarchicalTreeSettings.Name;
+                ExportFlatPlaylist = hierarchicalTreeSettings.ExportFlatPlaylist;
+                ExportRandomOrderPlaylist = hierarchicalTreeSettings.ExportRandomOrderPlaylist;
             }
         }
 

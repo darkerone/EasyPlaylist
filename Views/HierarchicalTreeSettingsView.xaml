@@ -30,11 +30,14 @@
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name" VerticalAlignment="Center"></TextBlock>
             <TextBox  Grid.Row="0" Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Flat playlist when exported:" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Flat playlist when exported" VerticalAlignment="Center"></TextBlock>
             <CheckBox Grid.Row="1" Grid.Column="1" Content="" IsChecked="{Binding ExportFlatPlaylist}" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
+            
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Export flat with random order" VerticalAlignment="Center"></TextBlock>
+            <CheckBox Grid.Row="2" Grid.Column="1" Content="" IsChecked="{Binding ExportRandomOrderPlaylist}" VerticalAlignment="Center" HorizontalAlignment="Center"></CheckBox>
         </Grid>
     </DockPanel>
 </UserControl>

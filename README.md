@@ -60,6 +60,7 @@ Il suffit d'ajouter les dossiers de gauche à droite puis d'exporter la playlist
   - Paramétrage
     - Nom
     - Export applati : récupère tous les fichiers de la playlist et les place dans le même dossier, sans arborescence
+    - Export en mélangeant les fichiers dans le cas d'un export aplati (un nombre est ajouté en préfix du nom du fichier)
   - Coloration en rouge des fichiers absents du disque dur
   - Menu contextuel
     - Bouton de renommage de l'élément sélectionné
@@ -70,4 +71,3 @@ Il suffit d'ajouter les dossiers de gauche à droite puis d'exporter la playlist
 ## Fonctionnalités à implémenter
 - Undu/Redo
 - Sauvegarder les playlists individuellement
-- Export en mélangeant les fichiers (utiliser MixerAC)

@@ -87,7 +87,8 @@ namespace EasyPlaylist.ViewModels
             Settings = new HierarchicalTreeSettingsViewModel()
             {
                 Name = name,
-                ExportFlatPlaylist = false
+                ExportFlatPlaylist = false,
+                ExportRandomOrderPlaylist = false
             };
             RootFolders = new ObservableCollection<MenuItemViewModel>();
             RootFolder = new RootFolderViewModel(eventAggregator, name, this);

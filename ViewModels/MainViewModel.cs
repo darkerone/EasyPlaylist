@@ -7,6 +7,7 @@ using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -90,6 +91,17 @@ namespace EasyPlaylist.ViewModels
             }
         }
 
+        private string _loaderMessage = "Loading...";
+        public string LoaderMessage
+        {
+            get { return _loaderMessage; }
+            set
+            {
+                _loaderMessage = value;
+                RaisePropertyChanged("LoaderMessage");
+            }
+        }
+
         /// <summary>
         /// Dictionnaire associant les sender de demande de désactivation de l'IHM au nombre de demande (du même sender)
         /// </summary>
@@ -134,7 +146,7 @@ namespace EasyPlaylist.ViewModels
             // Lorsqu'une demande d'activation/désactivation de l'IHM est reçu
             EventAggregator.GetEvent<RequestEnableLoaderEvent>().Subscribe((e) =>
             {
-                ManageLoader(e.Sender, e.EnableLoader, e.Force);
+                ManageLoader(e.Sender, e.EnableLoader, e.LoaderMessage, e.Force);
             });
 
             // Effectué après l'initialisation de l'explorer
@@ -268,6 +280,7 @@ namespace EasyPlaylist.ViewModels
                         {
                             PlaylistViewModel newPlaylist = new PlaylistViewModel(EventAggregator, namePopupViewModel.ItemName);
                             newPlaylist.Settings.ExportFlatPlaylist = SelectedPlaylist.Settings.ExportFlatPlaylist;
+                            newPlaylist.Settings.ExportRandomOrderPlaylist = SelectedPlaylist.Settings.ExportRandomOrderPlaylist;
                             newPlaylist.AddMenuItemsCopy(SelectedPlaylist.RootFolder.Items.ToList());
                             AddPlaylist(newPlaylist);
                             SelectedPlaylist = newPlaylist;
@@ -736,7 +749,7 @@ namespace EasyPlaylist.ViewModels
         /// <param name="sender">Celui qui demande l'activation du lolader</param>
         /// <param name="enableLoader">True pour activer, False pour désactiver</param>
         /// <param name="force">Supprime les demandes précédentes et ne tient compte que de celle ci</param>
-        private void ManageLoader(object sender, bool enableLoader, bool force = false)
+        private void ManageLoader(object sender, bool enableLoader, string loadingMessage = null, bool force = false)
         {
             if (force)
             {
@@ -778,6 +791,15 @@ namespace EasyPlaylist.ViewModels
                 }
             }
 
+            if(loadingMessage != null)
+            {
+                LoaderMessage = loadingMessage;
+            }
+            else
+            {
+                LoaderMessage = "Loading...";
+            }
+
             // S'il reste des demandes d'activation
             if (_enableLoaderRequests.Any())
             {
@@ -790,6 +812,7 @@ namespace EasyPlaylist.ViewModels
                 IsLoaderEnabled = false;
             }
 
+            
             // Force à repeindre l’écran sinon cela est fait trop tard. N'est pas une très bonne pratique.
             System.Windows.Forms.Application.DoEvents();
         }

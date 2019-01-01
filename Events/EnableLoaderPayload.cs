@@ -23,11 +23,17 @@ namespace EasyPlaylist.Events
         /// </summary>
         public bool Force { get; set; }
 
-        public EnableLoaderPayload(object sender, bool enableLoader, bool force = false)
+        /// <summary>
+        /// Définit le message affiché lors du chargement
+        /// </summary>
+        public string LoaderMessage { get; set; }
+
+        public EnableLoaderPayload(object sender, bool enableLoader, string loaderMessage = null, bool force = false)
         {
             Sender = sender;
             EnableLoader = enableLoader;
             Force = force;
+            LoaderMessage = loaderMessage;
         }
     }
 }

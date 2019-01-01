@@ -1,8 +1,10 @@
-﻿using EasyPlaylist.Views;
+﻿using EasyPlaylist.Events;
+using EasyPlaylist.Views;
 using Newtonsoft.Json;
 using Prism.Events;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -149,20 +151,13 @@ namespace EasyPlaylist.ViewModels
                                 {
                                     case MessageBoxResult.Yes:
                                         Directory.Delete(fbd.SelectedPath + "\\" + RootFolder.Title, true);
-                                        ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
+                                        ExportFoldersAndFilesAsync(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist, Settings.ExportRandomOrderPlaylist);
                                         break;
                                 }
                             }
                             else
                             {
-                                ExportFoldersAndFiles(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist);
-                            }
-                            MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{fbd.SelectedPath}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
-                            switch (exportedPlaylistMessageBoxResult)
-                            {
-                                case MessageBoxResult.Yes:
-                                    Process.Start(fbd.SelectedPath + "\\" + RootFolder.Title);
-                                    break;
+                                ExportFoldersAndFilesAsync(fbd.SelectedPath, RootFolder, Settings.ExportFlatPlaylist, Settings.ExportRandomOrderPlaylist);
                             }
                         }
                     }
@@ -183,11 +178,7 @@ namespace EasyPlaylist.ViewModels
                 {
                     HierarchicalTreeSettingsView playlistSettingsPopupView = new HierarchicalTreeSettingsView();
                     // Copie les paramètres (pour que le bouton "Cancel" puisse fonctionner)
-                    playlistSettingsPopupView.DataContext = new HierarchicalTreeSettingsViewModel()
-                    {
-                        Name = Settings.Name,
-                        ExportFlatPlaylist = Settings.ExportFlatPlaylist
-                    };
+                    playlistSettingsPopupView.DataContext = new HierarchicalTreeSettingsViewModel(Settings);
                     RadWindow radWindow = new RadWindow();
                     radWindow.Header = "Playlist settings";
                     radWindow.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
@@ -200,9 +191,8 @@ namespace EasyPlaylist.ViewModels
                         HierarchicalTreeSettingsViewModel hierarchicalTreeSettingsViewModel = hierarchicalTreeSettingsView.DataContext as HierarchicalTreeSettingsViewModel;
                         if (e.DialogResult == true)
                         {
-                            Settings.Name = hierarchicalTreeSettingsViewModel.Name;
+                            Settings = hierarchicalTreeSettingsViewModel;
                             RootFolder.Title = hierarchicalTreeSettingsViewModel.Name;
-                            Settings.ExportFlatPlaylist = hierarchicalTreeSettingsViewModel.ExportFlatPlaylist;
                             HasBeenModified = true;
                         }
                     };
@@ -253,10 +243,13 @@ namespace EasyPlaylist.ViewModels
         /// <summary>
         /// Exporte tout le contenu du dossier passé en paramètre dans le dossier de destination
         /// </summary>
-        /// <param name="destinationFolder"></param>
-        /// <param name="folderVM"></param>
-        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM, bool flatedPlaylist = false)
+        /// <param name="destinationFolder">Dossier de destination (un dossier sera créé)</param>
+        /// <param name="folderVM">Dossier à exporter</param>
+        /// <param name="flatedPlaylist">Définit si la playlist sera aplatie (tous les fichiers dans le même dossier racine)</param>
+        /// <param name="randomOrder">Si flatedPlaylist est True, définit si les fichiers seront préfixé d'un nombre pour les ordonnés de manière aléatoire</param>
+        private void ExportFoldersAndFiles(string destinationFolder, FolderViewModel folderVM, bool flatedPlaylist = false, bool randomOrder = false)
         {
+            
             // Créé le dossier
             bool success = folderVM.WriteFolder(destinationFolder);
 
@@ -267,8 +260,13 @@ namespace EasyPlaylist.ViewModels
                 // Dans le cas où l'on veut que tous les fichiers de la playlist soient exportés dans le dossier racine
                 if (flatedPlaylist)
                 {
-                    // Récupère tous les fichiers
-                    List<FileViewModel> filesToExport = folderVM.GetFiles(true);
+                    // Récupère une copie de tous les fichiers
+                    List<FileViewModel> filesToExport = folderVM.GetFiles(true).Select(x => (FileViewModel)x.GetItemCopy()).ToList();
+
+                    if (randomOrder)
+                    {
+                        filesToExport = RandomiseFileListByRenamming(filesToExport);
+                    }
 
                     // Ecris les fichiers
                     foreach (FileViewModel file in filesToExport)
@@ -281,7 +279,7 @@ namespace EasyPlaylist.ViewModels
                     // Créé les sous dossiers du dossier
                     foreach (FolderViewModel subFolderVM in folderVM.Items.OfType<FolderViewModel>())
                     {
-                        ExportFoldersAndFiles(folderPath, subFolderVM);
+                        ExportFoldersAndFilesAsync(folderPath, subFolderVM);
                     }
 
                     // Créé les fichiers du dossier
@@ -291,6 +289,77 @@ namespace EasyPlaylist.ViewModels
                     }
                 }
             }
+
+        }
+
+        /// <summary>
+        /// Exporte tout le contenu du dossier passé en paramètre dans le dossier de destination (Asynchrone)
+        /// </summary>
+        /// <param name="destinationFolder">Dossier de destination (un dossier sera créé)</param>
+        /// <param name="folderVM">Dossier à exporter</param>
+        /// <param name="flatedPlaylist">Définit si la playlist sera aplatie (tous les fichiers dans le même dossier racine)</param>
+        /// <param name="randomOrder">Si flatedPlaylist est True, définit si les fichiers seront préfixé d'un nombre pour les ordonnés de manière aléatoire</param>
+        private void ExportFoldersAndFilesAsync(string destinationFolder, FolderViewModel folderVM, bool flatedPlaylist = false, bool randomOrder = false)
+        {
+            EventAggregator.GetEvent<RequestEnableLoaderEvent>().Publish(new EnableLoaderPayload(this, true, "Exporting..."));
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = true;
+            worker.DoWork += (obj, e) => {
+                ExportFoldersAndFiles(destinationFolder, folderVM, flatedPlaylist, randomOrder);
+            };
+            worker.RunWorkerCompleted += (obj, e) => {
+                // Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{destinationFolder}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
+                    switch (exportedPlaylistMessageBoxResult)
+                    {
+                        case MessageBoxResult.Yes:
+                            Process.Start(destinationFolder + "\\" + folderVM.Title);
+                            break;
+                    }
+                });
+                EventAggregator.GetEvent<RequestEnableLoaderEvent>().Publish(new EnableLoaderPayload(this, false));
+            };
+            worker.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Renomme les fichiers en les préfixant d'un index tiré au sort et différent pour chaque fichier
+        /// </summary>
+        /// <param name="fileList"></param>
+        /// <returns></returns>
+        private List<FileViewModel> RandomiseFileListByRenamming(List<FileViewModel> fileList)
+        {
+            List<int> orderedIndexList = new List<int>();
+            List<int> randomIndexList = new List<int>();
+
+            // On créé une liste d'index comprenant autant d'élément qu'il y a de fichiers dans la liste
+            for (int i = 0; i < fileList.Count; i++)
+            {
+                orderedIndexList.Add(i + 1);
+            }
+
+            Random rnd = new Random();
+            // Tant que la liste temporaire des index n'est pas vide
+            while (orderedIndexList.Count != 0)
+            {
+                // On tire un nombre entre 0 et le nombre d'élément de la liste temporaire
+                int nb = rnd.Next(0, orderedIndexList.Count);
+                // On l'ajoute à la liste des index
+                randomIndexList.Add(orderedIndexList[nb]);
+                // On retire l'index de la liste temporaire
+                orderedIndexList.RemoveAt(nb);
+            }
+
+            foreach(int index in randomIndexList)
+            {
+                // Préfixe le nom du fichier avec l'index courant
+                fileList[index - 1].Title = randomIndexList[index - 1].ToString("D" + fileList.Count.ToString().Length) + "___" + fileList[index - 1].Title;
+            }
+
+            return fileList;
         }
 
         #endregion
