@@ -308,18 +308,19 @@ namespace EasyPlaylist.ViewModels
             worker.DoWork += (obj, e) => {
                 ExportFoldersAndFiles(destinationFolder, folderVM, flatedPlaylist, randomOrder);
             };
+            // TODO : afficher un message "completed" uniquement après que TOUS les dossiers aient été exporté
             worker.RunWorkerCompleted += (obj, e) => {
-                // Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{destinationFolder}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
-                    switch (exportedPlaylistMessageBoxResult)
-                    {
-                        case MessageBoxResult.Yes:
-                            Process.Start(destinationFolder + "\\" + folderVM.Title);
-                            break;
-                    }
-                });
+                //// Le thread du timer n'est pas le même que le thread de l'UI donc on demande à l'UI de faire le travail
+                //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                //{
+                //    MessageBoxResult exportedPlaylistMessageBoxResult = CustomMessageBox.Show($"Playlist exported to \"{destinationFolder}\". Do you want to open it ?", "Playlist exported successfully", MessageBoxButton.YesNo);
+                //    switch (exportedPlaylistMessageBoxResult)
+                //    {
+                //        case MessageBoxResult.Yes:
+                //            Process.Start(destinationFolder + "\\" + folderVM.Title);
+                //            break;
+                //    }
+                //});
                 EventAggregator.GetEvent<RequestEnableLoaderEvent>().Publish(new EnableLoaderPayload(this, false));
             };
             worker.RunWorkerAsync();
